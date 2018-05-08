@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"os"
+	"github.com/six519/titik2/info"
+)
 
 func main() {
-	fmt.Println("Hello Titik!")
+	if(len(os.Args) < 2) {
+		info.Help(os.Args[0])
+		os.Exit(1)
+	}
 }
