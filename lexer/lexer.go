@@ -57,6 +57,8 @@ func (lexer Lexer) GenerateToken() ([]map[string]string, error) {
 					//get word
 					if(unicode.IsLetter([]rune(currentChar)[0]) || currentChar == "_") {
 						//alphabetic or underscore
+					} else if(currentChar == "\t") {
+						//tab
 					} else {
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
