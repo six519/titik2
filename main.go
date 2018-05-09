@@ -2,7 +2,9 @@ package main
 
 import (
 	"os"
+	"fmt"
 	"github.com/six519/titik2/info"
+	"github.com/six519/titik2/lexer"
 )
 
 func main() {
@@ -18,5 +20,14 @@ func main() {
 	} else if (os.Args[1] == "-i") {
 	} else {
 		//open titik file
+		lxr := lexer.Lexer{FileName: os.Args[1]}
+		fileErr := lxr.ReadSourceFile()
+
+		if (fileErr != nil) {
+			fmt.Println(fileErr)
+			os.Exit(1)
+		}
+
+		//generate token below
 	}
 }
