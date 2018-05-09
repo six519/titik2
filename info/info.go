@@ -3,6 +3,8 @@ package info
 import (
 	"fmt"
 	"runtime"
+	"bytes"
+	"strconv"
 )
 
 const TITIK_APP_NAME string = "Titik"
@@ -24,4 +26,19 @@ func Version() {
     fmt.Printf("%s %s\n", TITIK_APP_NAME, TITIK_STRING_VERSION);
 	fmt.Printf("By: %s\n", TITIK_AUTHOR);
 	fmt.Printf("Operating System: %s\n", runtime.GOOS);
+}
+
+func TokenErrorMessage(lineNumber int, columnNumber int, description string, fileName string) string{
+	var strBuffer bytes.Buffer
+
+	strBuffer.WriteString("Token error on line number ")
+	strBuffer.WriteString(strconv.Itoa(lineNumber))
+	strBuffer.WriteString(" and column number ")
+	strBuffer.WriteString(strconv.Itoa(columnNumber))
+	strBuffer.WriteString(", Error description: ")
+	strBuffer.WriteString(description)
+	strBuffer.WriteString(", Filename: ")
+	strBuffer.WriteString(fileName)
+
+	return strBuffer.String()
 }

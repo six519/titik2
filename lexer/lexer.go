@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"errors"
 	"unicode"
+	"github.com/six519/titik2/info"
 	//"fmt"
 )
 
@@ -57,7 +58,7 @@ func (lexer Lexer) GenerateToken() ([]map[string]string, error) {
 					if(unicode.IsLetter([]rune(currentChar)[0]) || currentChar == "_") {
 						//alphabetic or underscore
 					} else {
-
+						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
 				case TOKENIZER_STATE_GET_SINGLE_COMMENT:
 					//get single comment
