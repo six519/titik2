@@ -9,6 +9,9 @@ const TITIK_APP_NAME string = "Titik"
 const TITIK_STRING_VERSION string = "2.0.0"
 const TITIK_AUTHOR string = "Ferdinand E. Silva"
 
+const TOKEN_ERROR int = 10
+const SYNTAX_ERROR int = 11
+
 func Help(exeName string) {
 	fmt.Printf("Usage: %s [-options] filename.ttk\n", exeName)
 	fmt.Printf("\nwhere options include:\n")

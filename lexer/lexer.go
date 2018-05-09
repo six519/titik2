@@ -29,4 +29,10 @@ func (lexer Lexer) ReadSourceFile() error {
 	}
 
 	return nil
-} 
+}
+
+func (lexer Lexer) GenerateToken() ([]map[string]string, error) {
+	var tokenArray []map[string]string
+
+	return tokenArray, nil
+}

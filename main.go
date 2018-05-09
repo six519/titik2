@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+
 	if(len(os.Args) < 2) {
 		info.Help(os.Args[0])
 		os.Exit(1)
@@ -29,5 +30,14 @@ func main() {
 		}
 
 		//generate token below
+		tokenArray, tokenErr := lxr.GenerateToken()
+
+		if (tokenErr != nil) {
+			fmt.Println(tokenErr)
+			os.Exit(info.TOKEN_ERROR)
+		}
+
+		fmt.Println(tokenArray) //:TEMPORARY
+
 	}
 }
