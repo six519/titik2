@@ -7,6 +7,14 @@ import (
 	//"fmt"
 )
 
+//Tokenizer States
+const TOKENIZER_STATE_GET_WORD int = 0
+const TOKENIZER_STATE_GET_SINGLE_COMMENT int = 1
+const TOKENIZER_STATE_GET_MULTI_COMMENT int = 2
+const TOKENIZER_STATE_GET_STRING int = 3
+const TOKENIZER_STATE_GET_FLOAT int = 4
+
+//lexer object
 type Lexer struct {
 	FileName string
 	fileContents []string
@@ -34,12 +42,28 @@ func (lexer *Lexer) ReadSourceFile() error {
 
 func (lexer Lexer) GenerateToken() ([]map[string]string, error) {
 	var tokenArray []map[string]string
+	tokenizerState := TOKENIZER_STATE_GET_WORD
 
 	//read the file contents line by line
 	for x := 0; x < len(lexer.fileContents); x++ {
 		//read character by character
 		for x2 := 0; x2 < len(lexer.fileContents[x]); x2++ {
 			//string(lexer.fileContents[x][x2])
+
+			switch(tokenizerState) {
+				case TOKENIZER_STATE_GET_WORD:
+					//get word
+				case TOKENIZER_STATE_GET_SINGLE_COMMENT:
+					//get single comment
+				case TOKENIZER_STATE_GET_MULTI_COMMENT:
+					//get multi comment
+				case TOKENIZER_STATE_GET_STRING:
+					//get string
+				case TOKENIZER_STATE_GET_FLOAT:
+					//get float
+				default:
+					continue
+			}
 		}
 	}
 
