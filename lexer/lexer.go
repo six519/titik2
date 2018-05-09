@@ -4,6 +4,7 @@ import (
 	"os"
 	"bufio"
 	"errors"
+	"unicode"
 	//"fmt"
 )
 
@@ -48,11 +49,16 @@ func (lexer Lexer) GenerateToken() ([]map[string]string, error) {
 	for x := 0; x < len(lexer.fileContents); x++ {
 		//read character by character
 		for x2 := 0; x2 < len(lexer.fileContents[x]); x2++ {
-			//string(lexer.fileContents[x][x2])
+			currentChar := string(lexer.fileContents[x][x2])
 
 			switch(tokenizerState) {
 				case TOKENIZER_STATE_GET_WORD:
 					//get word
+					if(unicode.IsLetter([]rune(currentChar)[0]) || currentChar == "_") {
+						//alphabetic or underscore
+					} else {
+
+					}
 				case TOKENIZER_STATE_GET_SINGLE_COMMENT:
 					//get single comment
 				case TOKENIZER_STATE_GET_MULTI_COMMENT:
