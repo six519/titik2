@@ -37,10 +37,10 @@ func (lexer Lexer) GenerateToken() ([]map[string]string, error) {
 
 	//read the file contents line by line
 	for x := 0; x < len(lexer.fileContents); x++ {
-		/*
-		fmt.Println(lexer.fileContents[x])
-		fmt.Printf("Line #%d \n", x + 1)
-		*/
+		//read character by character
+		for x2 := 0; x2 < len(lexer.fileContents[x]); x2++ {
+			//string(lexer.fileContents[x][x2])
+		}
 	}
 
 	return tokenArray, nil
