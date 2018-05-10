@@ -52,6 +52,8 @@ const TOKEN_TYPE_TAB int = 31
 const TOKEN_TYPE_CARRIAGE_RETURN int = 32
 const TOKEN_TYPE_NONE = 33
 
+//Token Types String
+
 //lexer object
 type Lexer struct {
 	FileName string
