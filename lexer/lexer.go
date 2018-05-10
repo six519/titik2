@@ -61,9 +61,11 @@ type Token struct {
 	Column int
 }
 
-func initToken(tokenArray *[]Token, isTokenInit *bool, lineNumber int, colNumber int, tokenType int, tokenFileName string) {
-	token := Token{Value: "", FileName: tokenFileName, Type: tokenType, Line: lineNumber, Column: colNumber}
+//function helper
+func setToken(initToken bool, tokenArray *[]Token, isTokenInit *bool, lineNumber int, colNumber int, tokenType int, tokenFileName string, tokenValue string) {
+	token := Token{Value: tokenValue, FileName: tokenFileName, Type: tokenType, Line: lineNumber, Column: colNumber}
 	*tokenArray = append(*tokenArray, token)
+	*isTokenInit = initToken
 }
 
 //lexer object
@@ -108,16 +110,24 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					//get word
 					if(unicode.IsLetter([]rune(currentChar)[0]) || currentChar == "_") {
 						//alphabetic or underscore
-
-						if(!isTokenInit) {
-							initToken(&tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_IDENTIFIER, lexer.FileName)
+						if(len(tokenArray) > 0) {
+							if(tokenArray[len(tokenArray) - 1].Type == TOKEN_TYPE_INTEGER) {
+								isTokenInit = false
+							}
 						}
+						if(!isTokenInit) {
+							setToken(true, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_IDENTIFIER, lexer.FileName, "") //init token
+						}
+						tokenArray[len(tokenArray) - 1].Value += currentChar
 					} else if(currentChar == "\n") {
 						//new line
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_NEWLINE, lexer.FileName, currentChar) //set token
 					} else if(currentChar == "\t") {
 						//tab
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_TAB, lexer.FileName, currentChar) //set token
 					} else if(currentChar == " ") {
 						//space
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_SPACE, lexer.FileName, currentChar) //set token
 					} else {
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
