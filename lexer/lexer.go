@@ -16,6 +16,42 @@ const TOKENIZER_STATE_GET_MULTI_COMMENT int = 2
 const TOKENIZER_STATE_GET_STRING int = 3
 const TOKENIZER_STATE_GET_FLOAT int = 4
 
+//Token Types
+const TOKEN_TYPE_IDENTIFIER int = 0
+const TOKEN_TYPE_PERIOD int = 1
+const TOKEN_TYPE_KEYWORD int = 2
+const TOKEN_TYPE_SPACE int = 3
+const TOKEN_TYPE_OPEN_PARENTHESIS int = 4
+const TOKEN_TYPE_CLOSE_PARENTHESIS int = 5
+const TOKEN_TYPE_SINGLE_COMMENT int = 6
+const TOKEN_TYPE_MULTI_COMMENT int = 7
+const TOKEN_TYPE_CLOSE_MULTI_COMMENT int = 8
+const TOKEN_TYPE_NEWLINE int = 9
+const TOKEN_TYPE_EQUALS int = 10
+const TOKEN_TYPE_STRING int = 11
+const TOKEN_TYPE_CLOSE_STRING int = 12
+const TOKEN_TYPE_INTEGER int = 13
+const TOKEN_TYPE_FLOAT int = 14
+const TOKEN_TYPE_PLUS int = 15
+const TOKEN_TYPE_MINUS int = 16
+const TOKEN_TYPE_DIVIDE int = 17
+const TOKEN_TYPE_MULTIPLY int = 18
+const TOKEN_TYPE_COLON int = 19
+const TOKEN_TYPE_SEMI_COLON int = 20
+const TOKEN_TYPE_COMMA int = 21
+const TOKEN_TYPE_OPEN_BRACKET int = 22
+const TOKEN_TYPE_CLOSE_BRACKET int = 23
+const TOKEN_TYPE_OPEN_BRACES int = 24
+const TOKEN_TYPE_CLOSE_BRACES int = 25
+const TOKEN_TYPE_AMPERSAND int = 26
+const TOKEN_TYPE_GREATER_THAN int = 27
+const TOKEN_TYPE_LESS_THAN int = 28
+const TOKEN_TYPE_OR int = 29
+const TOKEN_TYPE_EXCLAMATION int = 30
+const TOKEN_TYPE_TAB int = 31
+const TOKEN_TYPE_CARRIAGE_RETURN int = 32
+const TOKEN_TYPE_NONE = 33
+
 //lexer object
 type Lexer struct {
 	FileName string
@@ -59,6 +95,8 @@ func (lexer Lexer) GenerateToken() ([]map[string]string, error) {
 						//alphabetic or underscore
 					} else if(currentChar == "\t") {
 						//tab
+					} else if(currentChar == " ") {
+						//space
 					} else {
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
