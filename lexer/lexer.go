@@ -70,7 +70,7 @@ func (lexer *Lexer) ReadSourceFile() error {
 		scanner.Split(bufio.ScanLines)
 
 		for scanner.Scan() {
-			lexer.fileContents = append(lexer.fileContents, scanner.Text())
+			lexer.fileContents = append(lexer.fileContents, scanner.Text() + "\n")
 		}
 
 	} else {
@@ -83,6 +83,7 @@ func (lexer *Lexer) ReadSourceFile() error {
 func (lexer Lexer) GenerateToken() ([]map[string]string, error) {
 	var tokenArray []map[string]string
 	tokenizerState := TOKENIZER_STATE_GET_WORD
+	isTokenInit := false
 
 	//read the file contents line by line
 	for x := 0; x < len(lexer.fileContents); x++ {
@@ -95,6 +96,12 @@ func (lexer Lexer) GenerateToken() ([]map[string]string, error) {
 					//get word
 					if(unicode.IsLetter([]rune(currentChar)[0]) || currentChar == "_") {
 						//alphabetic or underscore
+
+						if(!isTokenInit) {
+
+						}
+					} else if(currentChar == "\n") {
+						//new line
 					} else if(currentChar == "\t") {
 						//tab
 					} else if(currentChar == " ") {
