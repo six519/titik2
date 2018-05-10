@@ -52,6 +52,15 @@ const TOKEN_TYPE_TAB int = 31
 const TOKEN_TYPE_CARRIAGE_RETURN int = 32
 const TOKEN_TYPE_NONE = 33
 
+//token object
+type Token struct {
+	Value string
+	FileName string
+	Type int
+	Line int
+	Column int
+}
+
 //lexer object
 type Lexer struct {
 	FileName string
@@ -78,8 +87,8 @@ func (lexer *Lexer) ReadSourceFile() error {
 	return nil
 }
 
-func (lexer Lexer) GenerateToken() ([]map[string]string, error) {
-	var tokenArray []map[string]string
+func (lexer Lexer) GenerateToken() ([]Token, error) {
+	var tokenArray []Token
 	tokenizerState := TOKENIZER_STATE_GET_WORD
 	isTokenInit := false
 
