@@ -61,6 +61,11 @@ type Token struct {
 	Column int
 }
 
+func initToken(tokenArray *[]Token, isTokenInit *bool, lineNumber int, colNumber int, tokenType int, tokenFileName string) {
+	token := Token{Value: "", FileName: tokenFileName, Type: tokenType, Line: lineNumber, Column: colNumber}
+	*tokenArray = append(*tokenArray, token)
+}
+
 //lexer object
 type Lexer struct {
 	FileName string
@@ -105,7 +110,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						//alphabetic or underscore
 
 						if(!isTokenInit) {
-
+							initToken(&tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_IDENTIFIER, lexer.FileName)
 						}
 					} else if(currentChar == "\n") {
 						//new line
