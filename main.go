@@ -37,7 +37,7 @@ func main() {
 			os.Exit(info.TOKEN_ERROR)
 		}
 
-		fmt.Println(tokenArray) //:TEMPORARY
+		lexer.DumpToken(tokenArray) //:TEMPORARY
 
 	}
 }
