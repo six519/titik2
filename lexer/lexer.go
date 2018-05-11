@@ -308,6 +308,12 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					}
 				case TOKENIZER_STATE_GET_SINGLE_COMMENT:
 					//get single comment
+					if(currentChar == "\n") {
+						tokenizerState = TOKENIZER_STATE_GET_WORD
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_NEWLINE, lexer.FileName, currentChar) //set token
+					} else {
+						tokenArray[len(tokenArray) - 1].Value += currentChar
+					}
 				case TOKENIZER_STATE_GET_MULTI_COMMENT:
 					//get multi comment
 				case TOKENIZER_STATE_GET_STRING:
