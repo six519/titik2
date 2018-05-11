@@ -183,6 +183,8 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var tokenArray []Token
 	tokenizerState := TOKENIZER_STATE_GET_WORD
 	isTokenInit := false
+	usePeriod := true
+	//withPeriod := false
 
 	//read the file contents line by line
 	for x := 0; x < len(lexer.fileContents); x++ {
@@ -228,6 +230,18 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else if(currentChar == "*") {
 						//multiply
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_MULTIPLY, lexer.FileName, currentChar) //set token
+					} else if(currentChar == ".") {
+						//period
+						usePeriod = true
+						if(len(tokenArray) > 0) {
+							if(tokenArray[len(tokenArray) - 1].Type == TOKEN_TYPE_INTEGER) {
+								tokenizerState = TOKENIZER_STATE_GET_FLOAT
+								usePeriod = false
+							}
+						}
+						if(usePeriod) {
+							setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_PERIOD, lexer.FileName, currentChar) //set token
+						}
 					} else {
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
