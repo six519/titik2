@@ -140,6 +140,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else if(currentChar == "/") {
 						//divide
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_DIVIDE, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "*") {
+						//multiply
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_MULTIPLY, lexer.FileName, currentChar) //set token
 					} else {
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
