@@ -302,7 +302,6 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						}
 						tokenArray[len(tokenArray) - 1].Value += currentChar
 					} else {
-						fmt.Printf("The current char is: %s\n", currentChar)
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
 				case TOKENIZER_STATE_GET_SINGLE_COMMENT:
