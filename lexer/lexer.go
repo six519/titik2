@@ -192,6 +192,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 		for x2 := 0; x2 < len(lexer.fileContents[x]); x2++ {
 			currentChar := string(lexer.fileContents[x][x2])
 
+			switch_label:
 			switch(tokenizerState) {
 				case TOKENIZER_STATE_GET_WORD:
 					//get word
@@ -301,6 +302,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						}
 						tokenArray[len(tokenArray) - 1].Value += currentChar
 					} else {
+						fmt.Printf("The current char is: %s\n", currentChar)
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
 				case TOKENIZER_STATE_GET_SINGLE_COMMENT:
@@ -311,6 +313,22 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					//get string
 				case TOKENIZER_STATE_GET_FLOAT:
 					//get float
+					if(unicode.IsDigit([]rune(currentChar)[0])) {
+						if(!withPeriod) {
+							withPeriod = true
+							tokenArray[len(tokenArray) - 1].Value += "."
+							tokenArray[len(tokenArray) - 1].Type = TOKEN_TYPE_FLOAT
+						}
+
+						tokenArray[len(tokenArray) - 1].Value += currentChar
+					} else {
+						if(!withPeriod) {
+							setToken(false, &tokenArray, &isTokenInit, x + 1, x2, TOKEN_TYPE_PERIOD, lexer.FileName, ".") //set token
+						}
+						tokenizerState = TOKENIZER_STATE_GET_WORD
+						isTokenInit = false
+						goto switch_label
+					}
 				default:
 					continue
 			}
