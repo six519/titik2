@@ -185,6 +185,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	isTokenInit := false
 	usePeriod := true
 	withPeriod := false
+	stringOpener := "\""
 
 	//read the file contents line by line
 	for x := 0; x < len(lexer.fileContents); x++ {
@@ -285,6 +286,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_OR, lexer.FileName, currentChar) //set token
 					} else if(currentChar == "'" || currentChar == "\"") {
 						//string
+						stringOpener = currentChar
 						setToken(true, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_STRING, lexer.FileName, "") //init token
 						tokenizerState = TOKENIZER_STATE_GET_STRING
 					} else if(currentChar == "#") {
@@ -310,6 +312,12 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					//get multi comment
 				case TOKENIZER_STATE_GET_STRING:
 					//get string
+					if(currentChar == stringOpener) {
+						tokenizerState = TOKENIZER_STATE_GET_WORD
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_CLOSE_STRING, lexer.FileName, currentChar) //set token
+					} else {
+						tokenArray[len(tokenArray) - 1].Value += currentChar
+					}
 				case TOKENIZER_STATE_GET_FLOAT:
 					//get float
 					if(unicode.IsDigit([]rune(currentChar)[0])) {
