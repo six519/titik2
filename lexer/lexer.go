@@ -316,6 +316,12 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					}
 				case TOKENIZER_STATE_GET_MULTI_COMMENT:
 					//get multi comment
+					if(currentChar == "\\") {
+						tokenizerState = TOKENIZER_STATE_GET_WORD
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_CLOSE_MULTI_COMMENT, lexer.FileName, currentChar) //set token
+					} else {
+						tokenArray[len(tokenArray) - 1].Value += currentChar
+					}
 				case TOKENIZER_STATE_GET_STRING:
 					//get string
 					if(currentChar == stringOpener) {
