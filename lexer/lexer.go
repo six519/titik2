@@ -184,7 +184,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	tokenizerState := TOKENIZER_STATE_GET_WORD
 	isTokenInit := false
 	usePeriod := true
-	//withPeriod := false
+	withPeriod := false
 
 	//read the file contents line by line
 	for x := 0; x < len(lexer.fileContents); x++ {
@@ -233,6 +233,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else if(currentChar == ".") {
 						//period
 						usePeriod = true
+						withPeriod = false
 						if(len(tokenArray) > 0) {
 							if(tokenArray[len(tokenArray) - 1].Type == TOKEN_TYPE_INTEGER) {
 								tokenizerState = TOKENIZER_STATE_GET_FLOAT
@@ -281,6 +282,24 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else if(currentChar == "|") {
 						//or
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_OR, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "'" || currentChar == "\"") {
+						//string
+						setToken(true, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_STRING, lexer.FileName, "") //init token
+						tokenizerState = TOKENIZER_STATE_GET_STRING
+					} else if(currentChar == "#") {
+						//start of single line comment
+						setToken(true, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_SINGLE_COMMENT, lexer.FileName, "") //init token
+						tokenizerState = TOKENIZER_STATE_GET_SINGLE_COMMENT
+					} else if(currentChar == "\\") {
+						//start of multiline comment
+						setToken(true, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_MULTI_COMMENT, lexer.FileName, "") //init token
+						tokenizerState = TOKENIZER_STATE_GET_MULTI_COMMENT
+					} else if(unicode.IsDigit([]rune(currentChar)[0])) {
+						//integer
+						if(!isTokenInit) {
+							setToken(true, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_INTEGER, lexer.FileName, "") //init token
+						}
+						tokenArray[len(tokenArray) - 1].Value += currentChar
 					} else {
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
