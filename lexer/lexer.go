@@ -128,6 +128,18 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else if(currentChar == " ") {
 						//space
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_SPACE, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "=") {
+						//equals
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_EQUALS, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "+") {
+						//plus
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_PLUS, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "-") {
+						//minus
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_MINUS, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "/") {
+						//divide
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_DIVIDE, lexer.FileName, currentChar) //set token
 					} else {
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
