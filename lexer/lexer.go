@@ -248,6 +248,18 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else if(currentChar == ")") {
 						//close parenthesis
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_CLOSE_PARENTHESIS, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "{") {
+						//open bracket
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_OPEN_BRACKET, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "}") {
+						//close brackeT
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_CLOSE_BRACKET, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "[") {
+						//open braces
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_OPEN_BRACES, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "]") {
+						//close braces
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_CLOSE_BRACES, lexer.FileName, currentChar) //set token
 					} else {
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
