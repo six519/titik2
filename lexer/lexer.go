@@ -260,6 +260,27 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else if(currentChar == "]") {
 						//close braces
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_CLOSE_BRACES, lexer.FileName, currentChar) //set token
+					} else if(currentChar == ":") {
+						//colon
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_COLON, lexer.FileName, currentChar) //set token
+					} else if(currentChar == ",") {
+						//comma
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_COMMA, lexer.FileName, currentChar) //set token
+					} else if(currentChar == ";") {
+						//semi colon
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_SEMI_COLON, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "&") {
+						//ampersand
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_AMPERSAND, lexer.FileName, currentChar) //set token
+					} else if(currentChar == ">") {
+						//greater than
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_GREATER_THAN, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "<") {
+						//less than
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_LESS_THAN, lexer.FileName, currentChar) //set token
+					} else if(currentChar == "|") {
+						//or
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_OR, lexer.FileName, currentChar) //set token
 					} else {
 						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
