@@ -147,6 +147,7 @@ func (lexer *Lexer) ReadSourceFile() error {
 
 func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var tokenArray []Token
+	var finalTokenArray []Token
 	tokenizerState := TOKENIZER_STATE_GET_WORD
 	isTokenInit := false
 	usePeriod := true
@@ -270,7 +271,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						}
 						tokenArray[len(tokenArray) - 1].Value += currentChar
 					} else {
-						return tokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
+						return finalTokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
 				case TOKENIZER_STATE_GET_SINGLE_COMMENT:
 					//get single comment
@@ -329,14 +330,26 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			}
 		} else if(tokenArray[x].Type == TOKEN_TYPE_STRING) {
 			if(!((x+1) < len(tokenArray))) {
-				return tokenArray, errors.New(info.TokenErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of string", lexer.FileName))
+				return finalTokenArray, errors.New(info.TokenErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of string", lexer.FileName))
 			}
 		} else if(tokenArray[x].Type == TOKEN_TYPE_MULTI_COMMENT) {
 			if(!((x+1) < len(tokenArray))) {
-				return tokenArray, errors.New(info.TokenErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of multi line comment", lexer.FileName))
+				return finalTokenArray, errors.New(info.TokenErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of multi line comment", lexer.FileName))
 			}
+		}
+
+		if(x != 0 && (tokenArray[x].Type == TOKEN_TYPE_FLOAT || tokenArray[x].Type == TOKEN_TYPE_INTEGER)) {
+			if(tokenArray[x - 1].Type == TOKEN_TYPE_MINUS) {
+				//set to negative number
+				finalTokenArray[len(finalTokenArray) - 1].Value += tokenArray[x].Value
+				finalTokenArray[len(finalTokenArray) - 1].Type = tokenArray[x].Type
+			} else {
+				finalTokenArray = append(finalTokenArray, tokenArray[x])
+			}
+		} else {
+			finalTokenArray = append(finalTokenArray, tokenArray[x])
 		}
 	}
 
-	return tokenArray, nil
+	return finalTokenArray, nil
 }
