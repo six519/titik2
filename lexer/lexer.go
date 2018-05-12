@@ -6,6 +6,7 @@ import (
 	"errors"
 	"unicode"
 	"github.com/six519/titik2/info"
+	"github.com/six519/titik2/reserved"
 	"fmt"
 )
 
@@ -319,7 +320,15 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 		}
 	}
 
-	
+	//token cleanup 
+	for x := 0; x < len(tokenArray); x++ {
+		if(tokenArray[x].Type == TOKEN_TYPE_IDENTIFIER) {
+			if(reserved.IsReservedWord(tokenArray[x].Value)) {
+				//Convert identifier to keyword if existing in reserved words
+				tokenArray[x].Type = TOKEN_TYPE_KEYWORD
+			}
+		}
+	}
 
 	return tokenArray, nil
 }
