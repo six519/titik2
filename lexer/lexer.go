@@ -52,6 +52,44 @@ const TOKEN_TYPE_TAB int = 31
 const TOKEN_TYPE_CARRIAGE_RETURN int = 32
 const TOKEN_TYPE_NONE = 33
 
+//for debugging purpose only
+var TOKEN_TYPES_STRING = []string {
+	"TOKEN_TYPE_IDENTIFIER",
+	"TOKEN_TYPE_PERIOD",
+	"TOKEN_TYPE_KEYWORD",
+	"TOKEN_TYPE_SPACE",
+	"TOKEN_TYPE_OPEN_PARENTHESIS",
+	"TOKEN_TYPE_CLOSE_PARENTHESIS",
+	"TOKEN_TYPE_SINGLE_COMMENT",
+	"TOKEN_TYPE_MULTI_COMMENT",
+	"TOKEN_TYPE_CLOSE_MULTI_COMMENT",
+	"TOKEN_TYPE_NEWLINE",
+	"TOKEN_TYPE_EQUALS",
+	"TOKEN_TYPE_STRING",
+	"TOKEN_TYPE_CLOSE_STRING",
+	"TOKEN_TYPE_INTEGER",
+	"TOKEN_TYPE_FLOAT",
+	"TOKEN_TYPE_PLUS",
+	"TOKEN_TYPE_MINUS",
+	"TOKEN_TYPE_DIVIDE",
+	"TOKEN_TYPE_MULTIPLY",
+	"TOKEN_TYPE_COLON",
+	"TOKEN_TYPE_SEMI_COLON",
+	"TOKEN_TYPE_COMMA",
+	"TOKEN_TYPE_OPEN_BRACKET",
+	"TOKEN_TYPE_CLOSE_BRACKET",
+	"TOKEN_TYPE_OPEN_BRACES",
+	"TOKEN_TYPE_CLOSE_BRACES",
+	"TOKEN_TYPE_AMPERSAND",
+	"TOKEN_TYPE_GREATER_THAN",
+	"TOKEN_TYPE_LESS_THAN",
+	"TOKEN_TYPE_OR",
+	"TOKEN_TYPE_EXCLAMATION",
+	"TOKEN_TYPE_TAB",
+	"TOKEN_TYPE_CARRIAGE_RETURN",
+	"TOKEN_TYPE_NONE",
+}
+
 //token object
 type Token struct {
 	Value string
@@ -72,80 +110,7 @@ func DumpToken(tokenArray []Token) {
 	fmt.Printf("====================================\n")
 
 	for x := 0; x < len(tokenArray); x++ {
-		tokenType := ""
-
-		switch(tokenArray[x].Type) {
-			case TOKEN_TYPE_IDENTIFIER:
-				tokenType = "TOKEN_TYPE_IDENTIFIER"
-			case TOKEN_TYPE_PERIOD:
-				tokenType = "TOKEN_TYPE_PERIOD"
-			case TOKEN_TYPE_KEYWORD:
-				tokenType = "TOKEN_TYPE_KEYWORD"
-			case TOKEN_TYPE_SPACE:
-				tokenType = "TOKEN_TYPE_SPACE"
-			case TOKEN_TYPE_OPEN_PARENTHESIS:
-				tokenType = "TOKEN_TYPE_OPEN_PARENTHESIS"
-			case TOKEN_TYPE_CLOSE_PARENTHESIS:
-				tokenType = "TOKEN_TYPE_CLOSE_PARENTHESIS"
-			case TOKEN_TYPE_SINGLE_COMMENT:
-				tokenType = "TOKEN_TYPE_SINGLE_COMMENT"
-			case TOKEN_TYPE_MULTI_COMMENT:
-				tokenType = "TOKEN_TYPE_MULTI_COMMENT"
-			case TOKEN_TYPE_CLOSE_MULTI_COMMENT:
-				tokenType = "TOKEN_TYPE_CLOSE_MULTI_COMMENT"
-			case TOKEN_TYPE_NEWLINE:
-				tokenType = "TOKEN_TYPE_NEWLINE"
-			case TOKEN_TYPE_EQUALS:
-				tokenType = "TOKEN_TYPE_EQUALS"
-			case TOKEN_TYPE_STRING:
-				tokenType = "TOKEN_TYPE_STRING"
-			case TOKEN_TYPE_CLOSE_STRING:
-				tokenType = "TOKEN_TYPE_CLOSE_STRING"
-			case TOKEN_TYPE_INTEGER:
-				tokenType = "TOKEN_TYPE_INTEGER"
-			case TOKEN_TYPE_FLOAT:
-				tokenType = "TOKEN_TYPE_FLOAT"
-			case TOKEN_TYPE_PLUS:
-				tokenType = "TOKEN_TYPE_PLUS"
-			case TOKEN_TYPE_MINUS:
-				tokenType = "TOKEN_TYPE_MINUS"
-			case TOKEN_TYPE_DIVIDE:
-				tokenType = "TOKEN_TYPE_DIVIDE"
-			case TOKEN_TYPE_MULTIPLY:
-				tokenType = "TOKEN_TYPE_MULTIPLY"
-			case TOKEN_TYPE_COLON:
-				tokenType = "TOKEN_TYPE_COLON"
-			case TOKEN_TYPE_SEMI_COLON:
-				tokenType = "TOKEN_TYPE_SEMI_COLON"
-			case TOKEN_TYPE_COMMA:
-				tokenType = "TOKEN_TYPE_COMMA"
-			case TOKEN_TYPE_OPEN_BRACKET:
-				tokenType = "TOKEN_TYPE_OPEN_BRACKET"
-			case TOKEN_TYPE_CLOSE_BRACKET:
-				tokenType = "TOKEN_TYPE_CLOSE_BRACKET"
-			case TOKEN_TYPE_OPEN_BRACES:
-				tokenType = "TOKEN_TYPE_OPEN_BRACES"
-			case TOKEN_TYPE_CLOSE_BRACES:
-				tokenType = "TOKEN_TYPE_CLOSE_BRACES"
-			case TOKEN_TYPE_AMPERSAND:
-				tokenType = "TOKEN_TYPE_AMPERSAND"
-			case TOKEN_TYPE_GREATER_THAN:
-				tokenType = "TOKEN_TYPE_GREATER_THAN"
-			case TOKEN_TYPE_LESS_THAN:
-				tokenType = "TOKEN_TYPE_LESS_THAN"
-			case TOKEN_TYPE_OR:
-				tokenType = "TOKEN_TYPE_OR"
-			case TOKEN_TYPE_EXCLAMATION:
-				tokenType = "TOKEN_TYPE_EXCLAMATION"
-			case TOKEN_TYPE_TAB:
-				tokenType = "TOKEN_TYPE_TAB"
-			case TOKEN_TYPE_CARRIAGE_RETURN:
-				tokenType = "TOKEN_TYPE_CARRIAGE_RETURN"
-			default:
-				tokenType = "TOKEN_TYPE_NONE"
-		}
-
-        fmt.Printf("Token Type: %s\n", tokenType)
+        fmt.Printf("Token Type: %s\n", TOKEN_TYPES_STRING[tokenArray[x].Type])
         fmt.Printf("Line #: %d\n", tokenArray[x].Line)
         fmt.Printf("Column #: %d\n", tokenArray[x].Column)
         fmt.Printf("Value: %s\n", tokenArray[x].Value)
@@ -353,6 +318,8 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			}
 		}
 	}
+
+	
 
 	return tokenArray, nil
 }
