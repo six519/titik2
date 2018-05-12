@@ -327,6 +327,14 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				//Convert identifier to keyword if existing in reserved words
 				tokenArray[x].Type = TOKEN_TYPE_KEYWORD
 			}
+		} else if(tokenArray[x].Type == TOKEN_TYPE_STRING) {
+			if(!((x+1) < len(tokenArray))) {
+				return tokenArray, errors.New(info.TokenErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of string", lexer.FileName))
+			}
+		} else if(tokenArray[x].Type == TOKEN_TYPE_MULTI_COMMENT) {
+			if(!((x+1) < len(tokenArray))) {
+				return tokenArray, errors.New(info.TokenErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of multi line comment", lexer.FileName))
+			}
 		}
 	}
 
