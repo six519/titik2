@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/six519/titik2/info"
 	"github.com/six519/titik2/lexer"
+	"github.com/six519/titik2/parser"
 )
 
 func main() {
@@ -36,8 +37,15 @@ func main() {
 			fmt.Println(tokenErr)
 			os.Exit(info.TOKEN_ERROR)
 		}
+		//parser object
+		prsr := parser.Parser{}
+		parserErr := prsr.Parse(tokenArray)
 
-		lexer.DumpToken(tokenArray) //:TEMPORARY
+		if(parserErr != nil) {
+			fmt.Println(parserErr)
+			os.Exit(info.SYNTAX_ERROR)
+		}
 
+		//lexer.DumpToken(tokenArray) //:TEMPORARY
 	}
 }
