@@ -28,10 +28,15 @@ func Version() {
 	fmt.Printf("Operating System: %s\n", runtime.GOOS);
 }
 
-func TokenErrorMessage(lineNumber int, columnNumber int, description string, fileName string) string{
+func ErrorMessage(isTokenType bool, lineNumber int, columnNumber int, description string, fileName string) string{
 	var strBuffer bytes.Buffer
 
-	strBuffer.WriteString("Token error on line number ")
+	if(isTokenType) {
+		strBuffer.WriteString("Token error on line number ")
+	} else {
+		strBuffer.WriteString("Syntax error on line number ")
+	}
+	
 	strBuffer.WriteString(strconv.Itoa(lineNumber))
 	strBuffer.WriteString(" and column number ")
 	strBuffer.WriteString(strconv.Itoa(columnNumber))

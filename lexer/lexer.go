@@ -271,7 +271,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						}
 						tokenArray[len(tokenArray) - 1].Value += currentChar
 					} else {
-						return finalTokenArray, errors.New(info.TokenErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
+						return finalTokenArray, errors.New(info.ErrorMessage(true, x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
 				case TOKENIZER_STATE_GET_SINGLE_COMMENT:
 					//get single comment
@@ -330,11 +330,11 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			}
 		} else if(tokenArray[x].Type == TOKEN_TYPE_STRING) {
 			if(!((x+1) < len(tokenArray))) {
-				return finalTokenArray, errors.New(info.TokenErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of string", lexer.FileName))
+				return finalTokenArray, errors.New(info.ErrorMessage(true, tokenArray[x].Line, tokenArray[x].Column, "Expected closing of string", lexer.FileName))
 			}
 		} else if(tokenArray[x].Type == TOKEN_TYPE_MULTI_COMMENT) {
 			if(!((x+1) < len(tokenArray))) {
-				return finalTokenArray, errors.New(info.TokenErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of multi line comment", lexer.FileName))
+				return finalTokenArray, errors.New(info.ErrorMessage(true, tokenArray[x].Line, tokenArray[x].Column, "Expected closing of multi line comment", lexer.FileName))
 			}
 		}
 

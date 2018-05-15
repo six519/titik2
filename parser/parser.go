@@ -1,7 +1,9 @@
 package parser
 
 import (
+	"errors"
 	"github.com/six519/titik2/lexer"
+	"github.com/six519/titik2/info"
 )
 
 //parser states
@@ -25,7 +27,17 @@ func (parser Parser) Parse(tokenArray []lexer.Token) error {
 	for x := 0; x < len(strippedTokenArray); x++ {
 		switch(parserState) {
 			case PARSER_STATE_START:
-				//start
+				//only accepts identifier & keywords at start
+				switch(strippedTokenArray[x].Type) {
+					case lexer.TOKEN_TYPE_IDENTIFIER:
+						//identifier type
+					case lexer.TOKEN_TYPE_KEYWORD:
+						//keyword type
+
+					default:
+						//token error
+						return errors.New(info.ErrorMessage(false, strippedTokenArray[x].Line, strippedTokenArray[x].Column, "Unexpected token", strippedTokenArray[x].FileName))
+				}
 			default:
 				continue
 		}
