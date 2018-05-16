@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/six519/titik2/lexer"
 	"github.com/six519/titik2/info"
+	"github.com/six519/titik2/variable"
 )
 
 //parser states
@@ -12,7 +13,7 @@ const PARSER_STATE_START int = 0
 type Parser struct {
 }
 
-func (parser Parser) Parse(tokenArray []lexer.Token) error {
+func (parser Parser) Parse(tokenArray []lexer.Token, globalVariableArray *[]variable.Variable) error {
 	var strippedTokenArray []lexer.Token
 	parserState := PARSER_STATE_START
 

@@ -6,6 +6,7 @@ import (
 	"github.com/six519/titik2/info"
 	"github.com/six519/titik2/lexer"
 	"github.com/six519/titik2/parser"
+	"github.com/six519/titik2/variable"
 )
 
 func main() {
@@ -24,6 +25,7 @@ func main() {
 		//open titik file
 		lxr := lexer.Lexer{FileName: os.Args[1]}
 		fileErr := lxr.ReadSourceFile()
+		var globalVariableArray []variable.Variable
 
 		if (fileErr != nil) {
 			fmt.Println(fileErr)
@@ -39,7 +41,7 @@ func main() {
 		}
 		//parser object
 		prsr := parser.Parser{}
-		parserErr := prsr.Parse(tokenArray)
+		parserErr := prsr.Parse(tokenArray, &globalVariableArray)
 
 		if(parserErr != nil) {
 			fmt.Println(parserErr)
