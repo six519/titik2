@@ -37,7 +37,7 @@ func (parser Parser) Parse(tokenArray []lexer.Token, globalVariableArray *[]vari
 
 					default:
 						//token error
-						return errors.New(info.ErrorMessage(false, strippedTokenArray[x].Line, strippedTokenArray[x].Column, "Unexpected token", strippedTokenArray[x].FileName))
+						return errors.New(info.SyntaxErrorMessage(strippedTokenArray[x].Line, strippedTokenArray[x].Column, "Unexpected token", strippedTokenArray[x].FileName))
 				}
 			default:
 				continue
