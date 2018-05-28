@@ -9,18 +9,12 @@ type Parser struct {
 }
 
 func (parser Parser) Parse(tokenArray []lexer.Token, globalVariableArray *[]variable.Variable) error {
-	var strippedTokenArray []lexer.Token
 
-	//remove spaces, newlines, comments and tabs
 	for x := 0; x < len(tokenArray); x++ {
+		//ignore newline, space, tab and comments
 		if(tokenArray[x].Type != lexer.TOKEN_TYPE_NEWLINE && tokenArray[x].Type != lexer.TOKEN_TYPE_SPACE && tokenArray[x].Type != lexer.TOKEN_TYPE_SINGLE_COMMENT && tokenArray[x].Type != lexer.TOKEN_TYPE_MULTI_COMMENT && tokenArray[x].Type != lexer.TOKEN_TYPE_CLOSE_MULTI_COMMENT && tokenArray[x].Type != lexer.TOKEN_TYPE_CLOSE_STRING && tokenArray[x].Type != lexer.TOKEN_TYPE_TAB) {
-			strippedTokenArray = append(strippedTokenArray, tokenArray[x])
+			//TODO: TRY TO APPLY SHUNTING-YARD BELOW
 		}
-	}
-
-	//parse the stripped tokens below
-	for x := 0; x < len(strippedTokenArray); x++ {
-		//TRY TO APPLY SHUNTING-YARD HERE :TODO
 	}
 
 	return nil
