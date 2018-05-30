@@ -33,7 +33,7 @@ func main() {
 
 		if (tokenErr != nil) {
 			fmt.Println(tokenErr)
-			os.Exit(TOKEN_ERROR)
+			os.Exit(2)
 		}
 		//parser object
 		prsr := Parser{}
@@ -41,7 +41,7 @@ func main() {
 
 		if(parserErr != nil) {
 			fmt.Println(parserErr)
-			os.Exit(SYNTAX_ERROR)
+			os.Exit(2)
 		}
 
 		//DumpToken(tokenArray) //:TEMPORARY
