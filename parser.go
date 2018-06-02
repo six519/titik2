@@ -31,6 +31,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 			//syntax error if the last token is an operator
 			return errors.New(SyntaxErrorMessage(finalTokenArray[len(finalTokenArray)-1].Line, finalTokenArray[len(finalTokenArray)-1].Column, "Unfinished operation", finalTokenArray[len(finalTokenArray)-1].FileName))
 		}
+
+		//shunting-yard
+		for len(finalTokenArray) > 0 {
+			currentToken := finalTokenArray[0]
+			finalTokenArray = append(finalTokenArray[:0], finalTokenArray[1:]...) //pop the first element
+
+
+		}
 	}
 
 	return nil
