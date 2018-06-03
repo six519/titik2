@@ -12,7 +12,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 	var finalTokenArray []Token
 	//operatorPrecedences := map[string] int{"+": 0, "-": 0, "/": 1, "*": 1} //operator order of precedences
 	//var operatorStack []Token
-	//var outputQueue []Token
+	var outputQueue []Token
 
 	for x := 0; x < len(tokenArray); x++ {
 		//ignore newline, space, tab and comments
@@ -37,6 +37,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 			currentToken := finalTokenArray[0]
 			finalTokenArray = append(finalTokenArray[:0], finalTokenArray[1:]...) //pop the first element
 
+			if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT) {
+				//If it's a number add it to queue
+				outputQueue = append(outputQueue, currentToken)
+			}
 
 		}
 	}
