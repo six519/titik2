@@ -10,8 +10,8 @@ type Parser struct {
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) error {
 
 	var finalTokenArray []Token
-	//operatorPrecedences := map[string] int{"+": 0, "-": 0, "/": 1, "*": 1} //operator order of precedences
-	//var operatorStack []Token
+	operatorPrecedences := map[string] int{"+": 0, "-": 0, "/": 1, "*": 1} //operator order of precedences
+	var operatorStack []Token
 	var outputQueue []Token
 
 	for x := 0; x < len(tokenArray); x++ {
@@ -40,6 +40,23 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 			if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT) {
 				//If it's a number add it to queue
 				outputQueue = append(outputQueue, currentToken)
+			}
+
+			if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY) {
+				//the token is operator
+				for true {
+					if(len(operatorStack) > 0) {
+						if(operatorPrecedences[operatorStack[len(operatorStack) - 1].Value] > operatorPrecedences[currentToken.Value]) {
+							outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
+							operatorStack = operatorStack[:len(operatorStack)-1]
+						} else {
+							break
+						}
+					} else {
+						break
+					}
+				}
+				operatorStack = append(operatorStack, currentToken)
 			}
 
 		}
