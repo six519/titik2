@@ -64,6 +64,13 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 				operatorStack = append(operatorStack, currentToken)
 			}
 
+			if(currentToken.Type == TOKEN_TYPE_CLOSE_PARENTHESIS) {
+				//close parenthesis
+				if(len(operatorStack) > 0) {
+
+				}
+			}
+
 		}
 	}
 
