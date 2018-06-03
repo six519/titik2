@@ -59,6 +59,11 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 				operatorStack = append(operatorStack, currentToken)
 			}
 
+			if(currentToken.Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
+				//if it's an open parenthesis '(' push it onto the stack
+				operatorStack = append(operatorStack, currentToken)
+			}
+
 		}
 	}
 
