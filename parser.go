@@ -67,7 +67,19 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 			if(currentToken.Type == TOKEN_TYPE_CLOSE_PARENTHESIS) {
 				//close parenthesis
 				if(len(operatorStack) > 0) {
+					for true {
+						if(operatorStack[len(operatorStack) - 1].Type != TOKEN_TYPE_OPEN_PARENTHESIS) {
+							outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
+							operatorStack = operatorStack[:len(operatorStack)-1]
+						} else {
+							operatorStack = operatorStack[:len(operatorStack)-1]
+							break
+						}
 
+						if(len(operatorStack) == 0) {
+							return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Operator expected", currentToken.FileName))		
+						}
+					}
 				} else {
 					return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Operator expected", currentToken.FileName))
 				}
