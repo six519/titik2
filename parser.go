@@ -68,6 +68,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 				//close parenthesis
 				if(len(operatorStack) > 0) {
 
+				} else {
+					return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Operator expected", currentToken.FileName))
 				}
 			}
 
