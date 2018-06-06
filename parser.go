@@ -86,6 +86,19 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 			}
 
 		}
+
+		for len(operatorStack) > 0 {
+			if(operatorStack[len(operatorStack) - 1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
+				return errors.New(SyntaxErrorMessage(operatorStack[len(operatorStack) - 1].Line, operatorStack[len(operatorStack) - 1].Column, "Unexpected token '" + operatorStack[len(operatorStack) - 1].Value + "'", operatorStack[len(operatorStack) - 1].FileName))
+			}
+			outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
+			operatorStack = operatorStack[:len(operatorStack)-1]
+		}
+
+		//the outputQueue contains the reverse polish notation
+		if(len(outputQueue) > 0) {
+			//read the reverse polish below
+		}
 	}
 
 	return nil
