@@ -44,8 +44,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 			currentToken := finalTokenArray[0]
 			finalTokenArray = append(finalTokenArray[:0], finalTokenArray[1:]...) //pop the first element
 
-			if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_IDENTIFIER || currentToken.Type == TOKEN_TYPE_KEYWORD) {
-				//If it's a number, identifier or keyword, add it to queue
+			if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_IDENTIFIER) {
+				//If it's a number or identifier, add it to queue, (ADD TOKEN_TYPE_KEYWORD LATER)
 				outputQueue = append(outputQueue, currentToken)
 			}
 
@@ -105,7 +105,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 		//the outputQueue contains the reverse polish notation
 		if(len(outputQueue) > 0) {
 			//read the reverse polish below
-			DumpOutputQueue(outputQueue) //TEMPORARY (FOR DEBUGGING PURPOSE ONLY)
+			//DumpOutputQueue(outputQueue) //TEMPORARY (FOR DEBUGGING PURPOSE ONLY)
 		}
 	}
 
