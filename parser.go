@@ -105,7 +105,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 		//the outputQueue contains the reverse polish notation
 		if(len(outputQueue) > 0) {
 			//read the reverse polish below
-			DumpOutputQueue(outputQueue) //TEMPORARY (FOR DEBUGGING PURPOSE ONLY)
+			//DumpOutputQueue(outputQueue) //TEMPORARY (FOR DEBUGGING PURPOSE ONLY)
 		}
 	}
 
