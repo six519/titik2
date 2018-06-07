@@ -17,7 +17,7 @@ func DumpOutputQueue(tokenArray []Token) {
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) error {
 
 	var finalTokenArray []Token
-	operatorPrecedences := map[string] int{"+": 0, "-": 0, "/": 1, "*": 1} //operator order of precedences
+	operatorPrecedences := map[string] int{"=": 0, "+": 1, "-": 1, "/": 2, "*": 2} //operator order of precedences
 	var operatorStack []Token
 	var outputQueue []Token
 
@@ -29,12 +29,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 	}
 
 	if(len(finalTokenArray) > 0) {
-		if(finalTokenArray[0].Type == TOKEN_TYPE_PLUS || finalTokenArray[0].Type == TOKEN_TYPE_MINUS || finalTokenArray[0].Type == TOKEN_TYPE_DIVIDE || finalTokenArray[0].Type == TOKEN_TYPE_MULTIPLY) {
+		if(finalTokenArray[0].Type == TOKEN_TYPE_PLUS || finalTokenArray[0].Type == TOKEN_TYPE_MINUS || finalTokenArray[0].Type == TOKEN_TYPE_DIVIDE || finalTokenArray[0].Type == TOKEN_TYPE_MULTIPLY || finalTokenArray[0].Type == TOKEN_TYPE_EQUALS) {
 			//syntax error if the first token is an operator
 			return errors.New(SyntaxErrorMessage(finalTokenArray[0].Line, finalTokenArray[0].Column, "Unexpected token '" + finalTokenArray[0].Value + "'", finalTokenArray[0].FileName))
 		}
 
-		if(finalTokenArray[len(finalTokenArray)-1].Type == TOKEN_TYPE_PLUS || finalTokenArray[len(finalTokenArray)-1].Type == TOKEN_TYPE_MINUS || finalTokenArray[len(finalTokenArray)-1].Type == TOKEN_TYPE_DIVIDE || finalTokenArray[len(finalTokenArray)-1].Type == TOKEN_TYPE_MULTIPLY) {
+		if(finalTokenArray[len(finalTokenArray)-1].Type == TOKEN_TYPE_PLUS || finalTokenArray[len(finalTokenArray)-1].Type == TOKEN_TYPE_MINUS || finalTokenArray[len(finalTokenArray)-1].Type == TOKEN_TYPE_DIVIDE || finalTokenArray[len(finalTokenArray)-1].Type == TOKEN_TYPE_MULTIPLY || finalTokenArray[len(finalTokenArray)-1].Type == TOKEN_TYPE_EQUALS) {
 			//syntax error if the last token is an operator
 			return errors.New(SyntaxErrorMessage(finalTokenArray[len(finalTokenArray)-1].Line, finalTokenArray[len(finalTokenArray)-1].Column, "Unfinished operation", finalTokenArray[len(finalTokenArray)-1].FileName))
 		}
@@ -49,7 +49,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 				outputQueue = append(outputQueue, currentToken)
 			}
 
-			if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY) {
+			if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS) {
 				//the token is operator
 				for true {
 					if(len(operatorStack) > 0) {
@@ -105,7 +105,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 		//the outputQueue contains the reverse polish notation
 		if(len(outputQueue) > 0) {
 			//read the reverse polish below
-			//DumpOutputQueue(outputQueue) //TEMPORARY (FOR DEBUGGING PURPOSE ONLY)
+			DumpOutputQueue(outputQueue) //TEMPORARY (FOR DEBUGGING PURPOSE ONLY)
 		}
 	}
 
