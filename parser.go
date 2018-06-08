@@ -113,7 +113,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 				outputQueue = append(outputQueue[:0], outputQueue[1:]...) //pop the first element
 
 				if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY) {
-
+					//arithmetic operation
+				} else if(currentToken.Type == TOKEN_TYPE_EQUALS) {
+					//assignment operation
 				} else {
 					stack = append(stack, currentToken)
 				}
