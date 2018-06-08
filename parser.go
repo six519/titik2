@@ -107,21 +107,29 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 
 				if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY) {
 					//arithmetic operation
+					//NOTE: ASSUME THAT RIGHT OPERAND AND LEFT OPERAND ARE INTEGER AND FLOAT ONLY (NO IDENTIFIER, STRING ETC... (TEMPORARY ONLY)
 					rightOperand := stack[len(stack)-1]
 					stack = stack[:len(stack)-1]
 
 					leftOperand := stack[len(stack)-1]
 					stack = stack[:len(stack)-1]
 
+					result := leftOperand
+
 					switch currentToken.Type {
 						case TOKEN_TYPE_PLUS:
 							//either addition or concatenation
+							//call a function below that validate the rightOperand
+							//ex:
+							//expectTypes(rightOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_STRING) //the return is nil or error (USE VARIADIC PARAM)
 						case TOKEN_TYPE_MINUS:
 						case TOKEN_TYPE_MULTIPLY:
 						default:
 							//division
 						
 					}
+
+					stack = append(stack, result)
 
 				} else if(currentToken.Type == TOKEN_TYPE_EQUALS) {
 					//assignment operation
