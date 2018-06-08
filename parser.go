@@ -2,16 +2,10 @@ package main
 
 import (
 	"errors"
-	"fmt"
+	//"fmt"
 )
 
 type Parser struct {
-}
-
-func DumpOutputQueue(tokenArray []Token) {
-	for x := 0; x < len(tokenArray); x++ {
-		fmt.Println(tokenArray[x].Value)
-	}
 }
 
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) error {
@@ -105,7 +99,6 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 		//the outputQueue contains the reverse polish notation
 		if(len(outputQueue) > 0) {
 			//read the reverse polish below
-			//DumpOutputQueue(outputQueue) //TEMPORARY (FOR DEBUGGING PURPOSE ONLY)
 			var stack []Token
 
 			for len(outputQueue) > 0 {
