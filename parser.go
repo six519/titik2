@@ -106,6 +106,18 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 		if(len(outputQueue) > 0) {
 			//read the reverse polish below
 			//DumpOutputQueue(outputQueue) //TEMPORARY (FOR DEBUGGING PURPOSE ONLY)
+			var stack []Token
+
+			for len(outputQueue) > 0 {
+				currentToken := outputQueue[0]
+				outputQueue = append(outputQueue[:0], outputQueue[1:]...) //pop the first element
+
+				if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY) {
+
+				} else {
+					stack = append(stack, currentToken)
+				}
+			}
 		}
 	}
 
