@@ -107,6 +107,22 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 
 				if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY) {
 					//arithmetic operation
+					rightOperand := stack[len(stack)-1]
+					stack = stack[:len(stack)-1]
+
+					leftOperand := stack[len(stack)-1]
+					stack = stack[:len(stack)-1]
+
+					switch currentToken.Type {
+						case TOKEN_TYPE_PLUS:
+							//either addition or concatenation
+						case TOKEN_TYPE_MINUS:
+						case TOKEN_TYPE_MULTIPLY:
+						default:
+							//division
+						
+					}
+
 				} else if(currentToken.Type == TOKEN_TYPE_EQUALS) {
 					//assignment operation
 				} else {
