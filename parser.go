@@ -39,7 +39,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 			finalTokenArray = append(finalTokenArray[:0], finalTokenArray[1:]...) //pop the first element
 
 			if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_IDENTIFIER) {
-				//If it's a number or identifier, add it to queue, (ADD TOKEN_TYPE_KEYWORD LATER)
+				//If it's a number or identifier, add it to queue, (ADD TOKEN_TYPE_KEYWORD AND string and other acceptable tokens LATER)
 				outputQueue = append(outputQueue, currentToken)
 			}
 
