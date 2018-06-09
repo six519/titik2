@@ -127,9 +127,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 					switch currentToken.Type {
 						case TOKEN_TYPE_PLUS:
 							//either addition or concatenation
-							//call a function below that validate the rightOperand
+							//call a function below that validate the leftOperand
 							//ex:
-							//expectTypes(rightOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_STRING) //the return is nil or error (USE VARIADIC PARAM)
+							//expectTypes(leftOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_STRING) //the return is nil or error (USE VARIADIC PARAM)
 						case TOKEN_TYPE_MINUS:
 						case TOKEN_TYPE_MULTIPLY:
 						default:
