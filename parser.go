@@ -8,6 +8,23 @@ import (
 type Parser struct {
 }
 
+func expectedTokenTypes(token Token, tokenTypes ...int) error {
+	isOK := false
+
+	for x := 0; x < len(tokenTypes); x++ {
+		if(token.Type == tokenTypes[x]) {
+			isOK = true
+			break
+		}
+	}
+
+	if(!isOK) {
+		return errors.New(SyntaxErrorMessage(token.Line, token.Column, "Invalid operand '" + token.Value + "'", token.FileName))
+	}
+
+	return nil
+}
+
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) error {
 
 	var finalTokenArray []Token
@@ -127,9 +144,19 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 					switch currentToken.Type {
 						case TOKEN_TYPE_PLUS:
 							//either addition or concatenation
-							//call a function below that validate the leftOperand
-							//ex:
-							//expectTypes(leftOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_STRING) //the return is nil or error (USE VARIADIC PARAM)
+							//validate left operand
+							errLeft := expectedTokenTypes(leftOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT)
+
+							if (errLeft != nil) {
+								return errLeft
+							}
+
+							//validate right operand
+							errRight := expectedTokenTypes(rightOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT)
+
+							if (errRight != nil) {
+								return errRight
+							}
 						case TOKEN_TYPE_MINUS:
 						case TOKEN_TYPE_MULTIPLY:
 						default:
