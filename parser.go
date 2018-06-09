@@ -2,7 +2,8 @@ package main
 
 import (
 	"errors"
-	//"fmt"
+	"strconv"
+	"fmt"
 )
 
 type Parser struct {
@@ -159,9 +160,15 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 								//convert to integer
 								result.Type = TOKEN_TYPE_INTEGER
 								//result.Value = ""
+								tempLeft, _ := strconv.Atoi(leftOperand.Value)
+								tempRight, _ := strconv.Atoi(rightOperand.Value)
+								result.Value = strconv.Itoa(tempLeft + tempRight)
 							} else {
 								//let's assume that it should be converted to float (for now)
 								result.Type = TOKEN_TYPE_FLOAT
+								tempLeft, _ := strconv.ParseFloat(leftOperand.Value, 32)
+								tempRight, _ := strconv.ParseFloat(rightOperand.Value, 32)
+								result.Value = strconv.FormatFloat(tempLeft + tempRight, 'f', -1, 64)
 							}
 						case TOKEN_TYPE_MINUS:
 						case TOKEN_TYPE_MULTIPLY:
@@ -178,6 +185,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 					stack = append(stack, currentToken)
 				}
 			}
+
+			fmt.Println(stack[0].Value)
 		}
 	}
 
