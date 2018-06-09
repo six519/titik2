@@ -146,16 +146,22 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 							//either addition or concatenation
 							//validate left operand
 							errLeft := expectedTokenTypes(leftOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT)
-
 							if (errLeft != nil) {
 								return errLeft
 							}
-
 							//validate right operand
 							errRight := expectedTokenTypes(rightOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT)
-
 							if (errRight != nil) {
 								return errRight
+							}
+
+							if(leftOperand.Type == TOKEN_TYPE_INTEGER) {
+								//convert to integer
+								result.Type = TOKEN_TYPE_INTEGER
+								//result.Value = ""
+							} else {
+								//let's assume that it should be converted to float (for now)
+								result.Type = TOKEN_TYPE_FLOAT
 							}
 						case TOKEN_TYPE_MINUS:
 						case TOKEN_TYPE_MULTIPLY:
