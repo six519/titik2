@@ -136,45 +136,65 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 					//NOTE: ASSUME THAT RIGHT OPERAND AND LEFT OPERAND ARE INTEGER AND FLOAT ONLY (NO IDENTIFIER, STRING ETC... (TEMPORARY ONLY)
 					rightOperand := stack[len(stack)-1]
 					stack = stack[:len(stack)-1]
+					var tempRightInt int
+					var tempRightFloat float64
+					//var tempRightString string
 
 					leftOperand := stack[len(stack)-1]
 					stack = stack[:len(stack)-1]
+					var tempLeftInt int
+					var tempLeftFloat float64
+					//var tempLeftString string
 
 					result := leftOperand
 
-					switch currentToken.Type {
-						case TOKEN_TYPE_PLUS:
-							//either addition or concatenation
-							//validate left operand
-							errLeft := expectedTokenTypes(leftOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT)
-							if (errLeft != nil) {
-								return errLeft
-							}
-							//validate right operand
-							errRight := expectedTokenTypes(rightOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT)
-							if (errRight != nil) {
-								return errRight
-							}
+					//convert operands to its designated type
+					if(leftOperand.Type == TOKEN_TYPE_INTEGER) {
+						//convert to integer
+						result.Type = TOKEN_TYPE_INTEGER
+						tempLeftInt, _ = strconv.Atoi(leftOperand.Value)
+						tempRightInt, _ = strconv.Atoi(rightOperand.Value)
+					} else {
+						//let's assume that it should be converted to float (for now)
+						result.Type = TOKEN_TYPE_FLOAT
+						tempLeftFloat, _ = strconv.ParseFloat(leftOperand.Value, 32)
+						tempRightFloat, _ = strconv.ParseFloat(rightOperand.Value, 32)
+					}
 
-							if(leftOperand.Type == TOKEN_TYPE_INTEGER) {
-								//convert to integer
-								result.Type = TOKEN_TYPE_INTEGER
-								//result.Value = ""
-								tempLeft, _ := strconv.Atoi(leftOperand.Value)
-								tempRight, _ := strconv.Atoi(rightOperand.Value)
-								result.Value = strconv.Itoa(tempLeft + tempRight)
-							} else {
-								//let's assume that it should be converted to float (for now)
-								result.Type = TOKEN_TYPE_FLOAT
-								tempLeft, _ := strconv.ParseFloat(leftOperand.Value, 32)
-								tempRight, _ := strconv.ParseFloat(rightOperand.Value, 32)
-								result.Value = strconv.FormatFloat(tempLeft + tempRight, 'f', -1, 64)
-							}
-						case TOKEN_TYPE_MINUS:
-						case TOKEN_TYPE_MULTIPLY:
-						default:
-							//division
-						
+					if(currentToken.Type == TOKEN_TYPE_PLUS) {
+						//either addition or concatenation
+
+						//validate left operand
+						errLeft := expectedTokenTypes(leftOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING)
+						if (errLeft != nil) {
+							return errLeft
+						}
+						//validate right operand
+						errRight := expectedTokenTypes(rightOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING)
+						if (errRight != nil) {
+							return errRight
+						}
+
+						if(leftOperand.Type == TOKEN_TYPE_INTEGER) {
+							result.Value = strconv.Itoa(tempLeftInt + tempRightInt)
+						} else {
+							//let's assume it's float
+							result.Value = strconv.FormatFloat(tempLeftFloat + tempRightFloat, 'f', -1, 64)
+						}
+
+					} else {
+						//substraction, division and multiplication
+
+						//validate left operand (No String)
+						errLeft := expectedTokenTypes(leftOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT)
+						if (errLeft != nil) {
+							return errLeft
+						}
+						//validate right operand (No String)
+						errRight := expectedTokenTypes(rightOperand, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT)
+						if (errRight != nil) {
+							return errRight
+						}
 					}
 
 					stack = append(stack, result)
