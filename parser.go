@@ -37,10 +37,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 		for len(finalTokenArray) > 0 {
 			currentToken := finalTokenArray[0]
 			finalTokenArray = append(finalTokenArray[:0], finalTokenArray[1:]...) //pop the first element
+			isValidToken := false
 
 			if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_IDENTIFIER) {
 				//If it's a number or identifier, add it to queue, (ADD TOKEN_TYPE_KEYWORD AND string and other acceptable tokens LATER)
 				outputQueue = append(outputQueue, currentToken)
+				isValidToken = true
 			}
 
 			if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS) {
@@ -58,14 +60,17 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 					}
 				}
 				operatorStack = append(operatorStack, currentToken)
+				isValidToken = true
 			}
 
 			if(currentToken.Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
 				//if it's an open parenthesis '(' push it onto the stack
 				operatorStack = append(operatorStack, currentToken)
+				isValidToken = true
 			}
 
 			if(currentToken.Type == TOKEN_TYPE_CLOSE_PARENTHESIS) {
+				isValidToken = true
 				//close parenthesis
 				if(len(operatorStack) > 0) {
 					for true {
@@ -86,6 +91,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 				}
 			}
 
+			if(!isValidToken) {
+				return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unexpected token '" + currentToken.Value + "'", currentToken.FileName))
+			}
 		}
 
 		for len(operatorStack) > 0 {
