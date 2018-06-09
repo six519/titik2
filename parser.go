@@ -195,6 +195,38 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 						if (errRight != nil) {
 							return errRight
 						}
+
+						if(currentToken.Type == TOKEN_TYPE_MINUS) {
+							//substraction
+							if(leftOperand.Type == TOKEN_TYPE_INTEGER) {
+								result.Value = strconv.Itoa(tempLeftInt - tempRightInt)
+							} else {
+								//let's assume it's float
+								result.Value = strconv.FormatFloat(tempLeftFloat - tempRightFloat, 'f', -1, 64)
+							}
+						} else if(currentToken.Type == TOKEN_TYPE_MULTIPLY) {
+							//multiplication
+							if(leftOperand.Type == TOKEN_TYPE_INTEGER) {
+								result.Value = strconv.Itoa(tempLeftInt * tempRightInt)
+							} else {
+								//let's assume it's float
+								result.Value = strconv.FormatFloat(tempLeftFloat * tempRightFloat, 'f', -1, 64)
+							}
+						} else {
+							//assume it's division
+							if(leftOperand.Type == TOKEN_TYPE_INTEGER) {
+								if(tempRightInt == 0) {
+									return errors.New(SyntaxErrorMessage(rightOperand.Line, rightOperand.Column, "Division by zero", rightOperand.FileName))
+								}
+								result.Value = strconv.Itoa(tempLeftInt / tempRightInt)
+							} else {
+								//let's assume it's float
+								if(tempRightInt == 0) {
+									return errors.New(SyntaxErrorMessage(rightOperand.Line, rightOperand.Column, "Division by zero", rightOperand.FileName))
+								}
+								result.Value = strconv.FormatFloat(tempLeftFloat / tempRightFloat, 'f', -1, 64)
+							}
+						}
 					}
 
 					stack = append(stack, result)
