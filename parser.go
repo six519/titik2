@@ -252,16 +252,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 					isExists, varIndex := isVariableExists(variable, *globalVariableArray, scopeName)
 
-					if(isExists) {
-						//variable exist
-						//modify existing
-						varIndex = varIndex //TEMPORARY ONLY
-					} else {
+					if(!isExists) {
 						//variable doesn't exists
 						//create a new variable
 
 						varIndex = len(*globalVariableArray) - 1 //last to execute
 					}
+
+					//modify the value/type of variable below
 
 				} else {
 					stack = append(stack, currentToken)

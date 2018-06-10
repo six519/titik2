@@ -20,6 +20,11 @@ type Variable struct {
 
 func isVariableExists(token Token, globalVariableArray []Variable, scopeName string) (bool, int) {
 
+	for x := 0; x < len(globalVariableArray); x++ {
+		if(globalVariableArray[x].Name == token.Value && globalVariableArray[x].ScopeName == scopeName) {
+			return true, x
+		}
+	}
 
 	return false, 0
 }
