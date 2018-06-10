@@ -126,6 +126,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 		if(len(outputQueue) > 0) {
 			//read the reverse polish below
 			var stack []Token
+			var iStack []Token
 
 			for len(outputQueue) > 0 {
 				currentToken := outputQueue[0]
@@ -236,8 +237,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					value := stack[len(stack)-1]
 					stack = stack[:len(stack)-1]
 
-					variable := stack[len(stack)-1]
-					stack = stack[:len(stack)-1]
+					variable := iStack[len(iStack)-1]
+					iStack = iStack[:len(iStack)-1]
 
 					//validate value
 					errVal := expectedTokenTypes(value, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING)
@@ -270,6 +271,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
 					}
 
+				} else if(currentToken.Type == TOKEN_TYPE_IDENTIFIER) {
+					//if identifier then push to identifier stack
+					iStack = append(iStack, currentToken)
 				} else {
 					stack = append(stack, currentToken)
 				}
