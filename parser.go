@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"strconv"
-	"fmt"
+	//"fmt"
 )
 
 type Parser struct {
@@ -239,14 +239,36 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					variable := stack[len(stack)-1]
 					stack = stack[:len(stack)-1]
 
+					//validate value
+					errVal := expectedTokenTypes(value, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING)
+					if (errVal != nil) {
+						return errVal
+					}
+					//validate variable
+					errVar := expectedTokenTypes(variable, TOKEN_TYPE_IDENTIFIER)
+					if (errVar != nil) {
+						return errVar
+					}
+
 					isExists, varIndex := isVariableExists(variable, *globalVariableArray, scopeName)
+
+					if(isExists) {
+						//variable exist
+						//modify existing
+						varIndex = varIndex //TEMPORARY ONLY
+					} else {
+						//variable doesn't exists
+						//create a new variable
+
+						varIndex = len(*globalVariableArray) - 1 //last to execute
+					}
 
 				} else {
 					stack = append(stack, currentToken)
 				}
 			}
 
-			fmt.Println(stack[0].Value)
+			//fmt.Println(stack[0].Value)
 		}
 	}
 
