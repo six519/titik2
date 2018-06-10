@@ -255,11 +255,20 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					if(!isExists) {
 						//variable doesn't exists
 						//create a new variable
-
+						newVar := Variable{Name: variable.Value, ScopeName: scopeName}
+						*globalVariableArray = append(*globalVariableArray, newVar)
 						varIndex = len(*globalVariableArray) - 1 //last to execute
 					}
 
 					//modify the value/type of variable below
+					if(value.Type == TOKEN_TYPE_INTEGER) {
+						(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_INTEGER
+						(*globalVariableArray)[varIndex].IntegerValue, _ = strconv.Atoi(value.Value)
+					} else {
+						//assume it's float for now (add types later on like string etc...)
+						(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
+						(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
+					}
 
 				} else {
 					stack = append(stack, currentToken)
