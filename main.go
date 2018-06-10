@@ -37,7 +37,7 @@ func main() {
 		}
 		//parser object
 		prsr := Parser{}
-		parserErr := prsr.Parse(tokenArray, &globalVariableArray)
+		parserErr := prsr.Parse(tokenArray, &globalVariableArray, "main")
 
 		if(parserErr != nil) {
 			fmt.Println(parserErr)

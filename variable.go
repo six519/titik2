@@ -17,3 +17,9 @@ type Variable struct {
 	IsConstant bool
 	ArrayValue []Variable
 }
+
+func isVariableExists(token Token, globalVariableArray []Variable, scopeName string) (bool, int) {
+
+
+	return false, 0
+}

@@ -26,7 +26,7 @@ func expectedTokenTypes(token Token, tokenTypes ...int) error {
 	return nil
 }
 
-func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) error {
+func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, scopeName string) error {
 
 	var finalTokenArray []Token
 	operatorPrecedences := map[string] int{"=": 0, "+": 1, "-": 1, "/": 2, "*": 2} //operator order of precedences
@@ -233,6 +233,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable) 
 
 				} else if(currentToken.Type == TOKEN_TYPE_EQUALS) {
 					//assignment operation
+					value := stack[len(stack)-1]
+					stack = stack[:len(stack)-1]
+
+					variable := stack[len(stack)-1]
+					stack = stack[:len(stack)-1]
+
+					isExists, varIndex := isVariableExists(variable, *globalVariableArray, scopeName)
+
 				} else {
 					stack = append(stack, currentToken)
 				}
