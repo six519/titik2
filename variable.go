@@ -39,6 +39,8 @@ func DumpVariable(variables []Variable) {
 		//NOTE: ASSUME VARIABLE TYPE AS FLOAT AND INTEGER FOR NOW (TEMPORARY)
 		if(variables[x].Type == VARIABLE_TYPE_FLOAT) {
 			fmt.Printf("Variable Value: %f\n", variables[x].FloatValue)
+		} else if(variables[x].Type == VARIABLE_TYPE_STRING) {
+			fmt.Printf("Variable Value: %s\n", variables[x].StringValue)
 		} else {
 			fmt.Printf("Variable Value: %d\n", variables[x].IntegerValue)
 		}

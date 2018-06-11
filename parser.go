@@ -54,7 +54,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						tokensToEvaluate = append(tokensToEvaluate[:0], tokensToEvaluate[1:]...) //pop the first element
 						isValidToken := false
 			
-						if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_IDENTIFIER) {
+						if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_IDENTIFIER || currentToken.Type == TOKEN_TYPE_STRING) {
 							//If it's a number or identifier, add it to queue, (ADD TOKEN_TYPE_KEYWORD AND string and other acceptable tokens LATER)
 							outputQueue = append(outputQueue, currentToken)
 							isValidToken = true
@@ -152,6 +152,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									result.Type = TOKEN_TYPE_INTEGER
 									tempLeftInt, _ = strconv.Atoi(leftOperand.Value)
 									tempRightInt, _ = strconv.Atoi(rightOperand.Value)
+								} else if(leftOperand.Type == TOKEN_TYPE_STRING) {
+									//string
+									result.Type = TOKEN_TYPE_STRING
 								} else {
 									//let's assume that it should be converted to float (for now)
 									result.Type = TOKEN_TYPE_FLOAT
@@ -175,6 +178,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 			
 									if(leftOperand.Type == TOKEN_TYPE_INTEGER) {
 										result.Value = strconv.Itoa(tempLeftInt + tempRightInt)
+									} else if(leftOperand.Type == TOKEN_TYPE_STRING) {
+										result.Value = leftOperand.Value + rightOperand.Value //concatenate
 									} else {
 										//let's assume it's float
 										result.Value = strconv.FormatFloat(tempLeftFloat + tempRightFloat, 'f', -1, 64)
@@ -262,6 +267,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								if(value.Type == TOKEN_TYPE_INTEGER) {
 									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_INTEGER
 									(*globalVariableArray)[varIndex].IntegerValue, _ = strconv.Atoi(value.Value)
+								} else if(value.Type == TOKEN_TYPE_STRING) {
+									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_STRING
+									(*globalVariableArray)[varIndex].StringValue = value.Value
 								} else {
 									//assume it's float for now (add types later on like string etc...)
 									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
