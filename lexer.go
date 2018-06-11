@@ -338,9 +338,19 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 
 		if(x != 0 && (tokenArray[x].Type == TOKEN_TYPE_FLOAT || tokenArray[x].Type == TOKEN_TYPE_INTEGER)) {
 			if(tokenArray[x - 1].Type == TOKEN_TYPE_MINUS) {
-				//set to negative number
-				finalTokenArray[len(finalTokenArray) - 1].Value += tokenArray[x].Value
-				finalTokenArray[len(finalTokenArray) - 1].Type = tokenArray[x].Type
+
+				if((x - 2) >= 0) {
+					if(tokenArray[x-2].Type != TOKEN_TYPE_FLOAT && tokenArray[x-2].Type != TOKEN_TYPE_INTEGER && tokenArray[x-2].Type != TOKEN_TYPE_IDENTIFIER) {
+						//set to negative number
+						finalTokenArray[len(finalTokenArray) - 1].Value += tokenArray[x].Value
+						finalTokenArray[len(finalTokenArray) - 1].Type = tokenArray[x].Type
+					} else {
+						finalTokenArray = append(finalTokenArray, tokenArray[x])
+					}
+				} else {
+					finalTokenArray = append(finalTokenArray, tokenArray[x])
+				}
+				
 			} else {
 				finalTokenArray = append(finalTokenArray, tokenArray[x])
 			}
