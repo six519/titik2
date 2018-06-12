@@ -135,13 +135,13 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								stack = stack[:len(stack)-1]
 								var tempRightInt int
 								var tempRightFloat float64
-								//var tempRightString string
+								var tempRightString string
 			
 								leftOperand := stack[len(stack)-1]
 								stack = stack[:len(stack)-1]
 								var tempLeftInt int
 								var tempLeftFloat float64
-								//var tempLeftString string
+								var tempLeftString string
 			
 								result := leftOperand
 			
@@ -154,6 +154,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								} else if(leftOperand.Type == TOKEN_TYPE_STRING) {
 									//string
 									result.Type = TOKEN_TYPE_STRING
+									tempLeftString = leftOperand.Value
+									tempRightString = rightOperand.Value
 								} else {
 									//let's assume that it should be converted to float (for now)
 									result.Type = TOKEN_TYPE_FLOAT
@@ -178,7 +180,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									if(leftOperand.Type == TOKEN_TYPE_INTEGER) {
 										result.Value = strconv.Itoa(tempLeftInt + tempRightInt)
 									} else if(leftOperand.Type == TOKEN_TYPE_STRING) {
-										result.Value = leftOperand.Value + rightOperand.Value //concatenate
+										result.Value = tempLeftString + tempRightString //concatenate
 									} else {
 										//let's assume it's float
 										result.Value = strconv.FormatFloat(tempLeftFloat + tempRightFloat, 'f', -1, 64)
