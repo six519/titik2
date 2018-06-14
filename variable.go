@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"errors"
+	"strconv"
 )
 
 //variable types (basic)
@@ -60,4 +62,27 @@ func isVariableExists(token Token, globalVariableArray []Variable, scopeName str
 	}
 
 	return false, 0
+}
+
+func convertVariableToToken(token Token, variables []Variable, scopeName string) (Token, error) {
+
+	isExists, indx := isVariableExists(token, variables, scopeName)
+
+	if(!isExists) {
+		return token, errors.New(SyntaxErrorMessage(token.Line, token.Column, "Variable doesn't exists '" + token.Value + "'", token.FileName))
+	}
+
+	if(variables[indx].Type == VARIABLE_TYPE_INTEGER) {
+		token.Type = TOKEN_TYPE_INTEGER
+		token.Value = strconv.Itoa(variables[indx].IntegerValue)
+	} else if(variables[indx].Type == VARIABLE_TYPE_STRING) {
+		token.Type = TOKEN_TYPE_STRING
+		token.Value = variables[indx].StringValue
+	} else {
+		//assume it's float for now
+		token.Type = TOKEN_TYPE_FLOAT
+		token.Value = strconv.FormatFloat(variables[indx].FloatValue, 'f', -1, 64)
+	}
+
+	return token, nil
 }

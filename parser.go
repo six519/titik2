@@ -142,8 +142,25 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								var tempLeftInt int
 								var tempLeftFloat float64
 								var tempLeftString string
+
+								var errConvert error
 			
 								result := leftOperand
+								//convert the identifier to token below
+								//left and right operand
+								//will raise an error if not existing (of course)
+								if(leftOperand.Type == TOKEN_TYPE_IDENTIFIER) {
+									leftOperand, errConvert = convertVariableToToken(leftOperand, *globalVariableArray, scopeName)
+									if(errConvert != nil) {
+										return errConvert
+									}
+								}
+								if(rightOperand.Type == TOKEN_TYPE_IDENTIFIER) {
+									rightOperand, errConvert = convertVariableToToken(rightOperand, *globalVariableArray, scopeName)
+									if(errConvert != nil) {
+										return errConvert
+									}
+								}
 			
 								//convert operands to its designated type
 								if(leftOperand.Type == TOKEN_TYPE_INTEGER) {
