@@ -253,6 +253,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								stack = append(stack, result)
 			
 							} else if(currentToken.Type == TOKEN_TYPE_EQUALS) {
+								//TODO: FIX THE BUG a=a=23+5
 								//assignment operation
 								value := stack[len(stack)-1]
 								stack = stack[:len(stack)-1]
