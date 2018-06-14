@@ -253,10 +253,19 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								stack = append(stack, result)
 			
 							} else if(currentToken.Type == TOKEN_TYPE_EQUALS) {
-								//TODO: FIX THE BUG a=a=23+5
 								//assignment operation
 								value := stack[len(stack)-1]
 								stack = stack[:len(stack)-1]
+								var errConvert error
+
+								//if value is an identifier
+								//the it's a variable
+								if(value.Type == TOKEN_TYPE_IDENTIFIER) {
+									value, errConvert = convertVariableToToken(value, *globalVariableArray, scopeName)
+									if(errConvert != nil) {
+										return errConvert
+									}
+								}
 			
 								variable := stack[len(stack)-1]
 								stack = stack[:len(stack)-1]
@@ -294,6 +303,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
 									(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
 								}
+
+								stack = append(stack, value)
 							} else {
 								stack = append(stack, currentToken)
 							}
