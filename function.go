@@ -28,7 +28,7 @@ type FunctionArgument struct {
 	FloatValue float64
 }
 
-type Execute func([]FunctionArgument, FunctionReturn) FunctionReturn
+type Execute func([]FunctionArgument) FunctionReturn
 
 type Function struct {
 	Name string
@@ -50,6 +50,17 @@ func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
 
 func defineFunction(funcName string, funcExec Execute, isNative bool) {
 
+}
+
+//native functions
+func P_execute(arguments []FunctionArgument) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if(len(arguments) == 1) {
+
+	}
+
+	return ret
 }
 
 func initNativeFunctions() {
