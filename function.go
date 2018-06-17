@@ -48,7 +48,7 @@ func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
 	return false, 0
 }
 
-func defineFunction(funcName string, arguments []FunctionArgument, funcExec Execute, funcReturn FunctionReturn, isNative bool) {
+func defineFunction(funcName string, funcExec Execute, isNative bool) {
 
 }
 
