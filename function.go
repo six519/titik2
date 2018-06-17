@@ -36,3 +36,14 @@ type Function struct {
 	Tokens []Token
 	Run Execute
 }
+
+func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
+
+	for x := 0; x < len(globalFunctionArray); x++ {
+		if(globalFunctionArray[x].Name == token.Value) {
+			return true, x
+		}
+	}
+
+	return false, 0
+}
