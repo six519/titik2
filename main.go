@@ -22,6 +22,7 @@ func main() {
 		lxr := Lexer{FileName: os.Args[1]}
 		fileErr := lxr.ReadSourceFile()
 		var globalVariableArray []Variable
+		var globalFunctionArray []Function
 
 		if (fileErr != nil) {
 			fmt.Println(fileErr)
@@ -37,7 +38,7 @@ func main() {
 		}
 		//parser object
 		prsr := Parser{}
-		parserErr := prsr.Parse(tokenArray, &globalVariableArray, "main")
+		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main")
 
 		if(parserErr != nil) {
 			fmt.Println(parserErr)
