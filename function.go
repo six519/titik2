@@ -32,7 +32,7 @@ type Execute func([]FunctionArgument, FunctionReturn) FunctionReturn
 
 type Function struct {
 	Name string
-	IsSystem bool
+	IsNative bool
 	Tokens []Token
 	Run Execute
 }
