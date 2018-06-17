@@ -1,10 +1,6 @@
 package main
 
 var RESERVED_WORDS = []string {
-	"zzz", //sleep
-	"p", //print
-	"fd", //function
-	"df", //end of function declaration
 	"fl", //for loop
 	"lf", //end of for loop
 	"wl", //while loop
@@ -16,10 +12,15 @@ var RESERVED_WORDS = []string {
 	"e", //else
 	"to", //use in looping statement
 	"b", //break loop
+	"fd", //function
+	"df", //end of function declaration
+	"rtn", //return
+	/*
+	"zzz", //sleep
+	"p", //print
 	"tof", //convert to float
 	"toi", //convert to integer
 	"tos", //convert to string
-	"rtn", //return
 	"ex", //exit
 	"sc", //set color
 	"flcp", //file copy
@@ -35,6 +36,7 @@ var RESERVED_WORDS = []string {
 	"genv", //get environment variable
 	"senv", //set environment variable
 	"as", //get array size
+	*/
 }
 
 func IsReservedWord(wrd string) bool {
