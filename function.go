@@ -47,3 +47,11 @@ func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
 
 	return false, 0
 }
+
+func defineFunction(funcName string, arguments []FunctionArgument, funcExec Execute, funcReturn FunctionReturn, isNative bool) {
+
+}
+
+func initNativeFunctions() {
+	//a lot of definefunctions below
+}

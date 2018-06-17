@@ -24,6 +24,9 @@ func main() {
 		var globalVariableArray []Variable
 		var globalFunctionArray []Function
 
+		//initialize native functions
+		initNativeFunctions()
+
 		if (fileErr != nil) {
 			fmt.Println(fileErr)
 			os.Exit(1)
