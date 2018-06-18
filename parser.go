@@ -149,6 +149,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								//convert the identifier to token below
 								//left and right operand
 								//will raise an error if not existing (of course)
+
+								//TODO: CHECK FIRST IF LEFT/RIGHT OPERAND IS EXISTING AS FUNCTION, IF YES THEN RAISE AN ERROR
+								//TODO: TRY TO FIX THE ASSIGNMENT OPERATION BEFORE THIS ONE
+
 								if(leftOperand.Type == TOKEN_TYPE_IDENTIFIER) {
 									leftOperand, errConvert = convertVariableToToken(leftOperand, *globalVariableArray, scopeName)
 									if(errConvert != nil) {
@@ -280,6 +284,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								if (errVar != nil) {
 									return errVar
 								}
+								//TODO: CHECK FIRST IF THE VARIABLE IS EXISTING AS FUNCTION, IF YES THEN RAISE AN ERROR
 			
 								isExists, varIndex := isVariableExists(variable, *globalVariableArray, scopeName)
 			
