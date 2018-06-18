@@ -50,7 +50,9 @@ func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
 }
 
 func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec Execute, argumentCount int, isNative bool) {
-
+	function := Function{Name: funcName, IsNative: isNative, Run: funcExec, ArgumentCount: argumentCount}
+	//append to global functions
+	*globalFunctionArray = append(*globalFunctionArray, function)
 }
 
 //native functions
@@ -65,5 +67,7 @@ func P_execute(arguments []FunctionArgument) FunctionReturn {
 }
 
 func initNativeFunctions(globalFunctionArray *[]Function) {
-	//a lot of definefunctions below
+	
+	//p(<anyvar>)
+	defineFunction(globalFunctionArray, "p", P_execute, 1, true)
 }
