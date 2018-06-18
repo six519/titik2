@@ -80,9 +80,13 @@ func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec E
 func P_execute(arguments []FunctionArgument) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
+	/*
 	if(len(arguments) == 1) {
 
 	}
+	*/
+	//TEMPORARY:
+	fmt.Println("THIS IS A TEST")
 
 	return ret
 }
