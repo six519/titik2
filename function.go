@@ -35,6 +35,7 @@ type Function struct {
 	IsNative bool
 	Tokens []Token
 	Run Execute
+	ArgumentCount int
 }
 
 func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
@@ -48,7 +49,7 @@ func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
 	return false, 0
 }
 
-func defineFunction(funcName string, funcExec Execute, isNative bool) {
+func defineFunction(funcName string, funcExec Execute, argumentCount int, isNative bool) {
 
 }
 
