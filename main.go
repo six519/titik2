@@ -25,7 +25,7 @@ func main() {
 		var globalFunctionArray []Function
 
 		//initialize native functions
-		initNativeFunctions()
+		initNativeFunctions(&globalFunctionArray)
 
 		if (fileErr != nil) {
 			fmt.Println(fileErr)

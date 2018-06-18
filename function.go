@@ -49,7 +49,7 @@ func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
 	return false, 0
 }
 
-func defineFunction(funcName string, funcExec Execute, argumentCount int, isNative bool) {
+func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec Execute, argumentCount int, isNative bool) {
 
 }
 
@@ -64,6 +64,6 @@ func P_execute(arguments []FunctionArgument) FunctionReturn {
 	return ret
 }
 
-func initNativeFunctions() {
+func initNativeFunctions(globalFunctionArray *[]Function) {
 	//a lot of definefunctions below
 }
