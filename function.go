@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 //function return type
 const RET_TYPE_NONE int = 0
 const RET_TYPE_STRING int = 1
@@ -36,6 +40,23 @@ type Function struct {
 	Tokens []Token
 	Run Execute
 	ArgumentCount int
+}
+
+func DumpFunction(functions []Function) {
+	fmt.Printf("====================================\n")
+
+	for x := 0; x < len(functions); x++ {
+		fmt.Printf("Function Name: %s\n", functions[x].Name)
+		fmt.Printf("Argument Count: %d\n", functions[x].ArgumentCount)
+
+		if(functions[x].IsNative) {
+			fmt.Println("Is Native: Yes")
+		} else {
+			fmt.Println("Is Native: No")
+		}
+
+		fmt.Printf("====================================\n")
+	}
 }
 
 func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
