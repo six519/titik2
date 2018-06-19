@@ -284,8 +284,15 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								if (errVar != nil) {
 									return errVar
 								}
-								//TODO: CHECK FIRST IF THE VARIABLE IS EXISTING AS FUNCTION, IF YES THEN RAISE AN ERROR
-			
+
+								//check if variable exists as a function
+								//if yes then raise an error
+								isExists, _ := isFunctionExists(variable, *globalFunctionArray)
+
+								if(isExists) {
+									return errors.New(SyntaxErrorMessage(variable.Line, variable.Column, "'" + variable.Value + "' exists as a function", variable.FileName))	
+								}
+
 								isExists, varIndex := isVariableExists(variable, *globalVariableArray, scopeName)
 			
 								if(!isExists) {
