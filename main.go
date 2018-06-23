@@ -50,6 +50,6 @@ func main() {
 
 		//DumpToken(tokenArray) //:TEMPORARY
 		//DumpVariable(globalVariableArray)
-		DumpFunction(globalFunctionArray)
+		//DumpFunction(globalFunctionArray)
 	}
 }

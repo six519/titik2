@@ -50,6 +50,7 @@ const TOKEN_TYPE_EXCLAMATION int = 30
 const TOKEN_TYPE_TAB int = 31
 const TOKEN_TYPE_CARRIAGE_RETURN int = 32
 const TOKEN_TYPE_NONE = 33
+const TOKEN_TYPE_FUNCTION = 34
 
 //for debugging purpose only
 var TOKEN_TYPES_STRING = []string {
@@ -87,6 +88,7 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_TAB",
 	"TOKEN_TYPE_CARRIAGE_RETURN",
 	"TOKEN_TYPE_NONE",
+	"TOKEN_TYPE_FUNCTION",
 }
 
 //token object
@@ -325,6 +327,13 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			if(IsReservedWord(tokenArray[x].Value)) {
 				//Convert identifier to keyword if existing in reserved words
 				tokenArray[x].Type = TOKEN_TYPE_KEYWORD
+			} else {
+				//Check if the next token is '(', if yes then it's a function call
+				if((x + 1) <= len(tokenArray) - 1 ) {
+					if(tokenArray[x+1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
+						tokenArray[x].Type = TOKEN_TYPE_FUNCTION
+					}
+				}
 			}
 		} else if(tokenArray[x].Type == TOKEN_TYPE_STRING) {
 			if(!((x+1) < len(tokenArray))) {
