@@ -28,7 +28,7 @@ type Parser struct {
 
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string) error {
 	var tokensToEvaluate []Token
-	operatorPrecedences := map[string] int{"function": 1, "=": 0, "+": 2, "-": 2, "/": 3, "*": 3} //operator order of precedences
+	operatorPrecedences := map[string] int{"function": 1, "=": 0, "+": 2, "-": 2, "/": 3, "*": 3, ",": 1} //operator order of precedences
 	var operatorStack []Token
 	var outputQueue []Token
 
@@ -60,7 +60,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							isValidToken = true
 						}
 			
-						if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_FUNCTION) {
+						if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA) {
 							//the token is operator
 							for true {
 								if(len(operatorStack) > 0) {
@@ -400,6 +400,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								} else {
 									//execute function from token
 								}
+							} else if(currentToken.Type == TOKEN_TYPE_COMMA) {
+								//IGNORE COMMA FOR NOW, (NOT SURE IF TEMPORARY)
 							} else {
 								stack = append(stack, currentToken)
 							}
