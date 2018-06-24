@@ -128,7 +128,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
 						operatorStack = operatorStack[:len(operatorStack)-1]
 					}
-
+					DumpToken(outputQueue)
 					//the outputQueue contains the reverse polish notation
 					if(len(outputQueue) > 0) {
 						//read the reverse polish below
@@ -415,10 +415,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							} else if(currentToken.Type == TOKEN_TYPE_COMMA) {
 								//TODO: add last stack to special queue
 								for true {
-									currentToken := outputQueue[0]
-									if(currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_IDENTIFIER || currentToken.Type == TOKEN_TYPE_STRING) {
-										outputQueue = append(outputQueue[:0], outputQueue[1:]...)
-										stack2 = append(stack2, currentToken)
+									if(len(stack) > 0) {
+										currentToken := stack[len(stack)-1]
+										if(currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_IDENTIFIER || currentToken.Type == TOKEN_TYPE_STRING) {
+											stack = stack[:len(stack)-1]
+											stack2 = append(stack2, currentToken)
+										} else {
+											break
+										}
 									} else {
 										break
 									}
