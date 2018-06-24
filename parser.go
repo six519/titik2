@@ -28,7 +28,7 @@ type Parser struct {
 
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string) error {
 	var tokensToEvaluate []Token
-	operatorPrecedences := map[string] int{"function": 1, "=": 0, "+": 2, "-": 2, "/": 3, "*": 3, ",": 1} //operator order of precedences
+	operatorPrecedences := map[string] int{"function": 1, "=": 0, "+": 3, "-": 3, "/": 4, "*": 4, ",": 2} //operator order of precedences
 	var operatorStack []Token
 	var outputQueue []Token
 
