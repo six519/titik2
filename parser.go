@@ -329,6 +329,16 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								stack = append(stack, value)
 							} else if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
 								//function execution here
+								//check if function is existing below
+								isExists, funcIndex := isFunctionExists(currentToken, *globalFunctionArray)
+								if(!isExists) {
+									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Function '" + currentToken.Value + "' doesn't exists", currentToken.FileName))
+								}
+
+								//check if function got arguments
+								if((*globalFunctionArray)[funcIndex].ArgumentCount > 0) {
+									//function need parameters
+								}
 							} else {
 								stack = append(stack, currentToken)
 							}
