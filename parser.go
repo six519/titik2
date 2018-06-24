@@ -133,6 +133,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					if(len(outputQueue) > 0) {
 						//read the reverse polish below
 						var stack []Token
+						var stack2 []Token
 			
 						for len(outputQueue) > 0 {
 							currentToken := outputQueue[0]
@@ -340,16 +341,27 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								//check if function got arguments
 								if((*globalFunctionArray)[funcIndex].ArgumentCount > 0) {
 									//function need parameters
+									/* //TODO: DISABLED TEMPORARILY, NEED VALIDATOR FOR THE PARAMS
 									if(len(stack) == 0 || len(stack) < (*globalFunctionArray)[funcIndex].ArgumentCount) {
 										return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly " + strconv.Itoa((*globalFunctionArray)[funcIndex].ArgumentCount) + " argument", currentToken.FileName))
 									}
+									*/
 
 									//add arguments from stack below
 									processedArg := 0
 									for true {
+										var param Token
 										//add to functionargument one by one
-										param := stack[len(stack)-1]
-										stack = stack[:len(stack)-1]
+										if(len(stack2) > 0) {
+											//if stack2 is available
+											//get the parameters there
+											param = stack2[0]
+											stack2 = append(stack2[:0], stack2[1:]...)
+										} else {
+											param = stack[len(stack)-1]
+											stack = stack[:len(stack)-1]
+										}
+
 										var errConvert error
 										if(param.Type == TOKEN_TYPE_IDENTIFIER) {
 											param, errConvert = convertVariableToToken(param, *globalVariableArray, scopeName)
@@ -402,6 +414,15 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							} else if(currentToken.Type == TOKEN_TYPE_COMMA) {
 								//TODO: add last stack to special queue
+								for true {
+									currentToken := outputQueue[0]
+									if(currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_IDENTIFIER || currentToken.Type == TOKEN_TYPE_STRING) {
+										outputQueue = append(outputQueue[:0], outputQueue[1:]...)
+										stack2 = append(stack2, currentToken)
+									} else {
+										break
+									}
+								}
 							} else {
 								stack = append(stack, currentToken)
 							}
