@@ -401,7 +401,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									//execute function from token
 								}
 							} else if(currentToken.Type == TOKEN_TYPE_COMMA) {
-								//IGNORE COMMA FOR NOW, (NOT SURE IF TEMPORARY)
+								//TODO: add last stack to special queue
 							} else {
 								stack = append(stack, currentToken)
 							}
