@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
 //function return type
@@ -80,13 +81,17 @@ func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec E
 func P_execute(arguments []FunctionArgument) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	/*
-	if(len(arguments) == 1) {
-
+	if(arguments[0].Type == ARG_TYPE_FLOAT) {
+		fmt.Printf("%f\n", arguments[0].FloatValue)
+		ret.StringValue = strconv.FormatFloat(arguments[0].FloatValue, 'f', -1, 64)
+	} else if(arguments[0].Type == ARG_TYPE_STRING) {
+		fmt.Printf("%s\n", arguments[0].StringValue)
+		ret.StringValue = arguments[0].StringValue
+	} else {
+		//integer
+		fmt.Printf("%d\n", arguments[0].IntegerValue)
+		ret.StringValue = strconv.Itoa(arguments[0].IntegerValue)
 	}
-	*/
-	//TEMPORARY:
-	fmt.Println("THIS IS A TEST")
 
 	return ret
 }
