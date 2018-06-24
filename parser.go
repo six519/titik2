@@ -359,7 +359,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										}
 
 										fa := FunctionArgument{}
-
+										//convert token to param (TODO: create a function for this one?)
 										if(param.Type == TOKEN_TYPE_INTEGER) {
 											fa.Type = ARG_TYPE_INTEGER
 											fa.IntegerValue, _ = strconv.Atoi(param.Value)
@@ -383,6 +383,20 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 								if((*globalFunctionArray)[funcIndex].IsNative) {
 									//execute native function
+									funcReturn := (*globalFunctionArray)[funcIndex].Run(functionArguments)
+									//convert FunctionReturn to Token and append to stack (TODO: Create a function for conversion?)
+									newToken := currentToken
+									if(funcReturn.Type == RET_TYPE_INTEGER) {
+										newToken.Type = TOKEN_TYPE_INTEGER
+										newToken.Value = strconv.Itoa(funcReturn.IntegerValue)
+									} else if(funcReturn.Type == RET_TYPE_STRING) {
+										newToken.Type = TOKEN_TYPE_STRING
+										newToken.Value = funcReturn.StringValue
+									} else {
+										//let's assume it's float
+										newToken.Value = strconv.FormatFloat(funcReturn.FloatValue, 'f', -1, 64)
+									}
+									stack = append(stack, newToken)
 								} else {
 									//execute function from token
 								}
