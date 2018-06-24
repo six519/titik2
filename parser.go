@@ -341,6 +341,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									if(len(stack) == 0) {
 										return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly " + strconv.Itoa((*globalFunctionArray)[funcIndex].ArgumentCount) + " argument", currentToken.FileName))
 									}
+
+									//add arguments from stack below
+								}
+
+								if((*globalFunctionArray)[funcIndex].IsNative) {
+									//execute native function
+								} else {
+									//execute function from token
 								}
 							} else {
 								stack = append(stack, currentToken)
