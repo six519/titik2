@@ -338,7 +338,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								//check if function got arguments
 								if((*globalFunctionArray)[funcIndex].ArgumentCount > 0) {
 									//function need parameters
-									if(len(stack) == 0) {
+									if(len(stack) == 0 || len(stack) < (*globalFunctionArray)[funcIndex].ArgumentCount) {
 										return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly " + strconv.Itoa((*globalFunctionArray)[funcIndex].ArgumentCount) + " argument", currentToken.FileName))
 									}
 
