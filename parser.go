@@ -64,7 +64,6 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						if(currentToken.Type == TOKEN_TYPE_COMMA) {
 							//TODO: ADD A VALIDATOR HERE, CHECK IF THE NEXT TOKEN IS A COMMA , IF TRUE THEN RAISE SYNTAX ERROR
 							isValidToken = true
-							//count argument below
 						}
 
 						if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
