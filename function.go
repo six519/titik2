@@ -96,17 +96,8 @@ func P_execute(arguments []FunctionArgument) FunctionReturn {
 	return ret
 }
 
-func P2_execute(arguments []FunctionArgument) FunctionReturn {
-	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
-
-	fmt.Printf("%d and %d and %d\n", arguments[2].IntegerValue, arguments[1].IntegerValue, arguments[0].IntegerValue)
-
-	return ret
-}
-
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
 	defineFunction(globalFunctionArray, "p", P_execute, 1, true)
-	defineFunction(globalFunctionArray, "p2", P2_execute, 3, true)
 }

@@ -28,7 +28,7 @@ type Parser struct {
 
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string) error {
 	var tokensToEvaluate []Token
-	operatorPrecedences := map[string] int{"function": 1, "=": 0, "+": 3, "-": 3, "/": 4, "*": 4, ",": 2} //operator order of precedences
+	operatorPrecedences := map[string] int{"=": 0, "+": 1, "-": 1, "/": 2, "*": 2, "function": 3} //operator order of precedences
 	var operatorStack []Token
 	var outputQueue []Token
 
@@ -59,8 +59,13 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							outputQueue = append(outputQueue, currentToken)
 							isValidToken = true
 						}
+
+						if(currentToken.Type == TOKEN_TYPE_COMMA) {
+							//TODO: IGNORE COMMA FOR NOW? (TEMPORARY)
+							isValidToken = true
+						}
 			
-						if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA) {
+						if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_FUNCTION) {
 							//the token is operator
 							for true {
 								if(len(operatorStack) > 0) {
@@ -133,7 +138,6 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					if(len(outputQueue) > 0) {
 						//read the reverse polish below
 						var stack []Token
-						var stack2 []Token
 			
 						for len(outputQueue) > 0 {
 							currentToken := outputQueue[0]
@@ -330,107 +334,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								stack = append(stack, value)
 							} else if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
 								//function execution here
-								var functionArguments []FunctionArgument
 
-								//check if function is existing below
-								isExists, funcIndex := isFunctionExists(currentToken, *globalFunctionArray)
-								if(!isExists) {
-									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Function '" + currentToken.Value + "' doesn't exists", currentToken.FileName))
-								}
-
-								//check if function got arguments
-								if((*globalFunctionArray)[funcIndex].ArgumentCount > 0) {
-									//function need parameters
-									/* //TODO: DISABLED TEMPORARILY, NEED VALIDATOR FOR THE PARAMS
-									if(len(stack) == 0 || len(stack) < (*globalFunctionArray)[funcIndex].ArgumentCount) {
-										return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly " + strconv.Itoa((*globalFunctionArray)[funcIndex].ArgumentCount) + " argument", currentToken.FileName))
-									}
-									*/
-
-									//add arguments from stack below
-									processedArg := 0
-									for true {
-										var param Token
-										//add to functionargument one by one
-										if(len(stack2) > 0) {
-											//if stack2 is available
-											//get the parameters there
-											param = stack2[0]
-											stack2 = append(stack2[:0], stack2[1:]...)
-										} else {
-											param = stack[len(stack)-1]
-											stack = stack[:len(stack)-1]
-										}
-
-										var errConvert error
-										if(param.Type == TOKEN_TYPE_IDENTIFIER) {
-											param, errConvert = convertVariableToToken(param, *globalVariableArray, scopeName)
-											if(errConvert != nil) {
-												return errConvert
-											}
-										}
-
-										fa := FunctionArgument{}
-										//convert token to param (TODO: create a function for this one?)
-										if(param.Type == TOKEN_TYPE_INTEGER) {
-											fa.Type = ARG_TYPE_INTEGER
-											fa.IntegerValue, _ = strconv.Atoi(param.Value)
-										} else if(param.Type == TOKEN_TYPE_STRING) {
-											fa.Type = ARG_TYPE_STRING
-											fa.StringValue = param.Value
-										} else {
-											//assume it's float for now (add types later on like string etc...)
-											fa.Type = ARG_TYPE_FLOAT
-											fa.FloatValue, _ = strconv.ParseFloat(param.Value, 32)
-										}
-
-										functionArguments = append(functionArguments, fa)
-
-										processedArg += 1
-										if (processedArg == (*globalFunctionArray)[funcIndex].ArgumentCount) {
-											break
-										}
-									}
-								}
-
-								if((*globalFunctionArray)[funcIndex].IsNative) {
-									//execute native function
-									funcReturn := (*globalFunctionArray)[funcIndex].Run(functionArguments)
-									//convert FunctionReturn to Token and append to stack (TODO: Create a function for conversion?)
-									newToken := currentToken
-									if(funcReturn.Type == RET_TYPE_INTEGER) {
-										newToken.Type = TOKEN_TYPE_INTEGER
-										newToken.Value = strconv.Itoa(funcReturn.IntegerValue)
-									} else if(funcReturn.Type == RET_TYPE_STRING) {
-										newToken.Type = TOKEN_TYPE_STRING
-										newToken.Value = funcReturn.StringValue
-									} else {
-										//let's assume it's float
-										newToken.Value = strconv.FormatFloat(funcReturn.FloatValue, 'f', -1, 64)
-									}
-									var newSlice []Token
-									newSlice = append(newSlice, newToken)
-									stack = append(newSlice, stack...)
-								} else {
-									//execute function from token
-								}
-							} else if(currentToken.Type == TOKEN_TYPE_COMMA) {
-								//TODO: add last stack to special queue
-								for true {
-									if(len(stack) > 0) {
-										//currentToken := stack[len(stack)-1]
-										currentToken := stack[0]
-										if(currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_IDENTIFIER || currentToken.Type == TOKEN_TYPE_STRING) {
-											//stack = stack[:len(stack)-1]
-											stack = append(stack[:0], stack[1:]...)
-											stack2 = append(stack2, currentToken)
-										} else {
-											break
-										}
-									} else {
-										break
-									}
-								}
 							} else {
 								stack = append(stack, currentToken)
 							}
