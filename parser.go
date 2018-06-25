@@ -66,7 +66,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							isValidToken = true
 						}
 
-						if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
+						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION) {
+							isValidToken = true
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
 							for true {
@@ -81,28 +82,13 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									break
 								}
 							}
-							functionStack = append(functionStack, currentToken)
-							isValidToken = true
-						}
 
-						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION) {
-							isValidToken = true
-							//pop all operators from operator stack to output queue before the function
-							//NOTE: don't include '=' (NOT SURE)
-							for true {
-								if(len(operatorStack) > 0) {
-									if(operatorStack[len(operatorStack) - 1].Type == TOKEN_TYPE_EQUALS) {
-										break
-									} else {
-										outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-										operatorStack = operatorStack[:len(operatorStack)-1]
-									}
-								} else {
-									break
-								}
+							if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
+								functionStack = append(functionStack, currentToken)
+							} else {
+								outputQueue = append(outputQueue, functionStack[len(functionStack) - 1])
+								functionStack = functionStack[:len(functionStack)-1]
 							}
-							outputQueue = append(outputQueue, functionStack[len(functionStack) - 1])
-							functionStack = functionStack[:len(functionStack)-1]
 						}
 
 						if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS) {
