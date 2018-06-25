@@ -51,6 +51,7 @@ const TOKEN_TYPE_TAB int = 31
 const TOKEN_TYPE_CARRIAGE_RETURN int = 32
 const TOKEN_TYPE_NONE = 33
 const TOKEN_TYPE_FUNCTION = 34
+const TOKEN_TYPE_INVOKE_FUNCTION = 35
 
 //for debugging purpose only
 var TOKEN_TYPES_STRING = []string {
@@ -89,6 +90,7 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_CARRIAGE_RETURN",
 	"TOKEN_TYPE_NONE",
 	"TOKEN_TYPE_FUNCTION",
+	"TOKEN_TYPE_INVOKE_FUNCTION",
 }
 
 //token object
@@ -322,7 +324,28 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	}
 
 	//token cleanup 
+	var ignoreOpenP bool = false
+	var f_count int = 0
+	var op_count int = 0
 	for x := 0; x < len(tokenArray); x++ {
+		if(ignoreOpenP) {
+			//ignore open parenthesis if the last token is a function
+			ignoreOpenP = false
+			continue
+		}
+		if(tokenArray[x].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
+			op_count += 1
+		}
+		if(tokenArray[x].Type == TOKEN_TYPE_CLOSE_PARENTHESIS) {
+			if(op_count > 0) {
+				op_count -= 1
+			} else {
+				if(f_count > 0) {
+					f_count -= 1
+					tokenArray[x].Type = TOKEN_TYPE_INVOKE_FUNCTION
+				}
+			}
+		}
 		if(tokenArray[x].Type == TOKEN_TYPE_IDENTIFIER) {
 			if(IsReservedWord(tokenArray[x].Value)) {
 				//Convert identifier to keyword if existing in reserved words
@@ -332,6 +355,8 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				if((x + 1) <= len(tokenArray) - 1 ) {
 					if(tokenArray[x+1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
 						tokenArray[x].Type = TOKEN_TYPE_FUNCTION
+						ignoreOpenP = true
+						f_count += 1
 					}
 				}
 			}
