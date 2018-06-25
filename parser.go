@@ -28,8 +28,9 @@ type Parser struct {
 
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string) error {
 	var tokensToEvaluate []Token
-	operatorPrecedences := map[string] int{"=": 0, "+": 1, "-": 1, "/": 2, "*": 2, "function": 3} //operator order of precedences
+	operatorPrecedences := map[string] int{"=": 0, "+": 1, "-": 1, "/": 2, "*": 2} //operator order of precedences
 	var operatorStack []Token
+	var functionStack []Token
 	var outputQueue []Token
 
 	for x := 0; x < len(tokenArray); x++ {
@@ -61,30 +62,62 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						}
 
 						if(currentToken.Type == TOKEN_TYPE_COMMA) {
-							//TODO: IGNORE COMMA FOR NOW? (TEMPORARY)
+							//TODO: ADD A VALIDATOR HERE, CHECK IF THE NEXT TOKEN IS A COMMA , IF TRUE THEN RAISE SYNTAX ERROR
+							isValidToken = true
+							//count argument below
+						}
+
+						if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
+							//pop all operators from operator stack to output queue before the function
+							//NOTE: don't include '=' (NOT SURE)
+							for true {
+								if(len(operatorStack) > 0) {
+									if(operatorStack[len(operatorStack) - 1].Type == TOKEN_TYPE_EQUALS) {
+										break
+									} else {
+										outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
+										operatorStack = operatorStack[:len(operatorStack)-1]
+									}
+								} else {
+									break
+								}
+							}
+							functionStack = append(functionStack, currentToken)
 							isValidToken = true
 						}
-			
-						if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_FUNCTION) {
+
+						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION) {
+							isValidToken = true
+							//pop all operators from operator stack to output queue before the function
+							//NOTE: don't include '=' (NOT SURE)
+							for true {
+								if(len(operatorStack) > 0) {
+									if(operatorStack[len(operatorStack) - 1].Type == TOKEN_TYPE_EQUALS) {
+										break
+									} else {
+										outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
+										operatorStack = operatorStack[:len(operatorStack)-1]
+									}
+								} else {
+									break
+								}
+							}
+							outputQueue = append(outputQueue, functionStack[len(functionStack) - 1])
+							functionStack = functionStack[:len(functionStack)-1]
+						}
+
+						if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS) {
 							//the token is operator
 							for true {
 								if(len(operatorStack) > 0) {
 
-									if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
-										if(operatorPrecedences[operatorStack[len(operatorStack) - 1].Value] > operatorPrecedences["function"]) {
-											outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-											operatorStack = operatorStack[:len(operatorStack)-1]
-										} else {
-											break
-										}
+									if(operatorPrecedences[operatorStack[len(operatorStack) - 1].Value] > operatorPrecedences[currentToken.Value]) {
+										outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
+										operatorStack = operatorStack[:len(operatorStack)-1]
 									} else {
-										if(operatorPrecedences[operatorStack[len(operatorStack) - 1].Value] > operatorPrecedences[currentToken.Value]) {
-											outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-											operatorStack = operatorStack[:len(operatorStack)-1]
-										} else {
-											break
-										}
+										break
 									}
+
 								} else {
 									break
 								}
