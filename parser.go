@@ -331,7 +331,6 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							} else if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
 								//function execution here
 								var functionArguments []FunctionArgument
-								var gotFromStack2 bool = false
 
 								//check if function is existing below
 								isExists, funcIndex := isFunctionExists(currentToken, *globalFunctionArray)
@@ -358,7 +357,6 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											//get the parameters there
 											param = stack2[0]
 											stack2 = append(stack2[:0], stack2[1:]...)
-											gotFromStack2 = true
 										} else {
 											param = stack[len(stack)-1]
 											stack = stack[:len(stack)-1]
@@ -410,14 +408,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										//let's assume it's float
 										newToken.Value = strconv.FormatFloat(funcReturn.FloatValue, 'f', -1, 64)
 									}
-
-									if(gotFromStack2) {
-										var newSlice []Token
-										newSlice = append(newSlice, newToken)
-										stack = append(newSlice, stack...)
-									} else {
-										stack = append(stack, newToken)
-									}
+									var newSlice []Token
+									newSlice = append(newSlice, newToken)
+									stack = append(newSlice, stack...)
 								} else {
 									//execute function from token
 								}

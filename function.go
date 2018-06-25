@@ -99,7 +99,7 @@ func P_execute(arguments []FunctionArgument) FunctionReturn {
 func P2_execute(arguments []FunctionArgument) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	fmt.Printf("%s and %s and %s\n", arguments[2].StringValue, arguments[1].StringValue, arguments[0].StringValue)
+	fmt.Printf("%d and %d and %d\n", arguments[2].IntegerValue, arguments[1].IntegerValue, arguments[0].IntegerValue)
 
 	return ret
 }
