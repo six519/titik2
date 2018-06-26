@@ -149,6 +149,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
 						operatorStack = operatorStack[:len(operatorStack)-1]
 					}
+
+					//validate end of function
+					if(len(functionStack) > 0) {
+						return errors.New(SyntaxErrorMessage(functionStack[0].Line, functionStack[0].Column, "End of function call expected", functionStack[0].FileName))
+					}
+
 					//DumpToken(outputQueue)
 					//the outputQueue contains the reverse polish notation
 					if(len(outputQueue) > 0) {
