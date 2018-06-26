@@ -350,7 +350,79 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								stack = append(stack, value)
 							} else if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
 								//function execution here
+								var functionArguments []FunctionArgument
 
+								//check if function is existing below
+								isExists, funcIndex := isFunctionExists(currentToken, *globalFunctionArray)
+								if(!isExists) {
+									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Function '" + currentToken.Value + "' doesn't exists", currentToken.FileName))
+								}
+
+								//check if function got arguments
+								if((*globalFunctionArray)[funcIndex].ArgumentCount > 0) {
+									//function parameter validation below
+									if(len(stack) == 0 || len(stack) < (*globalFunctionArray)[funcIndex].ArgumentCount) {
+										return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly " + strconv.Itoa((*globalFunctionArray)[funcIndex].ArgumentCount) + " argument", currentToken.FileName))
+									}
+
+									//add arguments from stack below
+									processedArg := 0
+									for true {
+										var param Token
+										//add to functionargument one by one
+										param = stack[len(stack)-1]
+										stack = stack[:len(stack)-1]
+
+										var errConvert error
+										if(param.Type == TOKEN_TYPE_IDENTIFIER) {
+											param, errConvert = convertVariableToToken(param, *globalVariableArray, scopeName)
+											if(errConvert != nil) {
+												return errConvert
+											}
+										}
+
+										fa := FunctionArgument{}
+										//convert token to param (TODO: create a function for this one?)
+										if(param.Type == TOKEN_TYPE_INTEGER) {
+											fa.Type = ARG_TYPE_INTEGER
+											fa.IntegerValue, _ = strconv.Atoi(param.Value)
+										} else if(param.Type == TOKEN_TYPE_STRING) {
+											fa.Type = ARG_TYPE_STRING
+											fa.StringValue = param.Value
+										} else {
+											//assume it's float for now (add types later on like string etc...)
+											fa.Type = ARG_TYPE_FLOAT
+											fa.FloatValue, _ = strconv.ParseFloat(param.Value, 32)
+										}
+
+										functionArguments = append(functionArguments, fa)
+
+										processedArg += 1
+										if (processedArg == (*globalFunctionArray)[funcIndex].ArgumentCount) {
+											break
+										}
+									}
+								}
+
+								if((*globalFunctionArray)[funcIndex].IsNative) {
+									//execute native function
+									funcReturn := (*globalFunctionArray)[funcIndex].Run(functionArguments)
+									//convert FunctionReturn to Token and append to stack (TODO: Create a function for conversion?)
+									newToken := currentToken
+									if(funcReturn.Type == RET_TYPE_INTEGER) {
+										newToken.Type = TOKEN_TYPE_INTEGER
+										newToken.Value = strconv.Itoa(funcReturn.IntegerValue)
+									} else if(funcReturn.Type == RET_TYPE_STRING) {
+										newToken.Type = TOKEN_TYPE_STRING
+										newToken.Value = funcReturn.StringValue
+									} else {
+										//let's assume it's float
+										newToken.Value = strconv.FormatFloat(funcReturn.FloatValue, 'f', -1, 64)
+									}
+									stack = append(stack, newToken)
+								} else {
+									//execute function from token
+								}
 							} else {
 								stack = append(stack, currentToken)
 							}
