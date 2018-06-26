@@ -85,7 +85,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								functionStack = functionStack[:len(functionStack)-1]
 							} else {
 								//comma
-								//TODO: ADD A VALIDATOR HERE, CHECK IF THE NEXT TOKEN IS A COMMA , IF TRUE THEN RAISE SYNTAX ERROR
+								//validate separator
+								if(len(tokensToEvaluate) > 0) {
+									if(tokensToEvaluate[0].Type != TOKEN_TYPE_FLOAT && tokensToEvaluate[0].Type != TOKEN_TYPE_INTEGER && tokensToEvaluate[0].Type != TOKEN_TYPE_STRING && tokensToEvaluate[0].Type != TOKEN_TYPE_IDENTIFIER && tokensToEvaluate[0].Type != TOKEN_TYPE_FUNCTION) {
+										return errors.New(SyntaxErrorMessage(tokensToEvaluate[0].Line, tokensToEvaluate[0].Column, "Unexpected token '" + tokensToEvaluate[0].Value + "'", tokensToEvaluate[0].FileName))
+									}
+								}
 							}
 						}
 
