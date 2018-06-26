@@ -61,12 +61,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							isValidToken = true
 						}
 
-						if(currentToken.Type == TOKEN_TYPE_COMMA) {
-							//TODO: ADD A VALIDATOR HERE, CHECK IF THE NEXT TOKEN IS A COMMA , IF TRUE THEN RAISE SYNTAX ERROR
-							isValidToken = true
-						}
-
-						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION) {
+						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA) {
 							isValidToken = true
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
@@ -85,9 +80,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 							if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
 								functionStack = append(functionStack, currentToken)
-							} else {
+							} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION) {
 								outputQueue = append(outputQueue, functionStack[len(functionStack) - 1])
 								functionStack = functionStack[:len(functionStack)-1]
+							} else {
+								//comma
+								//TODO: ADD A VALIDATOR HERE, CHECK IF THE NEXT TOKEN IS A COMMA , IF TRUE THEN RAISE SYNTAX ERROR
 							}
 						}
 
