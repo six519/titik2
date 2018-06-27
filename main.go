@@ -22,6 +22,7 @@ func main() {
 	} else if (os.Args[1] == "-h") {
 		Help(os.Args[0])
 	} else if (os.Args[1] == "-i") {
+		InteractiveShell(&globalVariableArray, &globalFunctionArray)
 	} else {
 		//open titik file
 		lxr := Lexer{FileName: os.Args[1]}

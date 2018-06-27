@@ -147,6 +147,10 @@ func (lexer *Lexer) ReadSourceFile() error {
 	return nil
 }
 
+func (lexer *Lexer) ReadString(inputString string) {
+
+}
+
 func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var tokenArray []Token
 	var finalTokenArray []Token
