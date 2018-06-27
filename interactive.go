@@ -23,7 +23,7 @@ func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Fu
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Printf("%s ", indicator)
 		text, _ := reader.ReadString('\n')
-		lxr := Lexer{}
+		lxr := Lexer{FileName: "interactive_shell"}
 		lxr.ReadString(text)
 
 		tokenArray, tokenErr := lxr.GenerateToken()
