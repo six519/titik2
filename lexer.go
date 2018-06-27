@@ -148,7 +148,7 @@ func (lexer *Lexer) ReadSourceFile() error {
 }
 
 func (lexer *Lexer) ReadString(inputString string) {
-
+	lexer.fileContents = append(lexer.fileContents, inputString)
 }
 
 func (lexer Lexer) GenerateToken() ([]Token, error) {

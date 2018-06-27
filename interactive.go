@@ -25,5 +25,18 @@ func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Fu
 		text, _ := reader.ReadString('\n')
 		lxr := Lexer{}
 		lxr.ReadString(text)
+
+		tokenArray, tokenErr := lxr.GenerateToken()
+
+		if (tokenErr != nil) {
+			fmt.Println(tokenErr)
+		} else {
+			prsr := Parser{}
+			parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main")
+	
+			if(parserErr != nil) {
+				fmt.Println(parserErr)
+			}
+		}
 	}
 }
