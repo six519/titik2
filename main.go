@@ -6,6 +6,11 @@ import (
 )
 
 func main() {
+	var globalVariableArray []Variable
+	var globalFunctionArray []Function
+
+	//initialize native functions
+	initNativeFunctions(&globalFunctionArray)
 
 	if(len(os.Args) < 2) {
 		Help(os.Args[0])
@@ -21,11 +26,6 @@ func main() {
 		//open titik file
 		lxr := Lexer{FileName: os.Args[1]}
 		fileErr := lxr.ReadSourceFile()
-		var globalVariableArray []Variable
-		var globalFunctionArray []Function
-
-		//initialize native functions
-		initNativeFunctions(&globalFunctionArray)
 
 		if (fileErr != nil) {
 			fmt.Println(fileErr)
