@@ -438,8 +438,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								stack = append(stack, currentToken)
 							}
 						}
-			
-						//fmt.Println(stack[0].Value)
+
+						if(len(stack) > 1) {
+							return errors.New(SyntaxErrorMessage(stack[0].Line, stack[0].Column, "Invalid statement", stack[0].FileName))
+						}
 					}
 				}
 
