@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"strconv"
+	"unicode"
 	//"fmt"
 )
 
@@ -342,7 +343,20 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									//create a new variable
 									newVar := Variable{Name: variable.Value, ScopeName: scopeName}
 									*globalVariableArray = append(*globalVariableArray, newVar)
-									varIndex = len(*globalVariableArray) - 1 //last to execute
+									varIndex = len(*globalVariableArray) - 1 
+
+									//check if the first letter of variable name is in uppercase
+									//if yes then tag it as constant
+									firstChar := string((*globalVariableArray)[varIndex].Name[0])
+									if(unicode.IsUpper([]rune(firstChar)[0])) {
+										(*globalVariableArray)[varIndex].IsConstant = true
+									}
+								} else {
+									//if variable exists
+									//check if constant, if yes then raise an error
+									if((*globalVariableArray)[varIndex].IsConstant) {
+										return errors.New(SyntaxErrorMessage(variable.Line, variable.Column, "Cannot override constant '" + variable.Value + "'", variable.FileName))
+									}
 								}
 			
 								//modify the value/type of variable below

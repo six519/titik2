@@ -48,7 +48,14 @@ func DumpVariable(variables []Variable) {
 		}
 
 		fmt.Printf("Variable Scope: %s\n", variables[x].ScopeName)
-        fmt.Printf("Variable Type: %s\n", VARIABLE_TYPES_STRING[variables[x].Type])
+		fmt.Printf("Variable Type: %s\n", VARIABLE_TYPES_STRING[variables[x].Type])
+		
+		if(variables[x].IsConstant) {
+			fmt.Println("Variable Constant: Yes")
+		} else {
+			fmt.Println("Variable Constant: No")
+		}
+
 		fmt.Printf("====================================\n")
 	}
 }
