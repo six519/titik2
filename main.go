@@ -11,6 +11,8 @@ func main() {
 
 	//initialize native functions
 	initNativeFunctions(&globalFunctionArray)
+	//initialize built-in variables
+	initBuiltInVariables(&globalVariableArray)
 
 	if(len(os.Args) < 2) {
 		Help(os.Args[0])

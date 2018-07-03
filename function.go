@@ -87,10 +87,13 @@ func P_execute(arguments []FunctionArgument) FunctionReturn {
 	} else if(arguments[0].Type == ARG_TYPE_STRING) {
 		fmt.Printf("%s\n", arguments[0].StringValue)
 		ret.StringValue = arguments[0].StringValue
-	} else {
+	} else if(arguments[0].Type == ARG_TYPE_INTEGER) {
 		//integer
 		fmt.Printf("%d\n", arguments[0].IntegerValue)
 		ret.StringValue = strconv.Itoa(arguments[0].IntegerValue)
+	} else {
+		//Nil
+		fmt.Println("Nil")
 	}
 
 	return ret

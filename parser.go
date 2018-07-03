@@ -318,7 +318,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								stack = stack[:len(stack)-1]
 			
 								//validate value
-								errVal := expectedTokenTypes(value, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING)
+								errVal := expectedTokenTypes(value, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE)
 								if (errVal != nil) {
 									return errVal
 								}
@@ -366,10 +366,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								} else if(value.Type == TOKEN_TYPE_STRING) {
 									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_STRING
 									(*globalVariableArray)[varIndex].StringValue = value.Value
-								} else {
-									//assume it's float for now (add types later on like string etc...)
+								} else if(value.Type == TOKEN_TYPE_FLOAT) {
 									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
 									(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
+								} else {
+									//Nil
+									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
 								}
 
 								stack = append(stack, value)
@@ -414,10 +416,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										} else if(param.Type == TOKEN_TYPE_STRING) {
 											fa.Type = ARG_TYPE_STRING
 											fa.StringValue = param.Value
-										} else {
-											//assume it's float for now (add types later on like string etc...)
+										} else if(param.Type == TOKEN_TYPE_FLOAT) {
 											fa.Type = ARG_TYPE_FLOAT
 											fa.FloatValue, _ = strconv.ParseFloat(param.Value, 32)
+										} else {
+											//Nil
+											fa.Type = ARG_TYPE_NONE
 										}
 
 										functionArguments = append(functionArguments, fa)
@@ -440,9 +444,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									} else if(funcReturn.Type == RET_TYPE_STRING) {
 										newToken.Type = TOKEN_TYPE_STRING
 										newToken.Value = funcReturn.StringValue
-									} else {
-										//let's assume it's float
+									} else if(funcReturn.Type == RET_TYPE_FLOAT) {
+										newToken.Type = TOKEN_TYPE_FLOAT
 										newToken.Value = strconv.FormatFloat(funcReturn.FloatValue, 'f', -1, 64)
+									} else {
+										//Nil
+										newToken.Type = TOKEN_TYPE_NONE
 									}
 									stack = append(stack, newToken)
 								} else {

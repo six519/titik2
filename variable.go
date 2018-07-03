@@ -43,8 +43,11 @@ func DumpVariable(variables []Variable) {
 			fmt.Printf("Variable Value: %f\n", variables[x].FloatValue)
 		} else if(variables[x].Type == VARIABLE_TYPE_STRING) {
 			fmt.Printf("Variable Value: %s\n", variables[x].StringValue)
-		} else {
+		} else if(variables[x].Type == VARIABLE_TYPE_INTEGER) {
 			fmt.Printf("Variable Value: %d\n", variables[x].IntegerValue)
+		} else {
+			//Nil type
+			fmt.Println("Variable Value: Nil")
 		}
 
 		fmt.Printf("Variable Scope: %s\n", variables[x].ScopeName)
@@ -85,11 +88,19 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 	} else if(variables[indx].Type == VARIABLE_TYPE_STRING) {
 		token.Type = TOKEN_TYPE_STRING
 		token.Value = variables[indx].StringValue
-	} else {
-		//assume it's float for now
+	} else if(variables[indx].Type == VARIABLE_TYPE_FLOAT) {
 		token.Type = TOKEN_TYPE_FLOAT
 		token.Value = strconv.FormatFloat(variables[indx].FloatValue, 'f', -1, 64)
+	} else {
+		//Nil
+		token.Type = TOKEN_TYPE_NONE
 	}
 
 	return token, nil
+}
+
+func initBuiltInVariables(globalVariableArray *[]Variable) {
+	//add Nil Variable
+	nilVar := Variable{Name: "Nil", ScopeName: "main", Type: VARIABLE_TYPE_NONE, IsConstant: true}
+	*globalVariableArray = append(*globalVariableArray, nilVar)
 }
