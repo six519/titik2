@@ -99,8 +99,17 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 	return token, nil
 }
 
+func defineConstantString(variableName string, variableValue string, globalVariableArray *[]Variable) {
+	strVar := Variable{Name: variableName, ScopeName: "main", Type: VARIABLE_TYPE_STRING, IsConstant: true, StringValue: variableValue}
+	*globalVariableArray = append(*globalVariableArray, strVar)
+}
+
 func initBuiltInVariables(globalVariableArray *[]Variable) {
 	//add Nil Variable
 	nilVar := Variable{Name: "Nil", ScopeName: "main", Type: VARIABLE_TYPE_NONE, IsConstant: true}
 	*globalVariableArray = append(*globalVariableArray, nilVar)
+
+	//define string constants
+	defineConstantString("__AUTHOR__", TITIK_AUTHOR, globalVariableArray)
+	defineConstantString("__VERSION_STRING__", TITIK_STRING_VERSION, globalVariableArray)
 }
