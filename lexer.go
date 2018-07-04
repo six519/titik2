@@ -153,6 +153,7 @@ func (lexer *Lexer) ReadString(inputString string) {
 
 func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var tokenArray []Token
+	var cleanTokenArray []Token
 	var finalTokenArray []Token
 	tokenizerState := TOKENIZER_STATE_GET_WORD
 	isTokenInit := false
@@ -327,73 +328,83 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 		}
 	}
 
-	//token cleanup 
+	//1st token cleanup
+	//TODO: Try to eliminate this part
+	for x := 0; x < len(tokenArray); x++ {
+		if(tokenArray[x].Type == TOKEN_TYPE_SPACE || tokenArray[x].Type == TOKEN_TYPE_SINGLE_COMMENT || tokenArray[x].Type == TOKEN_TYPE_MULTI_COMMENT || tokenArray[x].Type == TOKEN_TYPE_CLOSE_MULTI_COMMENT || tokenArray[x].Type == TOKEN_TYPE_CLOSE_STRING || tokenArray[x].Type == TOKEN_TYPE_TAB) {
+			//ignore space, tab, comments etc...
+			continue
+		}
+		cleanTokenArray = append(cleanTokenArray, tokenArray[x])
+	}
+
+	//2nd token cleanup 
 	var ignoreOpenP bool = false
 	var f_count int = 0
 	var op_count int = 0
-	for x := 0; x < len(tokenArray); x++ {
+	for x := 0; x < len(cleanTokenArray); x++ {
 		if(ignoreOpenP) {
 			//ignore open parenthesis if the last token is a function
 			ignoreOpenP = false
 			continue
 		}
-		if(tokenArray[x].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
+		if(cleanTokenArray[x].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
 			op_count += 1
 		}
-		if(tokenArray[x].Type == TOKEN_TYPE_CLOSE_PARENTHESIS) {
+		if(cleanTokenArray[x].Type == TOKEN_TYPE_CLOSE_PARENTHESIS) {
 			if(op_count > 0) {
 				op_count -= 1
 			} else {
 				if(f_count > 0) {
 					f_count -= 1
-					tokenArray[x].Type = TOKEN_TYPE_INVOKE_FUNCTION
+					cleanTokenArray[x].Type = TOKEN_TYPE_INVOKE_FUNCTION
 				}
 			}
 		}
-		if(tokenArray[x].Type == TOKEN_TYPE_IDENTIFIER) {
-			if(IsReservedWord(tokenArray[x].Value)) {
+		if(cleanTokenArray[x].Type == TOKEN_TYPE_IDENTIFIER) {
+			if(IsReservedWord(cleanTokenArray[x].Value)) {
 				//Convert identifier to keyword if existing in reserved words
-				tokenArray[x].Type = TOKEN_TYPE_KEYWORD
+				cleanTokenArray[x].Type = TOKEN_TYPE_KEYWORD
 			} else {
 				//Check if the next token is '(', if yes then it's a function call
-				if((x + 1) <= len(tokenArray) - 1 ) {
-					if(tokenArray[x+1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
-						tokenArray[x].Type = TOKEN_TYPE_FUNCTION
+				if((x + 1) <= len(cleanTokenArray) - 1 ) {
+					if(cleanTokenArray[x+1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
+						cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION
 						ignoreOpenP = true
 						f_count += 1
 					}
 				}
 			}
-		} else if(tokenArray[x].Type == TOKEN_TYPE_STRING) {
-			if(!((x+1) < len(tokenArray))) {
-				return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of string", lexer.FileName))
+		} else if(cleanTokenArray[x].Type == TOKEN_TYPE_STRING) {
+			if(!((x+1) < len(cleanTokenArray))) {
+				return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "Expected closing of string", lexer.FileName))
 			}
-		} else if(tokenArray[x].Type == TOKEN_TYPE_MULTI_COMMENT) {
-			if(!((x+1) < len(tokenArray))) {
-				return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of multi line comment", lexer.FileName))
+		} else if(cleanTokenArray[x].Type == TOKEN_TYPE_MULTI_COMMENT) {
+			if(!((x+1) < len(cleanTokenArray))) {
+				return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "Expected closing of multi line comment", lexer.FileName))
 			}
 		}
 
-		if(x != 0 && (tokenArray[x].Type == TOKEN_TYPE_FLOAT || tokenArray[x].Type == TOKEN_TYPE_INTEGER)) {
-			if(tokenArray[x - 1].Type == TOKEN_TYPE_MINUS) {
+		if(x != 0 && (cleanTokenArray[x].Type == TOKEN_TYPE_FLOAT || cleanTokenArray[x].Type == TOKEN_TYPE_INTEGER)) {
+			if(cleanTokenArray[x - 1].Type == TOKEN_TYPE_MINUS) {
 
 				if((x - 2) >= 0) {
-					if(tokenArray[x-2].Type != TOKEN_TYPE_FLOAT && tokenArray[x-2].Type != TOKEN_TYPE_INTEGER && tokenArray[x-2].Type != TOKEN_TYPE_IDENTIFIER) {
+					if(cleanTokenArray[x-2].Type != TOKEN_TYPE_FLOAT && cleanTokenArray[x-2].Type != TOKEN_TYPE_INTEGER && cleanTokenArray[x-2].Type != TOKEN_TYPE_IDENTIFIER) {
 						//set to negative number
-						finalTokenArray[len(finalTokenArray) - 1].Value += tokenArray[x].Value
-						finalTokenArray[len(finalTokenArray) - 1].Type = tokenArray[x].Type
+						finalTokenArray[len(finalTokenArray) - 1].Value += cleanTokenArray[x].Value
+						finalTokenArray[len(finalTokenArray) - 1].Type = cleanTokenArray[x].Type
 					} else {
-						finalTokenArray = append(finalTokenArray, tokenArray[x])
+						finalTokenArray = append(finalTokenArray, cleanTokenArray[x])
 					}
 				} else {
-					finalTokenArray = append(finalTokenArray, tokenArray[x])
+					finalTokenArray = append(finalTokenArray, cleanTokenArray[x])
 				}
 				
 			} else {
-				finalTokenArray = append(finalTokenArray, tokenArray[x])
+				finalTokenArray = append(finalTokenArray, cleanTokenArray[x])
 			}
 		} else {
-			finalTokenArray = append(finalTokenArray, tokenArray[x])
+			finalTokenArray = append(finalTokenArray, cleanTokenArray[x])
 		}
 	}
 
