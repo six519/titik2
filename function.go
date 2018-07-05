@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"os"
 )
 
 //function return type
@@ -99,8 +100,23 @@ func P_execute(arguments []FunctionArgument) FunctionReturn {
 	return ret
 }
 
+func Ex_execute(arguments []FunctionArgument) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if(arguments[0].Type != ARG_TYPE_INTEGER) {
+		fmt.Println("Error: Parameter must be an integer")
+	} else {
+		os.Exit(arguments[0].IntegerValue)
+	}
+
+	return ret
+}
+
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
 	defineFunction(globalFunctionArray, "p", P_execute, 1, true)
+
+	//ex(<integer)
+	defineFunction(globalFunctionArray, "ex", Ex_execute, 1, true)
 }
