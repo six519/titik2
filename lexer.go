@@ -49,9 +49,9 @@ const TOKEN_TYPE_OR int = 29
 const TOKEN_TYPE_EXCLAMATION int = 30
 const TOKEN_TYPE_TAB int = 31
 const TOKEN_TYPE_CARRIAGE_RETURN int = 32
-const TOKEN_TYPE_NONE = 33
-const TOKEN_TYPE_FUNCTION = 34
-const TOKEN_TYPE_INVOKE_FUNCTION = 35
+const TOKEN_TYPE_NONE int = 33
+const TOKEN_TYPE_FUNCTION int = 34
+const TOKEN_TYPE_INVOKE_FUNCTION int = 35
 
 //for debugging purpose only
 var TOKEN_TYPES_STRING = []string {
