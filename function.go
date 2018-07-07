@@ -7,18 +7,22 @@ import (
 )
 
 //function return type
-const RET_TYPE_NONE int = 0
-const RET_TYPE_STRING int = 1
-const RET_TYPE_INTEGER int = 2
-const RET_TYPE_FLOAT int = 3
-const RET_TYPE_ARRAY int = 4
+const (
+	RET_TYPE_NONE = iota
+	RET_TYPE_STRING
+	RET_TYPE_INTEGER
+	RET_TYPE_FLOAT
+	RET_TYPE_ARRAY
+)
 
 //function argument types
-const ARG_TYPE_NONE int = 0
-const ARG_TYPE_STRING int = 1
-const ARG_TYPE_INTEGER int = 2
-const ARG_TYPE_FLOAT int = 3
-const ARG_TYPE_ARRAY int = 4
+const (
+	ARG_TYPE_NONE = iota
+	ARG_TYPE_STRING
+	ARG_TYPE_INTEGER
+	ARG_TYPE_FLOAT
+	ARG_TYPE_ARRAY
+)
 
 type FunctionReturn struct {
 	Type int
