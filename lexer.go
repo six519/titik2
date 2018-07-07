@@ -55,6 +55,9 @@ const (
 	TOKEN_TYPE_NONE
 	TOKEN_TYPE_FUNCTION
 	TOKEN_TYPE_INVOKE_FUNCTION
+	TOKEN_TYPE_FUNCTION_DEF_START
+	TOKEN_TYPE_FUNCTION_PARAM_END
+	TOKEN_TYPE_FUNCTION_DEF_END
 )
 
 //for debugging purpose only
@@ -95,6 +98,9 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_NONE",
 	"TOKEN_TYPE_FUNCTION",
 	"TOKEN_TYPE_INVOKE_FUNCTION",
+	"TOKEN_TYPE_FUNCTION_DEF_START",
+	"TOKEN_TYPE_FUNCTION_PARAM_END",
+	"TOKEN_TYPE_FUNCTION_DEF_END",
 }
 
 //token object
@@ -344,6 +350,8 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 
 	//2nd token cleanup 
 	var ignoreOpenP bool = false
+	var isOpenP bool = false
+	var isFunctionDef bool = false
 	var f_count int = 0
 	var op_count int = 0
 	for x := 0; x < len(cleanTokenArray); x++ {
@@ -361,7 +369,13 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			} else {
 				if(f_count > 0) {
 					f_count -= 1
-					cleanTokenArray[x].Type = TOKEN_TYPE_INVOKE_FUNCTION
+
+					if(isFunctionDef) {
+						isFunctionDef = false
+						cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_PARAM_END
+					} else {
+						cleanTokenArray[x].Type = TOKEN_TYPE_INVOKE_FUNCTION
+					}
 				}
 			}
 		}
@@ -369,13 +383,33 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			if(IsReservedWord(cleanTokenArray[x].Value)) {
 				//Convert identifier to keyword if existing in reserved words
 				cleanTokenArray[x].Type = TOKEN_TYPE_KEYWORD
+				if(cleanTokenArray[x].Value == "fd") {
+					//function definition
+					continue
+				}
+				if(cleanTokenArray[x].Value == "df") {
+					//end of function definition
+					cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_DEF_END
+				}
 			} else {
 				//Check if the next token is '(', if yes then it's a function call
 				if((x + 1) <= len(cleanTokenArray) - 1 ) {
+					isOpenP = false
 					if(cleanTokenArray[x+1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
+						isOpenP = true
+					}
+					if(isOpenP) {
+						//set to function call
 						cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION
 						ignoreOpenP = true
 						f_count += 1
+						if((x - 1) >= 0) {
+							if(cleanTokenArray[x-1].Value == "fd") {
+								//set to function definition
+								cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_DEF_START
+								isFunctionDef = true
+							}
+						}
 					}
 				}
 			}
