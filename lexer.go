@@ -352,6 +352,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var ignoreOpenP bool = false
 	var isOpenP bool = false
 	var isFunctionDef bool = false
+	var openFunctionCount int = 0
 	var f_count int = 0
 	var op_count int = 0
 	for x := 0; x < len(cleanTokenArray); x++ {
@@ -385,11 +386,13 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				cleanTokenArray[x].Type = TOKEN_TYPE_KEYWORD
 				if(cleanTokenArray[x].Value == "fd") {
 					//function definition
+					openFunctionCount += 1
 					continue
 				}
 				if(cleanTokenArray[x].Value == "df") {
 					//end of function definition
 					cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_DEF_END
+					openFunctionCount -= 1
 				}
 			} else {
 				//Check if the next token is '(', if yes then it's a function call
@@ -408,6 +411,12 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 								//set to function definition
 								cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_DEF_START
 								isFunctionDef = true
+								if(openFunctionCount > 1) {
+									//if it's already true then
+									//you define a function inside a function
+									//but it's prohibited so raise an error
+									return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "You cannot define a function inside a function", lexer.FileName))
+								}
 							}
 						}
 					}
