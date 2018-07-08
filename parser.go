@@ -33,9 +33,18 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 	var operatorStack []Token
 	var functionStack []Token
 	var outputQueue []Token
+	var ignoreNewline bool = false
+	var justAddTokens bool = false
 
 	for x := 0; x < len(tokenArray); x++ {
 		if(tokenArray[x].Type == TOKEN_TYPE_NEWLINE) {
+
+			if(ignoreNewline) {
+				//put the token to stack for shunting yard process later
+				tokensToEvaluate = append(tokensToEvaluate, tokenArray[x])
+				continue
+			}
+
 			//execute shunting yard
 			if(len(tokensToEvaluate) > 0) {
 				if(tokensToEvaluate[0].Type == TOKEN_TYPE_PLUS || tokensToEvaluate[0].Type == TOKEN_TYPE_MINUS || tokensToEvaluate[0].Type == TOKEN_TYPE_DIVIDE || tokensToEvaluate[0].Type == TOKEN_TYPE_MULTIPLY || tokensToEvaluate[0].Type == TOKEN_TYPE_EQUALS) {
@@ -48,11 +57,27 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					return errors.New(SyntaxErrorMessage(tokensToEvaluate[len(tokensToEvaluate)-1].Line, tokensToEvaluate[len(tokensToEvaluate)-1].Column, "Unfinished operation", tokensToEvaluate[len(tokensToEvaluate)-1].FileName))
 				}
 		
+				justAddTokens = false
 				//shunting-yard
 				for len(tokensToEvaluate) > 0 {
 					currentToken := tokensToEvaluate[0]
 					tokensToEvaluate = append(tokensToEvaluate[:0], tokensToEvaluate[1:]...) //pop the first element
 					isValidToken := false
+
+					if(justAddTokens) {
+						//function body, just add to outputqueue
+						outputQueue = append(outputQueue, currentToken)
+
+						if(currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_END) {
+							justAddTokens = false
+						}
+						continue
+					}
+
+					if(currentToken.Type == TOKEN_TYPE_NEWLINE) {
+						//just ignore newline
+						continue
+					}
 		
 					if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_IDENTIFIER || currentToken.Type == TOKEN_TYPE_STRING) {
 						//If it's a number or identifier, add it to queue, (ADD TOKEN_TYPE_KEYWORD AND string and other acceptable tokens LATER)
@@ -60,7 +85,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						isValidToken = true
 					}
 
-					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA) {
+					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END) {
 						isValidToken = true
 						//pop all operators from operator stack to output queue before the function
 						//NOTE: don't include '=' (NOT SURE)
@@ -77,11 +102,16 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 						}
 
-						if(currentToken.Type == TOKEN_TYPE_FUNCTION) {
+						if(currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START) {
 							functionStack = append(functionStack, currentToken)
-						} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION) {
+						} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END) {
 							outputQueue = append(outputQueue, functionStack[len(functionStack) - 1])
 							functionStack = functionStack[:len(functionStack)-1]
+
+							if(currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END) {
+								//next is function body
+								justAddTokens = true
+							}
 						} else {
 							//comma
 							//validate separator
@@ -153,6 +183,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
 					operatorStack = operatorStack[:len(operatorStack)-1]
 				}
+				//end of shunting-yard
 
 				//validate end of function
 				if(len(functionStack) > 0) {
@@ -468,6 +499,15 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 				}
 			}
 
+		} else if(tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START || tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_END) {
+			if(tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START) {
+				ignoreNewline = true
+			} else {
+				//TOKEN_TYPE_FUNCTION_DEF_END
+				ignoreNewline = false
+			}
+			//put the token to stack for shunting yard process later
+			tokensToEvaluate = append(tokensToEvaluate, tokenArray[x])
 		} else {
 			//put the token to stack for shunting yard process later
 			tokensToEvaluate = append(tokensToEvaluate, tokenArray[x])
