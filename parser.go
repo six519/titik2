@@ -462,11 +462,11 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							}
 
+							newToken := currentToken
 							if((*globalFunctionArray)[funcIndex].IsNative) {
 								//execute native function
 								funcReturn := (*globalFunctionArray)[funcIndex].Run(functionArguments)
 								//convert FunctionReturn to Token and append to stack (TODO: Create a function for conversion?)
-								newToken := currentToken
 								if(funcReturn.Type == RET_TYPE_INTEGER) {
 									newToken.Type = TOKEN_TYPE_INTEGER
 									newToken.Value = strconv.Itoa(funcReturn.IntegerValue)
@@ -480,10 +480,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									//Nil
 									newToken.Type = TOKEN_TYPE_NONE
 								}
-								stack = append(stack, newToken)
+								
 							} else {
 								//execute function from token
+								//set the default return to Nil
+								newToken.Type = TOKEN_TYPE_NONE
 							}
+
+							stack = append(stack, newToken)
 						
 						} else if(currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START) {
 							//check if function already exists
