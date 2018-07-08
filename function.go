@@ -77,6 +77,17 @@ func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
 	return false, 0
 }
 
+func isParamExists(token Token, functionParams []Token) bool {
+
+	for x := 0; x < len(functionParams); x++ {
+		if(functionParams[x].Value == token.Value) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec Execute, argumentCount int, isNative bool) {
 	function := Function{Name: funcName, IsNative: isNative, Run: funcExec, ArgumentCount: argumentCount}
 	//append to global functions

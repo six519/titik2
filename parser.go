@@ -506,6 +506,11 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									if (errParam != nil) {
 										return errParam
 									}
+
+									if(isParamExists(param, functionParams)) {
+										return errors.New(SyntaxErrorMessage(param.Line, param.Column, "Duplicate argument '" + param.Value + "' in function definition", param.FileName))
+									}
+
 									functionParams = append(functionParams, param)
 								} else {
 									break
