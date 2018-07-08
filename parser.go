@@ -485,6 +485,18 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								//execute function from token
 								//set the default return to Nil
 								newToken.Type = TOKEN_TYPE_NONE
+
+								//set the arguments below
+								//fmt.Println(functionArguments[0])
+								//fmt.Println((*globalFunctionArray)[funcIndex].Arguments[0])
+								
+								//execute user defined function
+								prsr := Parser{}
+								parserErr := prsr.Parse((*globalFunctionArray)[funcIndex].Tokens, globalVariableArray, globalFunctionArray, (*globalFunctionArray)[funcIndex].Name)
+						
+								if(parserErr != nil) {
+									return parserErr
+								}
 							}
 
 							stack = append(stack, newToken)
@@ -506,11 +518,19 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									param = stack[len(stack)-1]
 									stack = stack[:len(stack)-1]
 
+									//validate param type
 									errParam := expectedTokenTypes(param, TOKEN_TYPE_IDENTIFIER)
 									if (errParam != nil) {
 										return errParam
 									}
 
+									//check if param is a constant
+									firstChar := string(param.Value[0])
+									if(unicode.IsUpper([]rune(firstChar)[0])) {
+										return errors.New(SyntaxErrorMessage(param.Line, param.Column, "Argument cannot be a constant", param.FileName))
+									}
+
+									//check if param already exists
 									if(isParamExists(param, functionParams)) {
 										return errors.New(SyntaxErrorMessage(param.Line, param.Column, "Duplicate argument '" + param.Value + "' in function definition", param.FileName))
 									}
