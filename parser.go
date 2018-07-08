@@ -484,6 +484,57 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							} else {
 								//execute function from token
 							}
+						
+						} else if(currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START) {
+							//check if function already exists
+							//if yes then raise an error
+							isExists, _ := isFunctionExists(currentToken, *globalFunctionArray)
+							if(isExists) {
+								return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Function '" + currentToken.Value + "' already exists", currentToken.FileName))
+							}
+
+							//get function arguments
+							var functionParams []Token
+							for true {
+								var param Token
+
+								if(len(stack) > 0) {
+									param = stack[len(stack)-1]
+									stack = stack[:len(stack)-1]
+
+									errParam := expectedTokenTypes(param, TOKEN_TYPE_IDENTIFIER)
+									if (errParam != nil) {
+										return errParam
+									}
+									functionParams = append(functionParams, param)
+								} else {
+									break
+								}	
+
+							}
+
+							//define function below
+							newFunction := Function{Name: currentToken.Value, IsNative: false, ArgumentCount: len(functionParams), Arguments: functionParams}
+							
+							//append all tokens to function (body of function)
+							for true {
+								currentToken := outputQueue[0]
+								outputQueue = append(outputQueue[:0], outputQueue[1:]...)
+
+								newFunction.Tokens = append(newFunction.Tokens, currentToken)
+
+								if(currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_END) {
+									break
+								}
+
+								if(len(outputQueue) == 0) {
+									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Invalid statement", currentToken.FileName))
+								}
+							}
+							
+							//append to global functions
+							*globalFunctionArray = append(*globalFunctionArray, newFunction)
+							stack = append(stack, currentToken) //TODO: not sure if it should append the TOKEN_TYPE_FUNCTION_DEF_END
 						} else {
 							stack = append(stack, currentToken)
 						}

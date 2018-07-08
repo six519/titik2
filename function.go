@@ -45,6 +45,7 @@ type Function struct {
 	IsNative bool
 	Tokens []Token
 	Run Execute
+	Arguments []Token
 	ArgumentCount int
 }
 
