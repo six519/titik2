@@ -93,20 +93,34 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						isValidToken = true
 					}
 
+					dontIgnorePopping := true
 					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END) {
 						isValidToken = true
-						//pop all operators from operator stack to output queue before the function
-						//NOTE: don't include '=' (NOT SURE)
-						for true {
-							if(len(operatorStack) > 0) {
-								if(operatorStack[len(operatorStack) - 1].Type == TOKEN_TYPE_EQUALS) {
-									break
-								} else {
-									outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-									operatorStack = operatorStack[:len(operatorStack)-1]
+
+						if(len(tokensToEvaluate) > 0) {
+							if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION) {
+								if(tokensToEvaluate[0].Type == TOKEN_TYPE_INVOKE_FUNCTION || tokensToEvaluate[0].Type == TOKEN_TYPE_COMMA) {
+									dontIgnorePopping = false
 								}
-							} else {
-								break
+							}
+						}
+
+						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END) {
+							//pop all operators from operator stack to output queue before the function
+							//NOTE: don't include '=' (NOT SURE)
+							if(dontIgnorePopping) {
+								for true {
+									if(len(operatorStack) > 0) {
+										if(operatorStack[len(operatorStack) - 1].Type == TOKEN_TYPE_EQUALS) {
+											break
+										} else {
+											outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
+											operatorStack = operatorStack[:len(operatorStack)-1]
+										}
+									} else {
+										break
+									}
+								}
 							}
 						}
 
@@ -129,6 +143,25 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							}
 						}
+
+						//dirty fix (not sure)
+						if(!dontIgnorePopping) {
+							//pop all operators from operator stack to output queue before the function
+							//NOTE: don't include '=' (NOT SURE)
+							for true {
+								if(len(operatorStack) > 0) {
+									if(operatorStack[len(operatorStack) - 1].Type == TOKEN_TYPE_EQUALS) {
+										break
+									} else {
+										outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
+										operatorStack = operatorStack[:len(operatorStack)-1]
+									}
+								} else {
+									break
+								}
+							}
+						}
+
 					}
 
 					if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS) {
@@ -200,6 +233,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 				//DumpToken(outputQueue)
 				//the outputQueue contains the reverse polish notation
+				
 				if(len(outputQueue) > 0) {
 					//read the reverse polish below
 					var stack []Token
@@ -607,6 +641,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						}
 					}
 				}
+				
 			}
 
 		} else if(tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START || tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_END) {
