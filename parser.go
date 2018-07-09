@@ -496,50 +496,26 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								thisScopeName := (*globalFunctionArray)[funcIndex].Name + generateRandomNumbers()
 
 								//set the arguments below
-								/*
-								for ind = 0; ind < len(functionArguments); ind++ {
+								for ind := 0; ind < len(functionArguments); ind++ {
 
-									isExists, varIndex := isVariableExists(variable, *globalVariableArray, scopeName)
-		
-									if(!isExists) {
-										//variable doesn't exists
-										//create a new variable
-										newVar := Variable{Name: variable.Value, ScopeName: scopeName}
-										*globalVariableArray = append(*globalVariableArray, newVar)
-										varIndex = len(*globalVariableArray) - 1 
-		
-										//check if the first letter of variable name is in uppercase
-										//if yes then tag it as constant
-										firstChar := string((*globalVariableArray)[varIndex].Name[0])
-										if(unicode.IsUpper([]rune(firstChar)[0])) {
-											(*globalVariableArray)[varIndex].IsConstant = true
-										}
-									} else {
-										//if variable exists
-										//check if constant, if yes then raise an error
-										if((*globalVariableArray)[varIndex].IsConstant) {
-											return errors.New(SyntaxErrorMessage(variable.Line, variable.Column, "Cannot override constant '" + variable.Value + "'", variable.FileName))
-										}
-									}
-				
-									//modify the value/type of variable below
-									if(value.Type == TOKEN_TYPE_INTEGER) {
+									newVar := Variable{Name: (*globalFunctionArray)[funcIndex].Arguments[ind].Value, ScopeName: thisScopeName}
+									*globalVariableArray = append(*globalVariableArray, newVar)
+									varIndex := len(*globalVariableArray) - 1
+
+									if(functionArguments[ind].Type == ARG_TYPE_INTEGER) {
 										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_INTEGER
-										(*globalVariableArray)[varIndex].IntegerValue, _ = strconv.Atoi(value.Value)
-									} else if(value.Type == TOKEN_TYPE_STRING) {
+										(*globalVariableArray)[varIndex].IntegerValue = functionArguments[ind].IntegerValue
+									} else if(functionArguments[ind].Type == ARG_TYPE_STRING) {
 										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_STRING
-										(*globalVariableArray)[varIndex].StringValue = value.Value
-									} else if(value.Type == TOKEN_TYPE_FLOAT) {
+										(*globalVariableArray)[varIndex].StringValue = functionArguments[ind].StringValue
+									} else if(functionArguments[ind].Type == ARG_TYPE_FLOAT) {
 										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
-										(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
+										(*globalVariableArray)[varIndex].FloatValue = functionArguments[ind].FloatValue
 									} else {
 										//Nil
 										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
 									}
 								}
-								*/
-								//fmt.Println(functionArguments[0])
-								//fmt.Println((*globalFunctionArray)[funcIndex].Arguments[0])
 								
 								//execute user defined function
 								prsr := Parser{}
@@ -548,6 +524,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								if(parserErr != nil) {
 									return parserErr
 								}
+
+								//TODO: NEED CLEANUP OF VARIABLES BELOW
+								//DELETE GENERATED VARIABLES with thisScopeName
 							}
 
 							stack = append(stack, newToken)
