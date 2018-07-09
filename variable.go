@@ -80,8 +80,19 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 
 	isExists, indx := isVariableExists(token, variables, scopeName)
 
-	if(!isExists) {
-		return token, errors.New(SyntaxErrorMessage(token.Line, token.Column, "Variable doesn't exists '" + token.Value + "'", token.FileName))
+	if(scopeName == "main"){
+		//if scope is main and not existing then raise an error right away
+		if(!isExists) {
+			return token, errors.New(SyntaxErrorMessage(token.Line, token.Column, "Variable doesn't exists '" + token.Value + "'", token.FileName))
+		}
+	} else {
+		if(!isExists) {
+			//if doesnt exists in function scope then check in main scope
+			isExists, indx = isVariableExists(token, variables, "main")
+			if(!isExists) {
+				return token, errors.New(SyntaxErrorMessage(token.Line, token.Column, "Variable doesn't exists '" + token.Value + "'", token.FileName))
+			}
+		}
 	}
 
 	if(variables[indx].Type == VARIABLE_TYPE_INTEGER) {
