@@ -138,7 +138,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							//comma
 							//validate separator
 							if(len(tokensToEvaluate) > 0) {
-								if(tokensToEvaluate[0].Type != TOKEN_TYPE_FLOAT && tokensToEvaluate[0].Type != TOKEN_TYPE_INTEGER && tokensToEvaluate[0].Type != TOKEN_TYPE_STRING && tokensToEvaluate[0].Type != TOKEN_TYPE_IDENTIFIER && tokensToEvaluate[0].Type != TOKEN_TYPE_FUNCTION) {
+								if(tokensToEvaluate[0].Type != TOKEN_TYPE_FLOAT && tokensToEvaluate[0].Type != TOKEN_TYPE_INTEGER && tokensToEvaluate[0].Type != TOKEN_TYPE_STRING && tokensToEvaluate[0].Type != TOKEN_TYPE_IDENTIFIER && tokensToEvaluate[0].Type != TOKEN_TYPE_FUNCTION && tokensToEvaluate[0].Type != TOKEN_TYPE_OPEN_PARENTHESIS) {
 									return errors.New(SyntaxErrorMessage(tokensToEvaluate[0].Line, tokensToEvaluate[0].Column, "Unexpected token '" + tokensToEvaluate[0].Value + "'", tokensToEvaluate[0].FileName))
 								}
 							}
