@@ -50,6 +50,11 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 			if(ignoreNewline) {
 				//put the token to stack for shunting yard process later
 				tokensToEvaluate = append(tokensToEvaluate, tokenArray[x])
+
+				if(len(tokenArray) == (x+1)) {
+					return errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Unfinished statement", tokenArray[x].FileName))
+				}
+
 				continue
 			}
 
@@ -62,7 +67,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 		
 				if(tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_PLUS || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_MINUS || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_DIVIDE || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_MULTIPLY || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_EQUALS) {
 					//syntax error if the last token is an operator
-					return errors.New(SyntaxErrorMessage(tokensToEvaluate[len(tokensToEvaluate)-1].Line, tokensToEvaluate[len(tokensToEvaluate)-1].Column, "Unfinished operation", tokensToEvaluate[len(tokensToEvaluate)-1].FileName))
+					return errors.New(SyntaxErrorMessage(tokensToEvaluate[len(tokensToEvaluate)-1].Line, tokensToEvaluate[len(tokensToEvaluate)-1].Column, "Unfinished statement", tokensToEvaluate[len(tokensToEvaluate)-1].FileName))
 				}
 		
 				justAddTokens = false
