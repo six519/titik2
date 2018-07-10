@@ -663,6 +663,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 			} else {
 				//TOKEN_TYPE_FUNCTION_DEF_END
 				ignoreNewline = false
+				
+				//NOTE: not sure if the code below is temporary
+				//append newline (to make the one liner definition of function works)
+				tokensToEvaluate = append(tokensToEvaluate, Token{Value: "\n", FileName: tokenArray[x].FileName, Type: TOKEN_TYPE_NEWLINE, Line: tokenArray[x].Line, Column: tokenArray[x].Column })
 			}
 			//put the token to stack for shunting yard process later
 			tokensToEvaluate = append(tokensToEvaluate, tokenArray[x])
