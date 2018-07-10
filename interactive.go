@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Function) {
+func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
 	var indicator string
 	var isContinue bool = false
 
@@ -32,7 +32,7 @@ func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Fu
 			fmt.Println(tokenErr)
 		} else {
 			prsr := Parser{}
-			parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main")
+			parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main", globalNativeVarList)
 	
 			if(parserErr != nil) {
 				fmt.Println(parserErr)

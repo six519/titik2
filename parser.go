@@ -35,7 +35,7 @@ func expectedTokenTypes(token Token, tokenTypes ...int) error {
 type Parser struct {
 }
 
-func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string) error {
+func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string) error {
 	var tokensToEvaluate []Token
 	operatorPrecedences := map[string] int{"=": 0, "+": 1, "-": 1, "/": 2, "*": 2} //operator order of precedences
 	var operatorStack []Token
@@ -407,6 +407,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								return errors.New(SyntaxErrorMessage(variable.Line, variable.Column, "'" + variable.Value + "' exists as a function", variable.FileName))	
 							}
 
+							//if not main scope then check if a system constant
+							//if yes then raise an error
+							if(scopeName != "main") {
+								if(isSystemVariable(variable.Value, *globalNativeVarList)) {
+									return errors.New(SyntaxErrorMessage(variable.Line, variable.Column, "Cannot assign to " + variable.Value, variable.FileName))
+								}
+							}
+
 							isExists, varIndex := isVariableExists(variable, *globalVariableArray, scopeName)
 		
 							if(!isExists) {
@@ -553,7 +561,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								
 								//execute user defined function
 								prsr := Parser{}
-								parserErr := prsr.Parse((*globalFunctionArray)[funcIndex].Tokens, globalVariableArray, globalFunctionArray, thisScopeName)
+								parserErr := prsr.Parse((*globalFunctionArray)[funcIndex].Tokens, globalVariableArray, globalFunctionArray, thisScopeName, globalNativeVarList)
 						
 								if(parserErr != nil) {
 									return parserErr

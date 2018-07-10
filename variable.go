@@ -76,6 +76,17 @@ func isVariableExists(token Token, globalVariableArray []Variable, scopeName str
 	return false, 0
 }
 
+func isSystemVariable(name string, globalNativeVarList []string) bool {
+
+	for x := 0; x < len(globalNativeVarList); x++ {
+		if(name == globalNativeVarList[x]) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func convertVariableToToken(token Token, variables []Variable, scopeName string) (Token, error) {
 
 	isExists, indx := isVariableExists(token, variables, scopeName)
@@ -112,17 +123,19 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 	return token, nil
 }
 
-func defineConstantString(variableName string, variableValue string, globalVariableArray *[]Variable) {
+func defineConstantString(variableName string, variableValue string, globalVariableArray *[]Variable, globalNativeVarList *[]string) {
 	strVar := Variable{Name: variableName, ScopeName: "main", Type: VARIABLE_TYPE_STRING, IsConstant: true, StringValue: variableValue}
 	*globalVariableArray = append(*globalVariableArray, strVar)
+	*globalNativeVarList= append(*globalNativeVarList, variableName)
 }
 
-func initBuiltInVariables(globalVariableArray *[]Variable) {
+func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *[]string) {
 	//add Nil Variable
 	nilVar := Variable{Name: "Nil", ScopeName: "main", Type: VARIABLE_TYPE_NONE, IsConstant: true}
 	*globalVariableArray = append(*globalVariableArray, nilVar)
+	*globalNativeVarList= append(*globalNativeVarList, "Nil")
 
 	//define string constants
-	defineConstantString("__AUTHOR__", TITIK_AUTHOR, globalVariableArray)
-	defineConstantString("__VERSION_STRING__", TITIK_STRING_VERSION, globalVariableArray)
+	defineConstantString("__AUTHOR__", TITIK_AUTHOR, globalVariableArray, globalNativeVarList)
+	defineConstantString("__VERSION_STRING__", TITIK_STRING_VERSION, globalVariableArray, globalNativeVarList)
 }

@@ -8,11 +8,12 @@ import (
 func main() {
 	var globalVariableArray []Variable
 	var globalFunctionArray []Function
+	var globalNativeVarList []string
 
 	//initialize native functions
 	initNativeFunctions(&globalFunctionArray)
 	//initialize built-in variables
-	initBuiltInVariables(&globalVariableArray)
+	initBuiltInVariables(&globalVariableArray, &globalNativeVarList)
 
 	if(len(os.Args) < 2) {
 		Help(os.Args[0])
@@ -24,7 +25,7 @@ func main() {
 	} else if (os.Args[1] == "-h") {
 		Help(os.Args[0])
 	} else if (os.Args[1] == "-i") {
-		InteractiveShell(&globalVariableArray, &globalFunctionArray)
+		InteractiveShell(&globalVariableArray, &globalFunctionArray, &globalNativeVarList)
 	} else {
 		//open titik file
 		lxr := Lexer{FileName: os.Args[1]}
@@ -44,7 +45,7 @@ func main() {
 		}
 		//parser object
 		prsr := Parser{}
-		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main")
+		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main", &globalNativeVarList)
 
 		if(parserErr != nil) {
 			fmt.Println(parserErr)
