@@ -58,6 +58,7 @@ const (
 	TOKEN_TYPE_FUNCTION_DEF_START
 	TOKEN_TYPE_FUNCTION_PARAM_END
 	TOKEN_TYPE_FUNCTION_DEF_END
+	TOKEN_TYPE_FUNCTION_RETURN
 )
 
 //for debugging purpose only
@@ -101,6 +102,7 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_FUNCTION_DEF_START",
 	"TOKEN_TYPE_FUNCTION_PARAM_END",
 	"TOKEN_TYPE_FUNCTION_DEF_END",
+	"TOKEN_TYPE_FUNCTION_RETURN",
 }
 
 //token object
@@ -393,6 +395,10 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					//end of function definition
 					cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_DEF_END
 					openFunctionCount -= 1
+				}
+				if(cleanTokenArray[x].Value == "rtn") {
+					//function return
+					cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_RETURN
 				}
 			} else {
 				//Check if the next token is '(', if yes then it's a function call
