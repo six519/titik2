@@ -27,6 +27,8 @@ func main() {
 	} else if (os.Args[1] == "-i") {
 		InteractiveShell(&globalVariableArray, &globalFunctionArray, &globalNativeVarList)
 	} else {
+		var gotReturn bool = false
+		var returnToken Token
 		//open titik file
 		lxr := Lexer{FileName: os.Args[1]}
 		fileErr := lxr.ReadSourceFile()
@@ -45,7 +47,7 @@ func main() {
 		}
 		//parser object
 		prsr := Parser{}
-		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main", &globalNativeVarList)
+		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main", &globalNativeVarList, &gotReturn, &returnToken)
 
 		if(parserErr != nil) {
 			fmt.Println(parserErr)

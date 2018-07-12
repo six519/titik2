@@ -35,9 +35,9 @@ func expectedTokenTypes(token Token, tokenTypes ...int) error {
 type Parser struct {
 }
 
-func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string) error {
+func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, gotReturn *bool, returnToken *Token) error {
 	var tokensToEvaluate []Token
-	operatorPrecedences := map[string] int{"=": 0, "+": 1, "-": 1, "/": 2, "*": 2} //operator order of precedences
+	operatorPrecedences := map[string] int{"function_return": 0, "=": 1, "+": 2, "-": 2, "/": 3, "*": 3} //operator order of precedences
 	var operatorStack []Token
 	var functionStack []Token
 	var outputQueue []Token
@@ -169,16 +169,25 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 					}
 
-					if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS) {
+					if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN) {
 						//the token is operator
 						for true {
 							if(len(operatorStack) > 0) {
 
-								if(operatorPrecedences[operatorStack[len(operatorStack) - 1].Value] > operatorPrecedences[currentToken.Value]) {
-									outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-									operatorStack = operatorStack[:len(operatorStack)-1]
+								if(currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN) {
+									if(operatorPrecedences[operatorStack[len(operatorStack) - 1].Value] > operatorPrecedences["function_return"]) {
+										outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
+										operatorStack = operatorStack[:len(operatorStack)-1]
+									} else {
+										break
+									}
 								} else {
-									break
+									if(operatorPrecedences[operatorStack[len(operatorStack) - 1].Value] > operatorPrecedences[currentToken.Value]) {
+										outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
+										operatorStack = operatorStack[:len(operatorStack)-1]
+									} else {
+										break
+									}
 								}
 
 							} else {
@@ -563,13 +572,21 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
 									}
 								}
+
+								var thisGotReturn bool = false
+								var thisReturnToken Token
 								
 								//execute user defined function
 								prsr := Parser{}
-								parserErr := prsr.Parse((*globalFunctionArray)[funcIndex].Tokens, globalVariableArray, globalFunctionArray, thisScopeName, globalNativeVarList)
+								parserErr := prsr.Parse((*globalFunctionArray)[funcIndex].Tokens, globalVariableArray, globalFunctionArray, thisScopeName, globalNativeVarList, &thisGotReturn, &thisReturnToken)
 						
 								if(parserErr != nil) {
 									return parserErr
+								}
+
+								if(thisGotReturn) {
+									//the function returns a value
+									newToken = thisReturnToken
 								}
 
 								//TODO: NEED CLEANUP OF VARIABLES BELOW
@@ -641,6 +658,31 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							//append to global functions
 							*globalFunctionArray = append(*globalFunctionArray, newFunction)
 							stack = append(stack, currentToken) //TODO: not sure if it should append the TOKEN_TYPE_FUNCTION_DEF_END
+						
+						} else if(currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN) {
+							if(scopeName == "main") {
+								return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "'rtn' outside function", currentToken.FileName))
+							}
+
+							returnValue := stack[len(stack)-1]
+							stack = stack[:len(stack)-1]
+							var errConvert error
+
+							if(returnValue.Type == TOKEN_TYPE_IDENTIFIER) {
+								returnValue, errConvert = convertVariableToToken(returnValue, *globalVariableArray, scopeName)
+								if(errConvert != nil) {
+									return errConvert
+								}
+							}
+
+							errValue := expectedTokenTypes(returnValue, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE)
+							if (errValue != nil) {
+								return errValue
+							}
+
+							*gotReturn = true
+							*returnToken = returnValue
+							return nil
 						} else {
 							stack = append(stack, currentToken)
 						}
