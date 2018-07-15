@@ -59,6 +59,9 @@ const (
 	TOKEN_TYPE_FUNCTION_PARAM_END
 	TOKEN_TYPE_FUNCTION_DEF_END
 	TOKEN_TYPE_FUNCTION_RETURN
+	TOKEN_TYPE_FOR_LOOP_START
+	TOKEN_TYPE_FOR_LOOP_PARAM_END
+	TOKEN_TYPE_FOR_LOOP_END
 )
 
 //for debugging purpose only
@@ -103,6 +106,9 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_FUNCTION_PARAM_END",
 	"TOKEN_TYPE_FUNCTION_DEF_END",
 	"TOKEN_TYPE_FUNCTION_RETURN",
+	"TOKEN_TYPE_FOR_LOOP_START",
+	"TOKEN_TYPE_FOR_LOOP_PARAM_END",
+	"TOKEN_TYPE_FOR_LOOP_END",
 }
 
 //token object
@@ -354,6 +360,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var ignoreOpenP bool = false
 	var isOpenP bool = false
 	var isFunctionDef bool = false
+	var isForLoop bool = false
 	var openFunctionCount int = 0
 	var f_count int = 0
 	var op_count int = 0
@@ -379,6 +386,11 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else {
 						cleanTokenArray[x].Type = TOKEN_TYPE_INVOKE_FUNCTION
 					}
+				} else {
+					if(isForLoop) {
+						isForLoop = false
+						cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_PARAM_END
+					}
 				}
 			}
 		}
@@ -399,6 +411,24 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				if(cleanTokenArray[x].Value == "rtn") {
 					//function return
 					cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_RETURN
+				}
+				if(cleanTokenArray[x].Value == "fl") {
+					//for loop
+					isForLoop = true
+					cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_START
+					ignoreOpenP = true
+
+					if((x + 1) <= len(cleanTokenArray) - 1 ) {
+						if(cleanTokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS) {
+							return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x+1].Line, cleanTokenArray[x+1].Column, "Unexpected token '" + cleanTokenArray[x+1].Value + "'", cleanTokenArray[x+1].FileName))
+						}
+					} else {
+						return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "Unfinished statement", cleanTokenArray[x].FileName))
+					}
+					//continue
+				}
+				if(cleanTokenArray[x].Value == "lf") {
+					cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_END
 				}
 			} else {
 				//Check if the next token is '(', if yes then it's a function call
