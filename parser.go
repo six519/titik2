@@ -43,6 +43,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 	var outputQueue []Token
 	var ignoreNewline bool = false
 	var justAddTokens bool = false
+	var isFunctionDefinition bool = false
+	var openLoopCount int = 0
 
 	for x := 0; x < len(tokenArray); x++ {
 		if(tokenArray[x].Type == TOKEN_TYPE_NEWLINE) {
@@ -699,16 +701,31 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 				
 			}
 
-		} else if(tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START || tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_END) {
+		} else if(tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START || tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_END || tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_START || tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_END) {
 			if(tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START) {
 				ignoreNewline = true
-			} else {
+				isFunctionDefinition = true
+			} else if(tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_END) {
 				//TOKEN_TYPE_FUNCTION_DEF_END
 				ignoreNewline = false
+				isFunctionDefinition = false
 				
 				//NOTE: not sure if the code below is temporary
 				//append newline (to make the one liner definition of function works)
 				tokensToEvaluate = append(tokensToEvaluate, Token{Value: "\n", FileName: tokenArray[x].FileName, Type: TOKEN_TYPE_NEWLINE, Line: tokenArray[x].Line, Column: tokenArray[x].Column })
+			}
+			if(!isFunctionDefinition) {
+				if(tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_START) {
+					openLoopCount += 1
+					ignoreNewline = true
+				} else if(tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_END) {
+					openLoopCount = openLoopCount - 1
+
+					if(openLoopCount == 0) {
+						ignoreNewline = false
+						tokensToEvaluate = append(tokensToEvaluate, Token{Value: "\n", FileName: tokenArray[x].FileName, Type: TOKEN_TYPE_NEWLINE, Line: tokenArray[x].Line, Column: tokenArray[x].Column })
+					}
+				}
 			}
 			//put the token to stack for shunting yard process later
 			tokensToEvaluate = append(tokensToEvaluate, tokenArray[x])
