@@ -73,6 +73,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 				}
 		
 				justAddTokens = false
+				isFunctionDefinition = false
+				openLoopCount = 0
 				//shunting-yard
 				for len(tokensToEvaluate) > 0 {
 					currentToken := tokensToEvaluate[0]
@@ -85,6 +87,20 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 						if(currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_END) {
 							justAddTokens = false
+							isFunctionDefinition = false
+						}
+						if(!isFunctionDefinition) {
+							if(currentToken.Type == TOKEN_TYPE_FOR_LOOP_START) {
+								openLoopCount += 1
+							}
+							if(currentToken.Type == TOKEN_TYPE_FOR_LOOP_END) {
+								if(openLoopCount == 0) {
+									justAddTokens = false
+								}
+								if(openLoopCount > 0) {
+									openLoopCount = openLoopCount - 1
+								}
+							}
 						}
 						continue
 					}
@@ -101,18 +117,18 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					}
 
 					dontIgnorePopping := true
-					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END) {
+					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
 						isValidToken = true
 
 						if(len(tokensToEvaluate) > 0) {
 							if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION) {
-								if(tokensToEvaluate[0].Type == TOKEN_TYPE_INVOKE_FUNCTION || tokensToEvaluate[0].Type == TOKEN_TYPE_COMMA) {
+								if(tokensToEvaluate[0].Type == TOKEN_TYPE_INVOKE_FUNCTION || tokensToEvaluate[0].Type == TOKEN_TYPE_COMMA || tokensToEvaluate[0].Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
 									dontIgnorePopping = false
 								}
 							}
 						}
 
-						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END) {
+						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || tokensToEvaluate[0].Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
 							if(dontIgnorePopping) {
@@ -131,13 +147,16 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 						}
 
-						if(currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START) {
+						if(currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START) {
 							functionStack = append(functionStack, currentToken)
-						} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END) {
+							if(currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START) {
+								isFunctionDefinition = true
+							}
+						} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
 							outputQueue = append(outputQueue, functionStack[len(functionStack) - 1])
 							functionStack = functionStack[:len(functionStack)-1]
 
-							if(currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END) {
+							if(currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
 								//next is function body
 								justAddTokens = true
 							}
@@ -685,6 +704,92 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							*gotReturn = true
 							*returnToken = returnValue
 							return nil
+						} else if(currentToken.Type == TOKEN_TYPE_FOR_LOOP_START) {
+							//get looping parameters
+							//param validation
+							if(len(stack) == 0 || len(stack) < 2) {
+								return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly 2 argument", currentToken.FileName))
+							}
+							var errConvert error
+
+							param2 := stack[len(stack)-1]
+							stack = stack[:len(stack)-1]
+
+							//if param2 is an identifier
+							//then it's a variable
+							if(param2.Type == TOKEN_TYPE_IDENTIFIER) {
+								param2, errConvert = convertVariableToToken(param2, *globalVariableArray, scopeName)
+								if(errConvert != nil) {
+									return errConvert
+								}
+							}
+		
+							param1 := stack[len(stack)-1]
+							stack = stack[:len(stack)-1]
+
+							//if param1 is an identifier
+							//then it's a variable
+							if(param1.Type == TOKEN_TYPE_IDENTIFIER) {
+								param1, errConvert = convertVariableToToken(param1, *globalVariableArray, scopeName)
+								if(errConvert != nil) {
+									return errConvert
+								}
+							}
+		
+							//validate param2
+							errParam2 := expectedTokenTypes(param2, TOKEN_TYPE_INTEGER)
+							if (errParam2 != nil) {
+								return errParam2
+							}
+							//validate param1
+							errParam1 := expectedTokenTypes(param1, TOKEN_TYPE_INTEGER)
+							if (errParam1 != nil) {
+								return errParam1
+							}
+
+							var tempTokens []Token
+							openLoopCount = 0
+							//append all tokens to temporary token
+							for true {
+								currentToken := outputQueue[0]
+								outputQueue = append(outputQueue[:0], outputQueue[1:]...)
+
+								tempTokens = append(tempTokens, currentToken)
+
+								if(currentToken.Type == TOKEN_TYPE_FOR_LOOP_START) {
+									openLoopCount += 1
+								}
+
+								if(currentToken.Type == TOKEN_TYPE_FOR_LOOP_END) {
+									if(openLoopCount == 0) {
+										break
+									}
+									openLoopCount = openLoopCount - 1
+								}
+
+								if(len(outputQueue) == 0) {
+									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Invalid statement", currentToken.FileName))
+								}
+							}
+
+							iParam1, _ := strconv.Atoi(param1.Value)
+							iParam2, _ := strconv.Atoi(param2.Value)
+
+							for loop_index := iParam1 ; loop_index <= iParam2; loop_index++ {
+
+								var loopGotReturn bool = false
+								var loopReturnToken Token
+								
+								prsr := Parser{}
+								parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &loopGotReturn, &loopReturnToken)
+						
+								if(parserErr != nil) {
+									return parserErr
+								}
+
+							}
+
+							stack = append(stack, currentToken) //append TOKEN_TYPE_FOR_LOOP_END
 						} else {
 							stack = append(stack, currentToken)
 						}
