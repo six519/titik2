@@ -786,7 +786,11 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								if(parserErr != nil) {
 									return parserErr
 								}
-
+								if(loopGotReturn) {
+									*gotReturn = loopGotReturn
+									*returnToken = loopReturnToken
+									return nil
+								}
 							}
 
 							stack = append(stack, currentToken) //append TOKEN_TYPE_FOR_LOOP_END
