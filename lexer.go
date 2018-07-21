@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"errors"
 	"unicode"
+	"strconv"
 	"fmt"
 )
 
@@ -115,6 +116,7 @@ var TOKEN_TYPES_STRING = []string {
 type Token struct {
 	Value string
 	FileName string
+	Context string
 	Type int
 	Line int
 	Column int
@@ -134,7 +136,8 @@ func DumpToken(tokenArray []Token) {
         fmt.Printf("Token Type: %s\n", TOKEN_TYPES_STRING[tokenArray[x].Type])
         fmt.Printf("Line #: %d\n", tokenArray[x].Line)
         fmt.Printf("Column #: %d\n", tokenArray[x].Column)
-        fmt.Printf("Value: %s\n", tokenArray[x].Value)
+		fmt.Printf("Value: %s\n", tokenArray[x].Value)
+		fmt.Printf("Context: %s\n", tokenArray[x].Context)
 		fmt.Printf("====================================\n")
 	}
 }
@@ -364,6 +367,10 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var openFunctionCount int = 0
 	var f_count int = 0
 	var op_count int = 0
+
+	var contextIndex int = 0
+	var contextName = []string{"main_context"}
+
 	for x := 0; x < len(cleanTokenArray); x++ {
 		if(ignoreOpenP) {
 			//ignore open parenthesis if the last token is a function
@@ -385,6 +392,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_PARAM_END
 					} else {
 						cleanTokenArray[x].Type = TOKEN_TYPE_INVOKE_FUNCTION
+						cleanTokenArray[x].Context = contextName[contextIndex]
+						contextIndex = contextIndex - 1
+						contextName = contextName[:len(contextName)-1]
 					}
 				} else {
 					if(isForLoop) {
@@ -455,6 +465,11 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 								}
 							}
 						}
+						if(cleanTokenArray[x].Type == TOKEN_TYPE_FUNCTION) {
+							contextIndex += 1
+							thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
+							contextName = append(contextName, cleanTokenArray[x].Value + "_" + thisSuffix)
+						}
 					}
 				}
 			}
@@ -466,6 +481,11 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			if(!((x+1) < len(cleanTokenArray))) {
 				return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "Expected closing of multi line comment", lexer.FileName))
 			}
+		}
+
+		//set context
+		if(cleanTokenArray[x].Context == "") {
+			cleanTokenArray[x].Context = contextName[contextIndex]
 		}
 
 		if(x != 0 && (cleanTokenArray[x].Type == TOKEN_TYPE_FLOAT || cleanTokenArray[x].Type == TOKEN_TYPE_INTEGER)) {
