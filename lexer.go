@@ -400,6 +400,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					if(isForLoop) {
 						isForLoop = false
 						cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_PARAM_END
+						cleanTokenArray[x].Context = contextName[contextIndex]
+						contextIndex = contextIndex - 1
+						contextName = contextName[:len(contextName)-1]
 					}
 				}
 			}
@@ -427,6 +430,10 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					isForLoop = true
 					cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_START
 					ignoreOpenP = true
+
+					contextIndex += 1
+					thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
+					contextName = append(contextName, "fl_" + thisSuffix)
 
 					if((x + 1) <= len(cleanTokenArray) - 1 ) {
 						if(cleanTokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS) {
