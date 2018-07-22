@@ -38,7 +38,9 @@ type Parser struct {
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, gotReturn *bool, returnToken *Token) error {
 	var tokensToEvaluate []Token
 	operatorPrecedences := map[string] int{"function_return": 0, "=": 1, "+": 2, "-": 2, "/": 3, "*": 3} //operator order of precedences
-	var operatorStack []Token
+	currentContext := "main_context"
+	var operatorStack map[string][]Token
+	operatorStack = make(map[string][]Token)
 	var functionStack []Token
 	var outputQueue []Token
 	var ignoreNewline bool = false
@@ -80,6 +82,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					currentToken := tokensToEvaluate[0]
 					tokensToEvaluate = append(tokensToEvaluate[:0], tokensToEvaluate[1:]...) //pop the first element
 					isValidToken := false
+					currentContext = currentToken.Context
 
 					if(justAddTokens) {
 						//function body, just add to outputqueue
@@ -116,10 +119,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						isValidToken = true
 					}
 
-					dontIgnorePopping := true
+					//dontIgnorePopping := true
 					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
 						isValidToken = true
-
+						/*
 						if(len(tokensToEvaluate) > 0) {
 							if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION) {
 								if(tokensToEvaluate[0].Type == TOKEN_TYPE_INVOKE_FUNCTION || tokensToEvaluate[0].Type == TOKEN_TYPE_COMMA || tokensToEvaluate[0].Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
@@ -127,22 +130,21 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							}
 						}
+						*/
 
 						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || tokensToEvaluate[0].Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
-							if(dontIgnorePopping) {
-								for true {
-									if(len(operatorStack) > 0) {
-										if(operatorStack[len(operatorStack) - 1].Type == TOKEN_TYPE_EQUALS) {
-											break
-										} else {
-											outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-											operatorStack = operatorStack[:len(operatorStack)-1]
-										}
-									} else {
+							for true {
+								if(len(operatorStack[currentContext]) > 0) {
+									if(operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Type == TOKEN_TYPE_EQUALS) {
 										break
+									} else {
+										outputQueue = append(outputQueue, operatorStack[currentContext][len(operatorStack[currentContext]) - 1])
+										operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
 									}
+								} else {
+									break
 								}
 							}
 						}
@@ -170,42 +172,44 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 						}
 
+						/*
 						//dirty fix (not sure)
 						if(!dontIgnorePopping) {
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
 							for true {
-								if(len(operatorStack) > 0) {
-									if(operatorStack[len(operatorStack) - 1].Type == TOKEN_TYPE_EQUALS) {
+								if(len(operatorStack[currentContext]) > 0) {
+									if(operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Type == TOKEN_TYPE_EQUALS) {
 										break
 									} else {
-										outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-										operatorStack = operatorStack[:len(operatorStack)-1]
+										outputQueue = append(outputQueue, operatorStack[currentContext][len(operatorStack[currentContext]) - 1])
+										operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
 									}
 								} else {
 									break
 								}
 							}
 						}
+						*/
 
 					}
 
 					if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN) {
 						//the token is operator
 						for true {
-							if(len(operatorStack) > 0) {
+							if(len(operatorStack[currentContext]) > 0) {
 
 								if(currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN) {
-									if(operatorPrecedences[operatorStack[len(operatorStack) - 1].Value] > operatorPrecedences["function_return"]) {
-										outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-										operatorStack = operatorStack[:len(operatorStack)-1]
+									if(operatorPrecedences[operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Value] > operatorPrecedences["function_return"]) {
+										outputQueue = append(outputQueue, operatorStack[currentContext][len(operatorStack[currentContext]) - 1])
+										operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
 									} else {
 										break
 									}
 								} else {
-									if(operatorPrecedences[operatorStack[len(operatorStack) - 1].Value] > operatorPrecedences[currentToken.Value]) {
-										outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-										operatorStack = operatorStack[:len(operatorStack)-1]
+									if(operatorPrecedences[operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Value] > operatorPrecedences[currentToken.Value]) {
+										outputQueue = append(outputQueue, operatorStack[currentContext][len(operatorStack[currentContext]) - 1])
+										operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
 									} else {
 										break
 									}
@@ -215,30 +219,30 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								break
 							}
 						}
-						operatorStack = append(operatorStack, currentToken)
+						operatorStack[currentContext] = append(operatorStack[currentContext], currentToken)
 						isValidToken = true
 					}
 		
 					if(currentToken.Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
 						//if it's an open parenthesis '(' push it onto the stack
-						operatorStack = append(operatorStack, currentToken)
+						operatorStack[currentContext] = append(operatorStack[currentContext], currentToken)
 						isValidToken = true
 					}
 		
 					if(currentToken.Type == TOKEN_TYPE_CLOSE_PARENTHESIS) {
 						isValidToken = true
 						//close parenthesis
-						if(len(operatorStack) > 0) {
+						if(len(operatorStack[currentContext]) > 0) {
 							for true {
-								if(operatorStack[len(operatorStack) - 1].Type != TOKEN_TYPE_OPEN_PARENTHESIS) {
-									outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-									operatorStack = operatorStack[:len(operatorStack)-1]
+								if(operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Type != TOKEN_TYPE_OPEN_PARENTHESIS) {
+									outputQueue = append(outputQueue, operatorStack[currentContext][len(operatorStack[currentContext]) - 1])
+									operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
 								} else {
-									operatorStack = operatorStack[:len(operatorStack)-1]
+									operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
 									break
 								}
 		
-								if(len(operatorStack) == 0) {
+								if(len(operatorStack[currentContext]) == 0) {
 									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Operator expected", currentToken.FileName))		
 								}
 							}
@@ -252,12 +256,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					}
 				}
 		
-				for len(operatorStack) > 0 {
-					if(operatorStack[len(operatorStack) - 1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
-						return errors.New(SyntaxErrorMessage(operatorStack[len(operatorStack) - 1].Line, operatorStack[len(operatorStack) - 1].Column, "Unexpected token '" + operatorStack[len(operatorStack) - 1].Value + "'", operatorStack[len(operatorStack) - 1].FileName))
+				for len(operatorStack[currentContext]) > 0 {
+					if(operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
+						return errors.New(SyntaxErrorMessage(operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Line, operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Column, "Unexpected token '" + operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Value + "'", operatorStack[currentContext][len(operatorStack[currentContext]) - 1].FileName))
 					}
-					outputQueue = append(outputQueue, operatorStack[len(operatorStack) - 1])
-					operatorStack = operatorStack[:len(operatorStack)-1]
+					outputQueue = append(outputQueue, operatorStack[currentContext][len(operatorStack[currentContext]) - 1])
+					operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
 				}
 				//end of shunting-yard
 
