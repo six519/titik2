@@ -368,7 +368,6 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var f_count int = 0
 	var op_count int = 0
 
-	var contextIndex int = 0
 	var contextName = []string{"main_context"}
 
 	for x := 0; x < len(cleanTokenArray); x++ {
@@ -392,16 +391,14 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_PARAM_END
 					} else {
 						cleanTokenArray[x].Type = TOKEN_TYPE_INVOKE_FUNCTION
-						cleanTokenArray[x].Context = contextName[contextIndex]
-						contextIndex = contextIndex - 1
+						cleanTokenArray[x].Context = contextName[len(contextName)-1]
 						contextName = contextName[:len(contextName)-1]
 					}
 				} else {
 					if(isForLoop) {
 						isForLoop = false
 						cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_PARAM_END
-						cleanTokenArray[x].Context = contextName[contextIndex]
-						contextIndex = contextIndex - 1
+						cleanTokenArray[x].Context = contextName[len(contextName)-1]
 						contextName = contextName[:len(contextName)-1]
 					}
 				}
@@ -431,7 +428,6 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_START
 					ignoreOpenP = true
 
-					contextIndex += 1
 					thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
 					contextName = append(contextName, "fl_" + thisSuffix)
 
@@ -473,7 +469,6 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 							}
 						}
 						if(cleanTokenArray[x].Type == TOKEN_TYPE_FUNCTION) {
-							contextIndex += 1
 							thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
 							contextName = append(contextName, cleanTokenArray[x].Value + "_" + thisSuffix)
 						}
@@ -492,7 +487,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 
 		//set context
 		if(cleanTokenArray[x].Context == "") {
-			cleanTokenArray[x].Context = contextName[contextIndex]
+			cleanTokenArray[x].Context = contextName[len(contextName)-1]
 		}
 
 		if(x != 0 && (cleanTokenArray[x].Type == TOKEN_TYPE_FLOAT || cleanTokenArray[x].Type == TOKEN_TYPE_INTEGER)) {
