@@ -63,6 +63,7 @@ const (
 	TOKEN_TYPE_FOR_LOOP_START
 	TOKEN_TYPE_FOR_LOOP_PARAM_END
 	TOKEN_TYPE_FOR_LOOP_END
+	TOKEN_TYPE_LOOP_BREAK
 )
 
 //for debugging purpose only
@@ -110,6 +111,7 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_FOR_LOOP_START",
 	"TOKEN_TYPE_FOR_LOOP_PARAM_END",
 	"TOKEN_TYPE_FOR_LOOP_END",
+	"TOKEN_TYPE_LOOP_BREAK",
 }
 
 //token object
@@ -422,6 +424,10 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				if(cleanTokenArray[x].Value == "rtn") {
 					//function return
 					cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_RETURN
+				}
+				if(cleanTokenArray[x].Value == "brk") {
+					//loop break
+					cleanTokenArray[x].Type = TOKEN_TYPE_LOOP_BREAK
 				}
 				if(cleanTokenArray[x].Value == "fl") {
 					//for loop
