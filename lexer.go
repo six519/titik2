@@ -366,7 +366,8 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var isForLoop bool = false
 	var openFunctionCount int = 0
 	var f_count int = 0
-	var op_count int = 0
+	var op_count map[string]int
+	op_count = make(map[string]int)
 
 	var contextName = []string{"main_context"}
 
@@ -377,11 +378,11 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			continue
 		}
 		if(cleanTokenArray[x].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
-			op_count += 1
+			op_count[contextName[len(contextName)-1]] += 1
 		}
 		if(cleanTokenArray[x].Type == TOKEN_TYPE_CLOSE_PARENTHESIS) {
-			if(op_count > 0) {
-				op_count -= 1
+			if(op_count[contextName[len(contextName)-1]] > 0) {
+				op_count[contextName[len(contextName)-1]] -= 1
 			} else {
 				if(f_count > 0) {
 					f_count -= 1
