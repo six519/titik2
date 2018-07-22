@@ -132,7 +132,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						}
 						*/
 
-						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || tokensToEvaluate[0].Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
+						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
 							for true {
