@@ -35,7 +35,7 @@ func expectedTokenTypes(token Token, tokenTypes ...int) error {
 type Parser struct {
 }
 
-func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, gotReturn *bool, returnToken *Token) error {
+func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, gotReturn *bool, returnToken *Token, isLoop bool, needBreak *bool) error {
 	var tokensToEvaluate []Token
 	operatorPrecedences := map[string] int{"function_return": 0, "=": 1, "+": 2, "-": 2, "/": 3, "*": 3} //operator order of precedences
 	currentContext := "main_context"
@@ -113,7 +113,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						continue
 					}
 		
-					if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_IDENTIFIER || currentToken.Type == TOKEN_TYPE_STRING) {
+					if(currentToken.Type == TOKEN_TYPE_INTEGER || currentToken.Type == TOKEN_TYPE_FLOAT || currentToken.Type == TOKEN_TYPE_IDENTIFIER || currentToken.Type == TOKEN_TYPE_STRING || currentToken.Type == TOKEN_TYPE_LOOP_BREAK) {
 						//If it's a number or identifier, add it to queue, (ADD TOKEN_TYPE_KEYWORD AND string and other acceptable tokens LATER)
 						outputQueue = append(outputQueue, currentToken)
 						isValidToken = true
@@ -600,10 +600,11 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 								var thisGotReturn bool = false
 								var thisReturnToken Token
+								var thisNeedBreak bool = false
 								
 								//execute user defined function
 								prsr := Parser{}
-								parserErr := prsr.Parse((*globalFunctionArray)[funcIndex].Tokens, globalVariableArray, globalFunctionArray, thisScopeName, globalNativeVarList, &thisGotReturn, &thisReturnToken)
+								parserErr := prsr.Parse((*globalFunctionArray)[funcIndex].Tokens, globalVariableArray, globalFunctionArray, thisScopeName, globalNativeVarList, &thisGotReturn, &thisReturnToken, false, &thisNeedBreak)
 						
 								if(parserErr != nil) {
 									return parserErr
@@ -783,9 +784,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 								var loopGotReturn bool = false
 								var loopReturnToken Token
+								var loopNeedBreak bool = false
 								
 								prsr := Parser{}
-								parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &loopGotReturn, &loopReturnToken)
+								parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &loopGotReturn, &loopReturnToken, true, &loopNeedBreak)
 						
 								if(parserErr != nil) {
 									return parserErr
@@ -795,9 +797,21 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									*returnToken = loopReturnToken
 									return nil
 								}
+
+								if(loopNeedBreak) {
+									//break the loop
+									break
+								}
 							}
 
 							stack = append(stack, currentToken) //append TOKEN_TYPE_FOR_LOOP_END
+						
+						} else if(currentToken.Type == TOKEN_TYPE_LOOP_BREAK) {
+							if(!isLoop) {
+								return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "'brk' outside loop", currentToken.FileName))
+							}
+							*needBreak = true
+							return nil
 						} else {
 							stack = append(stack, currentToken)
 						}

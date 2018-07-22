@@ -62,9 +62,10 @@ func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Fu
 			if(!isContinue) {
 				var gotReturn bool = false
 				var returnToken Token
+				var needBreak bool = false
 
 				prsr := Parser{}
-				parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main", globalNativeVarList, &gotReturn, &returnToken)
+				parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main", globalNativeVarList, &gotReturn, &returnToken, false, &needBreak)
 		
 				if(parserErr != nil) {
 					fmt.Println(parserErr)

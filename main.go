@@ -29,6 +29,7 @@ func main() {
 	} else {
 		var gotReturn bool = false
 		var returnToken Token
+		var needBreak bool = false
 		//open titik file
 		lxr := Lexer{FileName: os.Args[1]}
 		fileErr := lxr.ReadSourceFile()
@@ -47,7 +48,7 @@ func main() {
 		}
 		//parser object
 		prsr := Parser{}
-		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main", &globalNativeVarList, &gotReturn, &returnToken)
+		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main", &globalNativeVarList, &gotReturn, &returnToken, false, &needBreak)
 
 		if(parserErr != nil) {
 			fmt.Println(parserErr)
