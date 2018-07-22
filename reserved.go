@@ -9,9 +9,9 @@ var RESERVED_WORDS = []string {
 	"if", //if
 	"fi", //end of if
 	"ef", //else if
-	"e", //else
+	"el", //else
 	"to", //use in looping statement
-	"b", //break loop
+	"brk", //break loop
 	"fd", //function
 	"df", //end of function declaration
 	"rtn", //return
