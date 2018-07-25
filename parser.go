@@ -200,14 +200,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							if(len(operatorStack[currentContext]) > 0) {
 
 								if(currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN) {
-									if(operatorPrecedences[operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Value] > operatorPrecedences["function_return"]) {
+									if(operatorPrecedences[operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Value] >= operatorPrecedences["function_return"]) {
 										outputQueue = append(outputQueue, operatorStack[currentContext][len(operatorStack[currentContext]) - 1])
 										operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
 									} else {
 										break
 									}
 								} else {
-									if(operatorPrecedences[operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Value] > operatorPrecedences[currentToken.Value]) {
+									if(operatorPrecedences[operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Value] >= operatorPrecedences[currentToken.Value]) {
 										outputQueue = append(outputQueue, operatorStack[currentContext][len(operatorStack[currentContext]) - 1])
 										operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
 									} else {
