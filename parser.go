@@ -489,7 +489,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
 							} else if(value.Type == TOKEN_TYPE_BOOLEAN) {
 								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_BOOLEAN
-								if(value.Value == "1") {
+								if(value.Value == "true") {
 									(*globalVariableArray)[varIndex].BooleanValue = true
 								} else {
 									(*globalVariableArray)[varIndex].BooleanValue = false
@@ -546,7 +546,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										fa.FloatValue, _ = strconv.ParseFloat(param.Value, 32)
 									} else if(param.Type == TOKEN_TYPE_BOOLEAN) {
 										fa.Type = ARG_TYPE_BOOLEAN
-										if(param.Value == "1") {
+										if(param.Value == "true") {
 											fa.BooleanValue = true
 										} else {
 											fa.BooleanValue = false
@@ -583,10 +583,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									newToken.Type = TOKEN_TYPE_BOOLEAN
 									if(funcReturn.BooleanValue) {
 										//true
-										newToken.Value = "1"
+										newToken.Value = "true"
 									} else {
 										//false
-										newToken.Value = "0"
+										newToken.Value = "false"
 									}
 								} else {
 									//Nil

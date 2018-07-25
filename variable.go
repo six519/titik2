@@ -124,10 +124,10 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 		token.Type = TOKEN_TYPE_BOOLEAN
 		if(variables[indx].BooleanValue) {
 			//true
-			token.Value = "1"
+			token.Value = "true"
 		} else {
 			//false
-			token.Value = "0"
+			token.Value = "false"
 		}
 	} else {
 		//Nil
