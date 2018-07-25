@@ -13,6 +13,7 @@ const (
 	VARIABLE_TYPE_STRING
 	VARIABLE_TYPE_FLOAT
 	VARIABLE_TYPE_ARRAY
+	VARIABLE_TYPE_BOOLEAN
 )
 
 var VARIABLE_TYPES_STRING = []string {
@@ -21,6 +22,7 @@ var VARIABLE_TYPES_STRING = []string {
 	"VARIABLE_TYPE_STRING",
 	"VARIABLE_TYPE_FLOAT",
 	"VARIABLE_TYPE_ARRAY",
+	"VARIABLE_TYPE_BOOLEAN",
 }
 
 type Variable struct {
@@ -30,6 +32,7 @@ type Variable struct {
 	StringValue string
 	IntegerValue int
 	FloatValue float64
+	BooleanValue bool
 	IsConstant bool
 	ArrayValue []Variable
 }
@@ -47,6 +50,8 @@ func DumpVariable(variables []Variable) {
 			fmt.Printf("Variable Value: %s\n", variables[x].StringValue)
 		} else if(variables[x].Type == VARIABLE_TYPE_INTEGER) {
 			fmt.Printf("Variable Value: %d\n", variables[x].IntegerValue)
+		} else if(variables[x].Type == VARIABLE_TYPE_BOOLEAN) {
+			fmt.Printf("Variable Value: %v\n", variables[x].BooleanValue)
 		} else {
 			//Nil type
 			fmt.Println("Variable Value: Nil")
@@ -115,6 +120,15 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 	} else if(variables[indx].Type == VARIABLE_TYPE_FLOAT) {
 		token.Type = TOKEN_TYPE_FLOAT
 		token.Value = strconv.FormatFloat(variables[indx].FloatValue, 'f', -1, 64)
+	} else if(variables[indx].Type == VARIABLE_TYPE_BOOLEAN) {
+		token.Type = TOKEN_TYPE_BOOLEAN
+		if(variables[indx].BooleanValue) {
+			//true
+			token.Value = "1"
+		} else {
+			//false
+			token.Value = "0"
+		}
 	} else {
 		//Nil
 		token.Type = TOKEN_TYPE_NONE
@@ -129,6 +143,12 @@ func defineConstantString(variableName string, variableValue string, globalVaria
 	*globalNativeVarList= append(*globalNativeVarList, variableName)
 }
 
+func defineConstantBoolean(variableName string, variableValue bool, globalVariableArray *[]Variable, globalNativeVarList *[]string) {
+	boolVar := Variable{Name: variableName, ScopeName: "main", Type: VARIABLE_TYPE_BOOLEAN, IsConstant: true, BooleanValue: variableValue}
+	*globalVariableArray = append(*globalVariableArray, boolVar)
+	*globalNativeVarList= append(*globalNativeVarList, variableName)
+}
+
 func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *[]string) {
 	//add Nil Variable
 	nilVar := Variable{Name: "Nil", ScopeName: "main", Type: VARIABLE_TYPE_NONE, IsConstant: true}
@@ -138,4 +158,8 @@ func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *
 	//define string constants
 	defineConstantString("__AUTHOR__", TITIK_AUTHOR, globalVariableArray, globalNativeVarList)
 	defineConstantString("__VERSION_STRING__", TITIK_STRING_VERSION, globalVariableArray, globalNativeVarList)
+
+	//define boolean constants
+	defineConstantBoolean("T", true, globalVariableArray, globalNativeVarList)
+	defineConstantBoolean("F", false, globalVariableArray, globalNativeVarList)
 }

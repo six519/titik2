@@ -13,6 +13,7 @@ const (
 	RET_TYPE_INTEGER
 	RET_TYPE_FLOAT
 	RET_TYPE_ARRAY
+	RET_TYPE_BOOLEAN
 )
 
 //function argument types
@@ -22,6 +23,7 @@ const (
 	ARG_TYPE_INTEGER
 	ARG_TYPE_FLOAT
 	ARG_TYPE_ARRAY
+	ARG_TYPE_BOOLEAN
 )
 
 type FunctionReturn struct {
@@ -29,6 +31,7 @@ type FunctionReturn struct {
 	StringValue string
 	IntegerValue int
 	FloatValue float64
+	BooleanValue bool
 }
 
 type FunctionArgument struct {
@@ -36,6 +39,7 @@ type FunctionArgument struct {
 	StringValue string
 	IntegerValue int
 	FloatValue float64
+	BooleanValue bool
 }
 
 type Execute func([]FunctionArgument) FunctionReturn
@@ -108,6 +112,14 @@ func P_execute(arguments []FunctionArgument) FunctionReturn {
 		//integer
 		fmt.Printf("%d\n", arguments[0].IntegerValue)
 		ret.StringValue = strconv.Itoa(arguments[0].IntegerValue)
+	} else if(arguments[0].Type == ARG_TYPE_BOOLEAN) {
+		//boolean
+		fmt.Printf("%v\n", arguments[0].BooleanValue)
+		if(arguments[0].BooleanValue) {
+			ret.StringValue = "true"
+		} else {
+			ret.StringValue = "false"
+		}	
 	} else {
 		//Nil
 		fmt.Println("Nil")

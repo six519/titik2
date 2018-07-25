@@ -256,12 +256,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					}
 				}
 		
-				for len(operatorStack[currentContext]) > 0 {
-					if(operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
-						return errors.New(SyntaxErrorMessage(operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Line, operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Column, "Unexpected token '" + operatorStack[currentContext][len(operatorStack[currentContext]) - 1].Value + "'", operatorStack[currentContext][len(operatorStack[currentContext]) - 1].FileName))
+				for len(operatorStack["main_context"]) > 0 {
+					if(operatorStack["main_context"][len(operatorStack["main_context"]) - 1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
+						return errors.New(SyntaxErrorMessage(operatorStack["main_context"][len(operatorStack["main_context"]) - 1].Line, operatorStack["main_context"][len(operatorStack["main_context"]) - 1].Column, "Unexpected token '" + operatorStack["main_context"][len(operatorStack["main_context"]) - 1].Value + "'", operatorStack["main_context"][len(operatorStack["main_context"]) - 1].FileName))
 					}
-					outputQueue = append(outputQueue, operatorStack[currentContext][len(operatorStack[currentContext]) - 1])
-					operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
+					outputQueue = append(outputQueue, operatorStack["main_context"][len(operatorStack["main_context"]) - 1])
+					operatorStack["main_context"] = operatorStack["main_context"][:len(operatorStack["main_context"])-1]
 				}
 				//end of shunting-yard
 
@@ -428,7 +428,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							stack = stack[:len(stack)-1]
 		
 							//validate value
-							errVal := expectedTokenTypes(value, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE)
+							errVal := expectedTokenTypes(value, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE, TOKEN_TYPE_BOOLEAN)
 							if (errVal != nil) {
 								return errVal
 							}
@@ -487,6 +487,13 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							} else if(value.Type == TOKEN_TYPE_FLOAT) {
 								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
 								(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
+							} else if(value.Type == TOKEN_TYPE_BOOLEAN) {
+								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_BOOLEAN
+								if(value.Value == "1") {
+									(*globalVariableArray)[varIndex].BooleanValue = true
+								} else {
+									(*globalVariableArray)[varIndex].BooleanValue = false
+								}
 							} else {
 								//Nil
 								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
@@ -537,6 +544,13 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									} else if(param.Type == TOKEN_TYPE_FLOAT) {
 										fa.Type = ARG_TYPE_FLOAT
 										fa.FloatValue, _ = strconv.ParseFloat(param.Value, 32)
+									} else if(param.Type == TOKEN_TYPE_BOOLEAN) {
+										fa.Type = ARG_TYPE_BOOLEAN
+										if(param.Value == "1") {
+											fa.BooleanValue = true
+										} else {
+											fa.BooleanValue = false
+										}
 									} else {
 										//Nil
 										fa.Type = ARG_TYPE_NONE
@@ -565,6 +579,15 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								} else if(funcReturn.Type == RET_TYPE_FLOAT) {
 									newToken.Type = TOKEN_TYPE_FLOAT
 									newToken.Value = strconv.FormatFloat(funcReturn.FloatValue, 'f', -1, 64)
+								} else if(funcReturn.Type == RET_TYPE_BOOLEAN) {
+									newToken.Type = TOKEN_TYPE_BOOLEAN
+									if(funcReturn.BooleanValue) {
+										//true
+										newToken.Value = "1"
+									} else {
+										//false
+										newToken.Value = "0"
+									}
 								} else {
 									//Nil
 									newToken.Type = TOKEN_TYPE_NONE
@@ -592,6 +615,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									} else if(functionArguments[ind].Type == ARG_TYPE_FLOAT) {
 										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
 										(*globalVariableArray)[varIndex].FloatValue = functionArguments[ind].FloatValue
+									} else if(functionArguments[ind].Type == ARG_TYPE_BOOLEAN) {
+										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_BOOLEAN
+										(*globalVariableArray)[varIndex].BooleanValue = functionArguments[ind].BooleanValue
 									} else {
 										//Nil
 										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
