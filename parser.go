@@ -727,7 +727,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							}
 
-							errValue := expectedTokenTypes(returnValue, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE)
+							errValue := expectedTokenTypes(returnValue, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE, TOKEN_TYPE_BOOLEAN)
 							if (errValue != nil) {
 								return errValue
 							}
