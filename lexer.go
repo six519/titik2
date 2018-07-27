@@ -50,7 +50,6 @@ const (
 	TOKEN_TYPE_GREATER_THAN
 	TOKEN_TYPE_LESS_THAN
 	TOKEN_TYPE_OR
-	TOKEN_TYPE_EXCLAMATION
 	TOKEN_TYPE_TAB
 	TOKEN_TYPE_CARRIAGE_RETURN
 	TOKEN_TYPE_NONE
@@ -99,7 +98,6 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_GREATER_THAN",
 	"TOKEN_TYPE_LESS_THAN",
 	"TOKEN_TYPE_OR",
-	"TOKEN_TYPE_EXCLAMATION",
 	"TOKEN_TYPE_TAB",
 	"TOKEN_TYPE_CARRIAGE_RETURN",
 	"TOKEN_TYPE_NONE",
@@ -196,7 +194,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			switch(tokenizerState) {
 				case TOKENIZER_STATE_GET_WORD:
 					//get word
-					if(unicode.IsLetter([]rune(currentChar)[0]) || currentChar == "_") {
+					if(unicode.IsLetter([]rune(currentChar)[0]) || currentChar == "_" || currentChar == "!") {
 						//alphabetic or underscore
 						if(len(tokenArray) > 0) {
 							if(tokenArray[len(tokenArray) - 1].Type == TOKEN_TYPE_INTEGER) {
