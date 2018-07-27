@@ -37,7 +37,7 @@ type Parser struct {
 
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, gotReturn *bool, returnToken *Token, isLoop bool, needBreak *bool) error {
 	var tokensToEvaluate []Token
-	operatorPrecedences := map[string] int{"function_return": 0, "=": 1, "+": 2, "-": 2, "/": 3, "*": 3} //operator order of precedences
+	operatorPrecedences := map[string] int{"function_return": 0, "=": 1, "+": 2, "-": 2, "&": 2, "|": 2, "/": 3, "*": 3} //operator order of precedences
 	currentContext := "main_context"
 	var operatorStack map[string][]Token
 	operatorStack = make(map[string][]Token)
@@ -194,7 +194,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 					}
 
-					if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN) {
+					if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_AMPERSAND || currentToken.Type == TOKEN_TYPE_OR || currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN) {
 						//the token is operator
 						for true {
 							if(len(operatorStack[currentContext]) > 0) {
@@ -409,6 +409,63 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 		
 							stack = append(stack, result)
 		
+						} else if(currentToken.Type == TOKEN_TYPE_AMPERSAND || currentToken.Type == TOKEN_TYPE_OR) {
+							//logical operation
+							rightOperand := stack[len(stack)-1]
+							stack = stack[:len(stack)-1]
+		
+							leftOperand := stack[len(stack)-1]
+							stack = stack[:len(stack)-1]
+
+							var errConvert error
+		
+							result := leftOperand
+
+							if(leftOperand.Type == TOKEN_TYPE_IDENTIFIER) {
+								leftOperand, errConvert = convertVariableToToken(leftOperand, *globalVariableArray, scopeName)
+								if(errConvert != nil) {
+									return errConvert
+								}
+							}
+							if(rightOperand.Type == TOKEN_TYPE_IDENTIFIER) {
+								rightOperand, errConvert = convertVariableToToken(rightOperand, *globalVariableArray, scopeName)
+								if(errConvert != nil) {
+									return errConvert
+								}
+							}
+
+							//validate left operand
+							errLeft := expectedTokenTypes(leftOperand, TOKEN_TYPE_BOOLEAN)
+							if (errLeft != nil) {
+								return errLeft
+							}
+							//validate right operand
+							errRight := expectedTokenTypes(rightOperand, TOKEN_TYPE_BOOLEAN)
+							if (errRight != nil) {
+								return errRight
+							}
+
+							result.Type = TOKEN_TYPE_BOOLEAN
+							leftBool := convertTokenToBool(leftOperand)
+							rightBool := convertTokenToBool(rightOperand)
+
+							if(currentToken.Type == TOKEN_TYPE_AMPERSAND) {
+								//AND operation
+								if(leftBool && rightBool) {
+									result.Value = "true"
+								} else {
+									result.Value = "false"
+								}
+							} else {
+								//assume it's OR operation
+								if(leftBool || rightBool) {
+									result.Value = "true"
+								} else {
+									result.Value = "false"
+								}
+							}
+
+							stack = append(stack, result)
 						} else if(currentToken.Type == TOKEN_TYPE_EQUALS) {
 							//assignment operation
 							value := stack[len(stack)-1]

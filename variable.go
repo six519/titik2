@@ -92,6 +92,13 @@ func isSystemVariable(name string, globalNativeVarList []string) bool {
 	return false
 }
 
+func convertTokenToBool(token Token) bool {
+	if(token.Value == "true") {
+		return true
+	}
+	return false
+}
+
 func convertVariableToToken(token Token, variables []Variable, scopeName string) (Token, error) {
 
 	isExists, indx := isVariableExists(token, variables, scopeName)
