@@ -133,10 +133,21 @@ func Ex_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn 
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_INTEGER) {
-		//fmt.Println("Error: Parameter must be an integer")
 		*errMessage = errors.New("Error: Parameter must be an integer type")
 	} else {
 		os.Exit(arguments[0].IntegerValue)
+	}
+
+	return ret
+}
+
+func Abt_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter must be a string type")
+	} else {
+		*errMessage = errors.New(arguments[0].StringValue)
 	}
 
 	return ret
@@ -147,6 +158,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//p(<anyvar>)
 	defineFunction(globalFunctionArray, "p", P_execute, 1, true)
 
-	//ex(<integer)
+	//ex(<integer>)
 	defineFunction(globalFunctionArray, "ex", Ex_execute, 1, true)
+
+	//abt(<string>)
+	defineFunction(globalFunctionArray, "abt", Abt_execute, 1, true)
 }
