@@ -625,7 +625,11 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							newToken := currentToken
 							if((*globalFunctionArray)[funcIndex].IsNative) {
 								//execute native function
-								funcReturn := (*globalFunctionArray)[funcIndex].Run(functionArguments)
+								var thisError error
+								funcReturn := (*globalFunctionArray)[funcIndex].Run(functionArguments, &thisError)
+								if(thisError != nil) {
+									return thisError
+								}
 								//convert FunctionReturn to Token and append to stack (TODO: Create a function for conversion?)
 								if(funcReturn.Type == RET_TYPE_INTEGER) {
 									newToken.Type = TOKEN_TYPE_INTEGER

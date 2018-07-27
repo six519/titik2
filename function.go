@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"os"
+	"errors"
 )
 
 //function return type
@@ -42,7 +43,7 @@ type FunctionArgument struct {
 	BooleanValue bool
 }
 
-type Execute func([]FunctionArgument) FunctionReturn
+type Execute func([]FunctionArgument, *error) FunctionReturn
 
 type Function struct {
 	Name string
@@ -99,7 +100,7 @@ func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec E
 }
 
 //native functions
-func P_execute(arguments []FunctionArgument) FunctionReturn {
+func P_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
 	if(arguments[0].Type == ARG_TYPE_FLOAT) {
@@ -128,11 +129,12 @@ func P_execute(arguments []FunctionArgument) FunctionReturn {
 	return ret
 }
 
-func Ex_execute(arguments []FunctionArgument) FunctionReturn {
+func Ex_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_INTEGER) {
-		fmt.Println("Error: Parameter must be an integer")
+		//fmt.Println("Error: Parameter must be an integer")
+		*errMessage = errors.New("Error: Parameter must be an integer type")
 	} else {
 		os.Exit(arguments[0].IntegerValue)
 	}
