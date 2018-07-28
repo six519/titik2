@@ -706,6 +706,54 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								//COMPARISON LESS THAN OR EQUALS operation
 							} else {
 								//COMPARISON LESS THAN operation
+								switch leftOperand.Type {
+									case TOKEN_TYPE_INTEGER:
+										if(rightOperand.Type == TOKEN_TYPE_INTEGER || rightOperand.Type == TOKEN_TYPE_FLOAT) {
+											leftOperandInt, _ := strconv.Atoi(leftOperand.Value)
+											var rightOperandInt int = 0
+
+											if(rightOperand.Type == TOKEN_TYPE_INTEGER) {
+												rightOperandInt, _ = strconv.Atoi(rightOperand.Value)
+											} else {
+												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+												rightOperandInt = int(rightOperandFloat)
+											}
+											
+											if(leftOperandInt < rightOperandInt) {
+												result.Value = "true"
+											} else {
+												result.Value = "false"
+											}
+										} else {
+											//TOKEN_TYPE_STRING
+											//TOKEN_TYPE_BOOLEAN
+											//TOKEN_TYPE_NONE
+											result.Value = "false"
+										}
+									case TOKEN_TYPE_FLOAT:
+										if(rightOperand.Type == TOKEN_TYPE_INTEGER || rightOperand.Type == TOKEN_TYPE_FLOAT) {
+											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 32)
+											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+											
+											if(leftOperandFloat < rightOperandFloat) {
+												result.Value = "true"
+											} else {
+												result.Value = "false"
+											}
+										} else {
+											//TOKEN_TYPE_STRING
+											//TOKEN_TYPE_BOOLEAN
+											//TOKEN_TYPE_NONE
+											result.Value = "false"
+										}
+									case TOKEN_TYPE_STRING:
+										result.Value = "false"
+									case TOKEN_TYPE_BOOLEAN:
+										result.Value = "false"
+									default:
+										//TOKEN_TYPE_NONE
+										result.Value = "false"
+								}
 							}
 
 							stack = append(stack, result)
