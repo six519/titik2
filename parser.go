@@ -409,8 +409,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 		
 							stack = append(stack, result)
 		
-						} else if(currentToken.Type == TOKEN_TYPE_AMPERSAND || currentToken.Type == TOKEN_TYPE_OR) {
-							//logical operation
+						} else if(currentToken.Type == TOKEN_TYPE_AMPERSAND || currentToken.Type == TOKEN_TYPE_OR || currentToken.Type == TOKEN_TYPE_EQUALITY || currentToken.Type == TOKEN_TYPE_INEQUALITY || currentToken.Type == TOKEN_TYPE_GREATER_THAN || currentToken.Type == TOKEN_TYPE_LESS_THAN || currentToken.Type == TOKEN_TYPE_GREATER_THAN_OR_EQUALS || currentToken.Type == TOKEN_TYPE_LESS_THAN_OR_EQUALS) {
+							//logical or comparison operation
 							rightOperand := stack[len(stack)-1]
 							stack = stack[:len(stack)-1]
 		
@@ -434,35 +434,147 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							}
 
-							//validate left operand
-							errLeft := expectedTokenTypes(leftOperand, TOKEN_TYPE_BOOLEAN)
-							if (errLeft != nil) {
-								return errLeft
-							}
-							//validate right operand
-							errRight := expectedTokenTypes(rightOperand, TOKEN_TYPE_BOOLEAN)
-							if (errRight != nil) {
-								return errRight
+							if(currentToken.Type == TOKEN_TYPE_AMPERSAND || currentToken.Type == TOKEN_TYPE_OR) {
+								//validation for logical operations
+								//validate left operand
+								errLeft := expectedTokenTypes(leftOperand, TOKEN_TYPE_BOOLEAN)
+								if (errLeft != nil) {
+									return errLeft
+								}
+								//validate right operand
+								errRight := expectedTokenTypes(rightOperand, TOKEN_TYPE_BOOLEAN)
+								if (errRight != nil) {
+									return errRight
+								}
+							} else {
+								//validation for comparison operations
+								//validate left operand
+								errLeft := expectedTokenTypes(leftOperand, TOKEN_TYPE_BOOLEAN, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE)
+								if (errLeft != nil) {
+									return errLeft
+								}
+								//validate right operand
+								errRight := expectedTokenTypes(rightOperand, TOKEN_TYPE_BOOLEAN, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE)
+								if (errRight != nil) {
+									return errRight
+								}
 							}
 
 							result.Type = TOKEN_TYPE_BOOLEAN
-							leftBool := convertTokenToBool(leftOperand)
-							rightBool := convertTokenToBool(rightOperand)
 
 							if(currentToken.Type == TOKEN_TYPE_AMPERSAND) {
-								//AND operation
+								//LOGICAL AND operation
+								leftBool := convertTokenToBool(leftOperand)
+								rightBool := convertTokenToBool(rightOperand)
 								if(leftBool && rightBool) {
 									result.Value = "true"
 								} else {
 									result.Value = "false"
 								}
-							} else {
-								//assume it's OR operation
+							} else if(currentToken.Type == TOKEN_TYPE_OR) {
+								//LOGICAL OR operation
+								leftBool := convertTokenToBool(leftOperand)
+								rightBool := convertTokenToBool(rightOperand)
 								if(leftBool || rightBool) {
 									result.Value = "true"
 								} else {
 									result.Value = "false"
 								}
+							} else if(currentToken.Type == TOKEN_TYPE_EQUALITY) {
+								//COMPARISON EQUALITY operation
+								switch leftOperand.Type {
+									case TOKEN_TYPE_INTEGER:
+										if(rightOperand.Type == TOKEN_TYPE_INTEGER || rightOperand.Type == TOKEN_TYPE_FLOAT) {
+											leftOperandInt, _ := strconv.Atoi(leftOperand.Value)
+											var rightOperandInt int = 0
+
+											if(rightOperand.Type == TOKEN_TYPE_INTEGER) {
+												rightOperandInt, _ = strconv.Atoi(rightOperand.Value)
+											} else {
+												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+												rightOperandInt = int(rightOperandFloat)
+											}
+											
+											if(leftOperandInt == rightOperandInt) {
+												result.Value = "true"
+											} else {
+												result.Value = "false"
+											}
+										} else {
+											//TOKEN_TYPE_STRING
+											//TOKEN_TYPE_BOOLEAN
+											//TOKEN_TYPE_NONE
+											result.Value = "false"
+										}
+									case TOKEN_TYPE_FLOAT:
+										if(rightOperand.Type == TOKEN_TYPE_INTEGER || rightOperand.Type == TOKEN_TYPE_FLOAT) {
+											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 32)
+											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+											
+											if(leftOperandFloat == rightOperandFloat) {
+												result.Value = "true"
+											} else {
+												result.Value = "false"
+											}
+										} else {
+											//TOKEN_TYPE_STRING
+											//TOKEN_TYPE_BOOLEAN
+											//TOKEN_TYPE_NONE
+											result.Value = "false"
+										}
+									case TOKEN_TYPE_STRING:
+										if(rightOperand.Type == TOKEN_TYPE_STRING) {
+											if(leftOperand.Value == rightOperand.Value) {
+												result.Value = "true"
+											} else {
+												result.Value = "false"
+											}
+										} else {
+											//TOKEN_TYPE_INTEGER
+											//TOKEN_TYPE_FLOAT
+											//TOKEN_TYPE_BOOLEAN
+											//TOKEN_TYPE_NONE
+											result.Value = "false"
+										}
+									case TOKEN_TYPE_BOOLEAN:
+										if(rightOperand.Type == TOKEN_TYPE_BOOLEAN) {
+											leftBool := convertTokenToBool(leftOperand)
+											rightBool := convertTokenToBool(rightOperand)
+
+											if(leftBool == rightBool) {
+												result.Value = "true"
+											} else {
+												result.Value = "false"
+											}
+										} else {
+											//TOKEN_TYPE_INTEGER
+											//TOKEN_TYPE_FLOAT
+											//TOKEN_TYPE_STRING
+											//TOKEN_TYPE_NONE
+											result.Value = "false"
+										}
+									default:
+										//TOKEN_TYPE_NONE
+										if(rightOperand.Type == TOKEN_TYPE_NONE) {
+											result.Value = "true"
+										} else {
+											//TOKEN_TYPE_INTEGER
+											//TOKEN_TYPE_FLOAT
+											//TOKEN_TYPE_STRING
+											//TOKEN_TYPE_BOOLEAN
+											result.Value = "false"
+										}
+								}
+							} else if(currentToken.Type == TOKEN_TYPE_INEQUALITY) {
+								//COMPARISON INEQUALITY operation
+							} else if(currentToken.Type == TOKEN_TYPE_GREATER_THAN) {
+								//COMPARISON GREATER THAN operation
+							} else if(currentToken.Type == TOKEN_TYPE_GREATER_THAN_OR_EQUALS) {
+								//COMPARISON GREATER THAN OR EQUALS operation
+							} else if(currentToken.Type == TOKEN_TYPE_LESS_THAN_OR_EQUALS) {
+								//COMPARISON LESS THAN OR EQUALS operation
+							} else {
+								//COMPARISON LESS THAN operation
 							}
 
 							stack = append(stack, result)
