@@ -66,6 +66,7 @@ const (
 	TOKEN_TYPE_BOOLEAN
 	TOKEN_TYPE_EQUALITY
 	TOKEN_TYPE_INEQUALITY
+	TOKEN_TYPE_LESS_THAN_OR_EQUALS
 )
 
 //for debugging purpose only
@@ -116,6 +117,7 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_BOOLEAN",
 	"TOKEN_TYPE_EQUALITY",
 	"TOKEN_TYPE_INEQUALITY",
+	"TOKEN_TYPE_LESS_THAN_OR_EQUALS",
 }
 
 //token object
@@ -301,6 +303,11 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 								ignoreNext = true
 								tokenArray[len(tokenArray) - 1].Type = TOKEN_TYPE_INEQUALITY
 								tokenArray[len(tokenArray) - 1].Value = "<>"
+							} else if(string(lexer.fileContents[x][x2+1]) == "=") {
+								//less than or equals operator instead of less than
+								ignoreNext = true
+								tokenArray[len(tokenArray) - 1].Type = TOKEN_TYPE_LESS_THAN_OR_EQUALS
+								tokenArray[len(tokenArray) - 1].Value = "<="
 							}
 						}
 					} else if(currentChar == "|") {
