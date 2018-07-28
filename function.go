@@ -153,6 +153,18 @@ func Abt_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn
 	return ret
 }
 
+func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
+
+	if(arguments[0].Type != ARG_TYPE_BOOLEAN) {
+		*errMessage = errors.New("Error: Parameter must be a boolean type")
+	} else {
+		ret.BooleanValue = !arguments[0].BooleanValue
+	}
+
+	return ret
+}
+
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
@@ -163,4 +175,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//abt(<string>)
 	defineFunction(globalFunctionArray, "abt", Abt_execute, 1, true)
+
+	//!(<bool>)
+	defineFunction(globalFunctionArray, "!", ReverseBoolean_execute, 1, true)
 }
