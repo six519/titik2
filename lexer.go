@@ -67,6 +67,7 @@ const (
 	TOKEN_TYPE_EQUALITY
 	TOKEN_TYPE_INEQUALITY
 	TOKEN_TYPE_LESS_THAN_OR_EQUALS
+	TOKEN_TYPE_GREATER_THAN_OR_EQUALS
 )
 
 //for debugging purpose only
@@ -118,6 +119,7 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_EQUALITY",
 	"TOKEN_TYPE_INEQUALITY",
 	"TOKEN_TYPE_LESS_THAN_OR_EQUALS",
+	"TOKEN_TYPE_GREATER_THAN_OR_EQUALS",
 }
 
 //token object
@@ -294,6 +296,14 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else if(currentChar == ">") {
 						//greater than
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_GREATER_THAN, lexer.FileName, currentChar) //set token
+						if((x2 + 1) < len(lexer.fileContents[x])) {
+							if(string(lexer.fileContents[x][x2+1]) == "=") {
+								//greater than or equals instead of greater than only
+								ignoreNext = true
+								tokenArray[len(tokenArray) - 1].Type = TOKEN_TYPE_GREATER_THAN_OR_EQUALS
+								tokenArray[len(tokenArray) - 1].Value = ">="
+							}
+						}
 					} else if(currentChar == "<") {
 						//less than
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_LESS_THAN, lexer.FileName, currentChar) //set token
