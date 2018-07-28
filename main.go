@@ -41,7 +41,7 @@ func main() {
 
 		//generate token below
 		tokenArray, tokenErr := lxr.GenerateToken()
-
+		DumpToken(tokenArray)
 		if (tokenErr != nil) {
 			fmt.Println(tokenErr)
 			os.Exit(2)

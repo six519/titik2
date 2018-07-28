@@ -65,6 +65,7 @@ const (
 	TOKEN_TYPE_LOOP_BREAK
 	TOKEN_TYPE_BOOLEAN
 	TOKEN_TYPE_EQUALITY
+	TOKEN_TYPE_INEQUALITY
 )
 
 //for debugging purpose only
@@ -114,6 +115,7 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_LOOP_BREAK",
 	"TOKEN_TYPE_BOOLEAN",
 	"TOKEN_TYPE_EQUALITY",
+	"TOKEN_TYPE_INEQUALITY",
 }
 
 //token object
@@ -293,6 +295,14 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else if(currentChar == "<") {
 						//less than
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_LESS_THAN, lexer.FileName, currentChar) //set token
+						if((x2 + 1) < len(lexer.fileContents[x])) {
+							if(string(lexer.fileContents[x][x2+1]) == ">") {
+								//inequality operator instead of less than
+								ignoreNext = true
+								tokenArray[len(tokenArray) - 1].Type = TOKEN_TYPE_INEQUALITY
+								tokenArray[len(tokenArray) - 1].Value = "<>"
+							}
+						}
 					} else if(currentChar == "|") {
 						//or
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_OR, lexer.FileName, currentChar) //set token
