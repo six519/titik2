@@ -37,7 +37,7 @@ type Parser struct {
 
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, gotReturn *bool, returnToken *Token, isLoop bool, needBreak *bool) error {
 	var tokensToEvaluate []Token
-	operatorPrecedences := map[string] int{"function_return": 0, "=": 1, "+": 2, "-": 2, "&": 2, "|": 2, "/": 3, "*": 3} //operator order of precedences
+	operatorPrecedences := map[string] int{"function_return": 0, "=": 1, "+": 2, "-": 2, "&": 2, "|": 2, "==": 2, "<>": 2, ">": 2, "<": 2, ">=": 2, "<=": 2, "/": 3, "*": 3} //operator order of precedences
 	currentContext := "main_context"
 	var operatorStack map[string][]Token
 	operatorStack = make(map[string][]Token)
@@ -64,12 +64,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 			//execute shunting yard
 			if(len(tokensToEvaluate) > 0) {
-				if(tokensToEvaluate[0].Type == TOKEN_TYPE_PLUS || tokensToEvaluate[0].Type == TOKEN_TYPE_MINUS || tokensToEvaluate[0].Type == TOKEN_TYPE_DIVIDE || tokensToEvaluate[0].Type == TOKEN_TYPE_MULTIPLY || tokensToEvaluate[0].Type == TOKEN_TYPE_EQUALS || tokensToEvaluate[0].Type == TOKEN_TYPE_AMPERSAND || tokensToEvaluate[0].Type == TOKEN_TYPE_OR) {
+				if(tokensToEvaluate[0].Type == TOKEN_TYPE_PLUS || tokensToEvaluate[0].Type == TOKEN_TYPE_MINUS || tokensToEvaluate[0].Type == TOKEN_TYPE_DIVIDE || tokensToEvaluate[0].Type == TOKEN_TYPE_MULTIPLY || tokensToEvaluate[0].Type == TOKEN_TYPE_EQUALS || tokensToEvaluate[0].Type == TOKEN_TYPE_AMPERSAND || tokensToEvaluate[0].Type == TOKEN_TYPE_OR || tokensToEvaluate[0].Type == TOKEN_TYPE_EQUALITY || tokensToEvaluate[0].Type == TOKEN_TYPE_INEQUALITY || tokensToEvaluate[0].Type == TOKEN_TYPE_LESS_THAN_OR_EQUALS || tokensToEvaluate[0].Type == TOKEN_TYPE_GREATER_THAN_OR_EQUALS || tokensToEvaluate[0].Type == TOKEN_TYPE_GREATER_THAN || tokensToEvaluate[0].Type == TOKEN_TYPE_LESS_THAN) {
 					//syntax error if the first token is an operator
 					return errors.New(SyntaxErrorMessage(tokensToEvaluate[0].Line, tokensToEvaluate[0].Column, "Unexpected token '" + tokensToEvaluate[0].Value + "'", tokensToEvaluate[0].FileName))
 				}
 		
-				if(tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_PLUS || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_MINUS || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_DIVIDE || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_MULTIPLY || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_EQUALS || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_AMPERSAND || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_OR) {
+				if(tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_PLUS || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_MINUS || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_DIVIDE || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_MULTIPLY || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_EQUALS || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_AMPERSAND || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_OR || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_EQUALITY || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_INEQUALITY || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_LESS_THAN_OR_EQUALS || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_GREATER_THAN_OR_EQUALS || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_GREATER_THAN || tokensToEvaluate[len(tokensToEvaluate)-1].Type == TOKEN_TYPE_LESS_THAN) {
 					//syntax error if the last token is an operator
 					return errors.New(SyntaxErrorMessage(tokensToEvaluate[len(tokensToEvaluate)-1].Line, tokensToEvaluate[len(tokensToEvaluate)-1].Column, "Unfinished statement", tokensToEvaluate[len(tokensToEvaluate)-1].FileName))
 				}
@@ -194,7 +194,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 					}
 
-					if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_AMPERSAND || currentToken.Type == TOKEN_TYPE_OR || currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN) {
+					if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_AMPERSAND || currentToken.Type == TOKEN_TYPE_OR || currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN || currentToken.Type == TOKEN_TYPE_EQUALITY || currentToken.Type == TOKEN_TYPE_INEQUALITY || currentToken.Type == TOKEN_TYPE_LESS_THAN_OR_EQUALS || currentToken.Type == TOKEN_TYPE_LESS_THAN || currentToken.Type == TOKEN_TYPE_GREATER_THAN_OR_EQUALS || currentToken.Type == TOKEN_TYPE_GREATER_THAN) {
 						//the token is operator
 						for true {
 							if(len(operatorStack[currentContext]) > 0) {
