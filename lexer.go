@@ -64,6 +64,7 @@ const (
 	TOKEN_TYPE_FOR_LOOP_END
 	TOKEN_TYPE_LOOP_BREAK
 	TOKEN_TYPE_BOOLEAN
+	TOKEN_TYPE_EQUALITY
 )
 
 //for debugging purpose only
@@ -112,6 +113,7 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_FOR_LOOP_END",
 	"TOKEN_TYPE_LOOP_BREAK",
 	"TOKEN_TYPE_BOOLEAN",
+	"TOKEN_TYPE_EQUALITY",
 }
 
 //token object
@@ -183,11 +185,16 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	usePeriod := true
 	withPeriod := false
 	stringOpener := "\""
+	var ignoreNext bool = false
 
 	//read the file contents line by line
 	for x := 0; x < len(lexer.fileContents); x++ {
 		//read character by character
 		for x2 := 0; x2 < len(lexer.fileContents[x]); x2++ {
+			if(ignoreNext) {
+				ignoreNext = false
+				continue
+			}
 			currentChar := string(lexer.fileContents[x][x2])
 
 			switch_label:
@@ -217,6 +224,14 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					} else if(currentChar == "=") {
 						//equals
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_EQUALS, lexer.FileName, currentChar) //set token
+						if((x2 + 1) < len(lexer.fileContents[x])) {
+							if(string(lexer.fileContents[x][x2+1]) == "=") {
+								//equality operator instead of equals
+								ignoreNext = true
+								tokenArray[len(tokenArray) - 1].Type = TOKEN_TYPE_EQUALITY
+								tokenArray[len(tokenArray) - 1].Value = "=="
+							}
+						}
 					} else if(currentChar == "+") {
 						//plus
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_PLUS, lexer.FileName, currentChar) //set token
