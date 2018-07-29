@@ -1435,7 +1435,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											continue
 										}
 									}
-									openIfCount = openIfCount - 1
+									if(currentToken.Type == TOKEN_TYPE_IF_END) {
+										openIfCount = openIfCount - 1
+									}
 								}
 
 								if(len(outputQueue) == 0) {
