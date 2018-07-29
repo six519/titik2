@@ -68,6 +68,9 @@ const (
 	TOKEN_TYPE_INEQUALITY
 	TOKEN_TYPE_LESS_THAN_OR_EQUALS
 	TOKEN_TYPE_GREATER_THAN_OR_EQUALS
+	TOKEN_TYPE_IF_START
+	TOKEN_TYPE_IF_PARAM_END
+	TOKEN_TYPE_IF_END
 )
 
 //for debugging purpose only
@@ -120,6 +123,9 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_INEQUALITY",
 	"TOKEN_TYPE_LESS_THAN_OR_EQUALS",
 	"TOKEN_TYPE_GREATER_THAN_OR_EQUALS",
+	"TOKEN_TYPE_IF_START",
+	"TOKEN_TYPE_IF_PARAM_END",
+	"TOKEN_TYPE_IF_END",
 }
 
 //token object
@@ -408,6 +414,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var isOpenP bool = false
 	var isFunctionDef bool = false
 	var isForLoop bool = false
+	var isForIf bool = false
 	var openFunctionCount int = 0
 	var f_count int = 0
 	var op_count map[string]int
@@ -443,6 +450,12 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					if(isForLoop) {
 						isForLoop = false
 						cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_PARAM_END
+						cleanTokenArray[x].Context = contextName[len(contextName)-1]
+						contextName = contextName[:len(contextName)-1]
+					}
+					if(isForIf) {
+						isForIf = false
+						cleanTokenArray[x].Type = TOKEN_TYPE_IF_PARAM_END
 						cleanTokenArray[x].Context = contextName[len(contextName)-1]
 						contextName = contextName[:len(contextName)-1]
 					}
@@ -491,6 +504,27 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				}
 				if(cleanTokenArray[x].Value == "lf") {
 					cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_END
+				}
+				if(cleanTokenArray[x].Value == "if") {
+					//if statement
+					isForIf = true
+					cleanTokenArray[x].Type = TOKEN_TYPE_IF_START
+					ignoreOpenP = true
+
+					thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
+					contextName = append(contextName, "if_" + thisSuffix)
+
+					if((x + 1) <= len(cleanTokenArray) - 1 ) {
+						if(cleanTokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS) {
+							return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x+1].Line, cleanTokenArray[x+1].Column, "Unexpected token '" + cleanTokenArray[x+1].Value + "'", cleanTokenArray[x+1].FileName))
+						}
+					} else {
+						return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "Unfinished statement", cleanTokenArray[x].FileName))
+					}
+					//continue
+				}
+				if(cleanTokenArray[x].Value == "fi") {
+					cleanTokenArray[x].Type = TOKEN_TYPE_IF_END
 				}
 			} else {
 				//Check if the next token is '(', if yes then it's a function call

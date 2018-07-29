@@ -46,7 +46,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 	var ignoreNewline bool = false
 	var justAddTokens bool = false
 	var isFunctionDefinition bool = false
+	var isLoopStatement bool = false
+	var isIfStatement bool = false
 	var openLoopCount int = 0
+	var openIfCount int = 0
 
 	for x := 0; x < len(tokenArray); x++ {
 		if(tokenArray[x].Type == TOKEN_TYPE_NEWLINE) {
@@ -76,6 +79,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 		
 				justAddTokens = false
 				isFunctionDefinition = false
+				isLoopStatement = false
+				isIfStatement = false
+				openIfCount = 0
 				openLoopCount = 0
 				//shunting-yard
 				for len(tokensToEvaluate) > 0 {
@@ -93,15 +99,30 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							isFunctionDefinition = false
 						}
 						if(!isFunctionDefinition) {
-							if(currentToken.Type == TOKEN_TYPE_FOR_LOOP_START) {
-								openLoopCount += 1
-							}
-							if(currentToken.Type == TOKEN_TYPE_FOR_LOOP_END) {
-								if(openLoopCount == 0) {
-									justAddTokens = false
+							if(!isIfStatement) {
+								if(currentToken.Type == TOKEN_TYPE_FOR_LOOP_START) {
+									openLoopCount += 1
 								}
-								if(openLoopCount > 0) {
-									openLoopCount = openLoopCount - 1
+								if(currentToken.Type == TOKEN_TYPE_FOR_LOOP_END) {
+									if(openLoopCount == 0) {
+										justAddTokens = false
+									}
+									if(openLoopCount > 0) {
+										openLoopCount = openLoopCount - 1
+									}
+								}
+							}
+							if(!isLoopStatement) {
+								if(currentToken.Type == TOKEN_TYPE_IF_START) {
+									openIfCount += 1
+								}
+								if(currentToken.Type == TOKEN_TYPE_IF_END) {
+									if(openIfCount == 0) {
+										justAddTokens = false
+									}
+									if(openIfCount > 0) {
+										openIfCount = openIfCount - 1
+									}
 								}
 							}
 						}
@@ -120,7 +141,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					}
 
 					//dontIgnorePopping := true
-					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
+					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_IF_PARAM_END) {
 						isValidToken = true
 						/*
 						if(len(tokensToEvaluate) > 0) {
@@ -132,7 +153,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						}
 						*/
 
-						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
+						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END) {
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
 							for true {
@@ -149,16 +170,28 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 						}
 
-						if(currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START) {
+						if(currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_IF_START) {
 							functionStack = append(functionStack, currentToken)
 							if(currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START) {
 								isFunctionDefinition = true
 							}
-						} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
+							if(!isFunctionDefinition) {
+								if(!isIfStatement) {
+									if(currentToken.Type == TOKEN_TYPE_FOR_LOOP_START) {
+										isLoopStatement = true
+									}
+								}
+								if(!isLoopStatement) {
+									if(currentToken.Type == TOKEN_TYPE_IF_START) {
+										isIfStatement = true
+									}
+								}
+							}
+						} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END) {
 							outputQueue = append(outputQueue, functionStack[len(functionStack) - 1])
 							functionStack = functionStack[:len(functionStack)-1]
 
-							if(currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END) {
+							if(currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END) {
 								//next is function body
 								justAddTokens = true
 							}
@@ -1356,6 +1389,78 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 							*needBreak = true
 							return nil
+						} else if(currentToken.Type == TOKEN_TYPE_IF_START) {
+							var errConvert error
+
+							param := stack[len(stack)-1]
+							stack = stack[:len(stack)-1]
+
+							//if param is an identifier
+							//then it's a variable
+							if(param.Type == TOKEN_TYPE_IDENTIFIER) {
+								param, errConvert = convertVariableToToken(param, *globalVariableArray, scopeName)
+								if(errConvert != nil) {
+									return errConvert
+								}
+							}
+		
+							//validate param
+							errParam := expectedTokenTypes(param, TOKEN_TYPE_BOOLEAN)
+							if (errParam != nil) {
+								return errParam
+							}
+
+							var tempTokens []Token
+							openIfCount = 0
+							//append all tokens to temporary token
+							for true {
+								currentToken := outputQueue[0]
+								outputQueue = append(outputQueue[:0], outputQueue[1:]...)
+
+								tempTokens = append(tempTokens, currentToken)
+
+								if(currentToken.Type == TOKEN_TYPE_IF_START) {
+									openIfCount += 1
+								}
+
+								if(currentToken.Type == TOKEN_TYPE_IF_END) {
+									if(openIfCount == 0) {
+										break
+									}
+									openIfCount = openIfCount - 1
+								}
+
+								if(len(outputQueue) == 0) {
+									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Invalid statement", currentToken.FileName))
+								}
+							}
+
+							paramBool := convertTokenToBool(param)
+
+							if(paramBool) {
+								var ifGotReturn bool = false
+								var ifReturnToken Token
+								var ifNeedBreak bool = false
+								
+								prsr := Parser{}
+								parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &ifGotReturn, &ifReturnToken, isLoop, &ifNeedBreak)
+						
+								if(parserErr != nil) {
+									return parserErr
+								}
+								if(ifGotReturn) {
+									*gotReturn = ifGotReturn
+									*returnToken = ifReturnToken
+									return nil
+								}
+
+								if(isLoop && ifNeedBreak) {
+									*needBreak = ifNeedBreak
+									return nil
+								}
+							}
+
+							stack = append(stack, currentToken) //TOKEN_TYPE_IF_END
 						} else {
 							stack = append(stack, currentToken)
 						}
@@ -1372,7 +1477,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 				
 			}
 
-		} else if(tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START || tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_END || tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_START || tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_END) {
+		} else if(tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START || tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_END || tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_START || tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_END || tokenArray[x].Type == TOKEN_TYPE_IF_START || tokenArray[x].Type == TOKEN_TYPE_IF_END) {
 			if(tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START) {
 				ignoreNewline = true
 				isFunctionDefinition = true
@@ -1386,15 +1491,34 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 				tokensToEvaluate = append(tokensToEvaluate, Token{Value: "\n", FileName: tokenArray[x].FileName, Type: TOKEN_TYPE_NEWLINE, Line: tokenArray[x].Line, Column: tokenArray[x].Column })
 			}
 			if(!isFunctionDefinition) {
-				if(tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_START) {
-					openLoopCount += 1
-					ignoreNewline = true
-				} else if(tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_END) {
-					openLoopCount = openLoopCount - 1
+				if(!isIfStatement) {
+					if(tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_START) {
+						openLoopCount += 1
+						ignoreNewline = true
+						isLoopStatement = true
+					} else if(tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_END) {
+						openLoopCount = openLoopCount - 1
 
-					if(openLoopCount == 0) {
-						ignoreNewline = false
-						tokensToEvaluate = append(tokensToEvaluate, Token{Value: "\n", FileName: tokenArray[x].FileName, Type: TOKEN_TYPE_NEWLINE, Line: tokenArray[x].Line, Column: tokenArray[x].Column })
+						if(openLoopCount == 0) {
+							ignoreNewline = false
+							isLoopStatement = false
+							tokensToEvaluate = append(tokensToEvaluate, Token{Value: "\n", FileName: tokenArray[x].FileName, Type: TOKEN_TYPE_NEWLINE, Line: tokenArray[x].Line, Column: tokenArray[x].Column })
+						}
+					}
+				}
+				if(!isLoopStatement) {
+					if(tokenArray[x].Type == TOKEN_TYPE_IF_START) {
+						openIfCount += 1
+						ignoreNewline = true
+						isIfStatement = true
+					} else if(tokenArray[x].Type == TOKEN_TYPE_IF_END) {
+						openIfCount = openIfCount - 1
+
+						if(openIfCount == 0) {
+							ignoreNewline = false
+							isIfStatement = false
+							tokensToEvaluate = append(tokensToEvaluate, Token{Value: "\n", FileName: tokenArray[x].FileName, Type: TOKEN_TYPE_NEWLINE, Line: tokenArray[x].Line, Column: tokenArray[x].Column })
+						}
 					}
 				}
 			}
