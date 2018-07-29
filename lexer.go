@@ -140,6 +140,10 @@ type Token struct {
 	Column int
 }
 
+type TokenArray struct {
+	Tokens []Token
+}
+
 //function helpers
 func setToken(initToken bool, tokenArray *[]Token, isTokenInit *bool, lineNumber int, colNumber int, tokenType int, tokenFileName string, tokenValue string) {
 	token := Token{Value: tokenValue, FileName: tokenFileName, Type: tokenType, Line: lineNumber, Column: colNumber}

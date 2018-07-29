@@ -1410,22 +1410,30 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								return errParam
 							}
 
-							var tempTokens []Token
+							var tempTokens []TokenArray
 							openIfCount = 0
 							//append all tokens to temporary token
+
+							tempTokens = append(tempTokens, TokenArray{})
 							for true {
 								currentToken := outputQueue[0]
 								outputQueue = append(outputQueue[:0], outputQueue[1:]...)
 
-								tempTokens = append(tempTokens, currentToken)
+								tempTokens[len(tempTokens)-1].Tokens = append(tempTokens[len(tempTokens)-1].Tokens, currentToken)
 
 								if(currentToken.Type == TOKEN_TYPE_IF_START) {
 									openIfCount += 1
 								}
 
-								if(currentToken.Type == TOKEN_TYPE_IF_END) {
+								if(currentToken.Type == TOKEN_TYPE_IF_END || currentToken.Type == TOKEN_TYPE_ELSE) {
 									if(openIfCount == 0) {
-										break
+										if(currentToken.Type == TOKEN_TYPE_IF_END) {
+											break
+										} else {
+											//else
+											tempTokens = append(tempTokens, TokenArray{})
+											continue
+										}
 									}
 									openIfCount = openIfCount - 1
 								}
@@ -1436,14 +1444,25 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 
 							paramBool := convertTokenToBool(param)
+							var currentStatementIndex int = 0
+							var executeIfStatement bool = false
 
 							if(paramBool) {
+								executeIfStatement = true
+							} else {
+								if(len(tempTokens) > 1) {
+									currentStatementIndex = 1
+									executeIfStatement = true
+								}
+							}
+
+							if(executeIfStatement) {
 								var ifGotReturn bool = false
 								var ifReturnToken Token
 								var ifNeedBreak bool = false
 								
 								prsr := Parser{}
-								parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &ifGotReturn, &ifReturnToken, isLoop, &ifNeedBreak)
+								parserErr := prsr.Parse(tempTokens[currentStatementIndex].Tokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &ifGotReturn, &ifReturnToken, isLoop, &ifNeedBreak)
 						
 								if(parserErr != nil) {
 									return parserErr
