@@ -12,6 +12,7 @@ func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Fu
 	var stringContainer string
 	var fdCount int = 0
 	var flCount int = 0
+	var ifCount int = 0
 
 	fmt.Printf("%s %s\n", TITIK_APP_NAME, TITIK_STRING_VERSION)
 	fmt.Println("To exit, press ^C")
@@ -33,6 +34,7 @@ func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Fu
 		tokenArray, tokenErr := lxr.GenerateToken()
 		fdCount = 0
 		flCount = 0
+		ifCount = 0
 
 		if (tokenErr != nil) {
 			fmt.Println(tokenErr)
@@ -51,9 +53,15 @@ func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Fu
 				if(tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_END) {
 					flCount -= 1
 				}
+				if(tokenArray[x].Type == TOKEN_TYPE_IF_START) {
+					ifCount += 1
+				}
+				if(tokenArray[x].Type == TOKEN_TYPE_IF_END) {
+					ifCount -= 1
+				}
 			}
 
-			if(fdCount > 0 || flCount > 0) {
+			if(fdCount > 0 || flCount > 0 || ifCount > 0) {
 				isContinue = true
 			} else {
 				isContinue = false
