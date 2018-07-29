@@ -71,6 +71,7 @@ const (
 	TOKEN_TYPE_IF_START
 	TOKEN_TYPE_IF_PARAM_END
 	TOKEN_TYPE_IF_END
+	TOKEN_TYPE_ELSE
 )
 
 //for debugging purpose only
@@ -126,6 +127,7 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_IF_START",
 	"TOKEN_TYPE_IF_PARAM_END",
 	"TOKEN_TYPE_IF_END",
+	"TOKEN_TYPE_ELSE",
 }
 
 //token object
@@ -525,6 +527,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				}
 				if(cleanTokenArray[x].Value == "fi") {
 					cleanTokenArray[x].Type = TOKEN_TYPE_IF_END
+				}
+				if(cleanTokenArray[x].Value == "el") {
+					cleanTokenArray[x].Type = TOKEN_TYPE_ELSE
 				}
 			} else {
 				//Check if the next token is '(', if yes then it's a function call
