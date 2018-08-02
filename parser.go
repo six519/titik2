@@ -35,7 +35,7 @@ func expectedTokenTypes(token Token, tokenTypes ...int) error {
 type Parser struct {
 }
 
-func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, gotReturn *bool, returnToken *Token, isLoop bool, needBreak *bool) error {
+func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, gotReturn *bool, returnToken *Token, isLoop bool, needBreak *bool, stackReference *[]Token) error {
 	var tokensToEvaluate []Token
 	operatorPrecedences := map[string] int{"function_return": 0, "=": 1, "+": 2, "-": 2, "&": 2, "|": 2, "==": 2, "<>": 2, ">": 2, "<": 2, ">=": 2, "<=": 2, "/": 3, "*": 3} //operator order of precedences
 	currentContext := "main_context"
@@ -1178,10 +1178,11 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								var thisGotReturn bool = false
 								var thisReturnToken Token
 								var thisNeedBreak bool = false
+								var thisStackReference []Token
 								
 								//execute user defined function
 								prsr := Parser{}
-								parserErr := prsr.Parse((*globalFunctionArray)[funcIndex].Tokens, globalVariableArray, globalFunctionArray, thisScopeName, globalNativeVarList, &thisGotReturn, &thisReturnToken, false, &thisNeedBreak)
+								parserErr := prsr.Parse((*globalFunctionArray)[funcIndex].Tokens, globalVariableArray, globalFunctionArray, thisScopeName, globalNativeVarList, &thisGotReturn, &thisReturnToken, false, &thisNeedBreak, &thisStackReference)
 						
 								if(parserErr != nil) {
 									return parserErr
@@ -1362,9 +1363,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								var loopGotReturn bool = false
 								var loopReturnToken Token
 								var loopNeedBreak bool = false
+								var loopStackReference []Token
 								
 								prsr := Parser{}
-								parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &loopGotReturn, &loopReturnToken, true, &loopNeedBreak)
+								parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &loopGotReturn, &loopReturnToken, true, &loopNeedBreak, &loopStackReference)
 						
 								if(parserErr != nil) {
 									return parserErr
@@ -1462,9 +1464,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								var ifGotReturn bool = false
 								var ifReturnToken Token
 								var ifNeedBreak bool = false
+								var ifStackReference []Token
 								
 								prsr := Parser{}
-								parserErr := prsr.Parse(tempTokens[currentStatementIndex].Tokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &ifGotReturn, &ifReturnToken, isLoop, &ifNeedBreak)
+								parserErr := prsr.Parse(tempTokens[currentStatementIndex].Tokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &ifGotReturn, &ifReturnToken, isLoop, &ifNeedBreak, &ifStackReference)
 						
 								if(parserErr != nil) {
 									return parserErr
@@ -1486,6 +1489,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							stack = append(stack, currentToken)
 						}
 					}
+
+					*stackReference = stack
 
 					if(len(stack) > 1) {
 						return errors.New(SyntaxErrorMessage(stack[0].Line, stack[0].Column, "Invalid statement", stack[0].FileName))
