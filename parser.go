@@ -1392,25 +1392,13 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							*needBreak = true
 							return nil
 						} else if(currentToken.Type == TOKEN_TYPE_IF_START) {
-							var errConvert error
+							var params []Token
+							var gotElse bool = false
 
-							param := stack[len(stack)-1]
+							//param := stack[len(stack)-1]
+
+							params = append(params, stack[len(stack)-1])
 							stack = stack[:len(stack)-1]
-
-							//if param is an identifier
-							//then it's a variable
-							if(param.Type == TOKEN_TYPE_IDENTIFIER) {
-								param, errConvert = convertVariableToToken(param, *globalVariableArray, scopeName)
-								if(errConvert != nil) {
-									return errConvert
-								}
-							}
-		
-							//validate param
-							errParam := expectedTokenTypes(param, TOKEN_TYPE_BOOLEAN)
-							if (errParam != nil) {
-								return errParam
-							}
 
 							var tempTokens []TokenArray
 							openIfCount = 0
@@ -1427,12 +1415,55 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									openIfCount += 1
 								}
 
-								if(currentToken.Type == TOKEN_TYPE_IF_END || currentToken.Type == TOKEN_TYPE_ELSE) {
+								if(currentToken.Type == TOKEN_TYPE_IF_END || currentToken.Type == TOKEN_TYPE_ELSE || currentToken.Type == TOKEN_TYPE_ELIF_START) {
 									if(openIfCount == 0) {
 										if(currentToken.Type == TOKEN_TYPE_IF_END) {
 											break
+										} else if (currentToken.Type == TOKEN_TYPE_ELIF_START) {
+											//else if
+											//get parameters until end
+											var paramTokens []Token
+											var currentToken2 Token
+											var will_change_to_main string = outputQueue[0].Context
+											for true {
+												currentToken2 = outputQueue[0]
+												outputQueue = append(outputQueue[:0], outputQueue[1:]...)
+
+												if(currentToken2.Type == TOKEN_TYPE_ELIF_PARAM_END) {
+													break
+												} else {
+													if(currentToken2.Context == will_change_to_main) {
+														currentToken2.Context = "main_context"
+													}
+													paramTokens = append(paramTokens, currentToken2)
+												}
+
+												if(len(outputQueue) == 0) {
+													return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Invalid statement", currentToken.FileName))
+												}
+											}
+											//evaluate paramTokens
+											var efGotReturn bool = false
+											var efReturnToken Token
+											var efNeedBreak bool = false
+											var efStackReference []Token
+											
+											//add newline to paramTokens so parser can execute it
+											paramTokens = append(paramTokens, Token{Value: "\n", FileName: currentToken2.FileName, Type: TOKEN_TYPE_NEWLINE, Line: currentToken2.Line, Column: currentToken2.Column, Context: "main_context" })
+
+											prsr := Parser{}
+											parserErr := prsr.Parse(paramTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &efGotReturn, &efReturnToken, isLoop, &efNeedBreak, &efStackReference)
+									
+											if(parserErr != nil) {
+												return parserErr
+											}
+											//end of evaluate paramTokens
+											params = append(params, efStackReference[0])
+											tempTokens = append(tempTokens, TokenArray{})
+											continue											
 										} else {
 											//else
+											gotElse = true
 											tempTokens = append(tempTokens, TokenArray{})
 											continue
 										}
@@ -1447,16 +1478,40 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							}
 
-							paramBool := convertTokenToBool(param)
+
 							var currentStatementIndex int = 0
 							var executeIfStatement bool = false
 
-							if(paramBool) {
-								executeIfStatement = true
-							} else {
-								if(len(tempTokens) > 1) {
-									currentStatementIndex = 1
+							for paramIndex := 0; paramIndex < len(params); paramIndex++ {
+								var thisParam Token = params[paramIndex]
+								var errConvert error
+
+								if(thisParam.Type == TOKEN_TYPE_IDENTIFIER) {
+									thisParam, errConvert = convertVariableToToken(thisParam, *globalVariableArray, scopeName)
+									if(errConvert != nil) {
+										return errConvert
+									}
+								}
+
+								//validate param
+								errParam := expectedTokenTypes(thisParam, TOKEN_TYPE_BOOLEAN)
+								if (errParam != nil) {
+									return errParam
+								}
+
+								paramBool := convertTokenToBool(thisParam)
+
+								if(paramBool) {
 									executeIfStatement = true
+									currentStatementIndex = paramIndex
+									break
+								}
+							}
+
+							if(!executeIfStatement) {
+								if(gotElse && len(tempTokens) > 1) {
+									executeIfStatement = true
+									currentStatementIndex = len(tempTokens) - 1
 								}
 							}
 
@@ -1494,11 +1549,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 					if(len(stack) > 1) {
 						return errors.New(SyntaxErrorMessage(stack[0].Line, stack[0].Column, "Invalid statement", stack[0].FileName))
-					} else {
+					} /* else {
 						if(stack[0].Type == TOKEN_TYPE_IDENTIFIER) {
 							return errors.New(SyntaxErrorMessage(stack[0].Line, stack[0].Column, "Unexpected token '" + stack[0].Value + "'", stack[0].FileName))
 						}
 					}
+					*/
 				}
 				
 			}
