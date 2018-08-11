@@ -1424,7 +1424,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											//get parameters until end
 											var paramTokens []Token
 											var currentToken2 Token
-											var will_change_to_main string = outputQueue[0].Context
+											var will_change_to_main string = currentToken.Context
 											for true {
 												currentToken2 = outputQueue[0]
 												outputQueue = append(outputQueue[:0], outputQueue[1:]...)
