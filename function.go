@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"os"
 	"errors"
+	"time"
 )
 
 //function return type
@@ -165,6 +166,18 @@ func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error) Fun
 	return ret
 }
 
+func Zzz_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if(arguments[0].Type != ARG_TYPE_INTEGER) {
+		*errMessage = errors.New("Error: Parameter must be an integer type")
+	} else {
+		time.Sleep(time.Duration(arguments[0].IntegerValue) * time.Millisecond)
+	}
+
+	return ret
+}
+
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
@@ -178,4 +191,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//!(<bool>)
 	defineFunction(globalFunctionArray, "!", ReverseBoolean_execute, 1, true)
+
+	//zzz(<integer>)
+	defineFunction(globalFunctionArray, "zzz", Zzz_execute, 1, true)
 }
