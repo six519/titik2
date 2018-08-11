@@ -72,6 +72,8 @@ const (
 	TOKEN_TYPE_IF_PARAM_END
 	TOKEN_TYPE_IF_END
 	TOKEN_TYPE_ELSE
+	TOKEN_TYPE_ELIF_START
+	TOKEN_TYPE_ELIF_PARAM_END
 )
 
 //for debugging purpose only
@@ -128,6 +130,8 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_IF_PARAM_END",
 	"TOKEN_TYPE_IF_END",
 	"TOKEN_TYPE_ELSE",
+	"TOKEN_TYPE_ELIF_START",
+	"TOKEN_TYPE_ELIF_PARAM_END",
 }
 
 //token object
@@ -421,6 +425,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var isFunctionDef bool = false
 	var isForLoop bool = false
 	var isForIf bool = false
+	var isForEf bool = false
 	var openFunctionCount int = 0
 	var f_count int = 0
 	var op_count map[string]int
@@ -462,6 +467,12 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					if(isForIf) {
 						isForIf = false
 						cleanTokenArray[x].Type = TOKEN_TYPE_IF_PARAM_END
+						cleanTokenArray[x].Context = contextName[len(contextName)-1]
+						contextName = contextName[:len(contextName)-1]
+					}
+					if(isForEf) {
+						isForEf = false
+						cleanTokenArray[x].Type = TOKEN_TYPE_ELIF_PARAM_END
 						cleanTokenArray[x].Context = contextName[len(contextName)-1]
 						contextName = contextName[:len(contextName)-1]
 					}
@@ -511,15 +522,23 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				if(cleanTokenArray[x].Value == "lf") {
 					cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_END
 				}
-				if(cleanTokenArray[x].Value == "if") {
-					//if statement
-					isForIf = true
-					cleanTokenArray[x].Type = TOKEN_TYPE_IF_START
-					ignoreOpenP = true
-
+				if(cleanTokenArray[x].Value == "if" || cleanTokenArray[x].Value == "ef") {
+					//if or ef statement
 					thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
-					contextName = append(contextName, "if_" + thisSuffix)
 
+					if(cleanTokenArray[x].Value == "if") {
+						//if statement
+						isForIf = true
+						cleanTokenArray[x].Type = TOKEN_TYPE_IF_START
+						contextName = append(contextName, "if_" + thisSuffix)
+					} else {
+						//ef statement
+						isForEf = true
+						cleanTokenArray[x].Type = TOKEN_TYPE_ELIF_START
+						contextName = append(contextName, "ef_" + thisSuffix)
+					}
+
+					ignoreOpenP = true
 					if((x + 1) <= len(cleanTokenArray) - 1 ) {
 						if(cleanTokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS) {
 							return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x+1].Line, cleanTokenArray[x+1].Column, "Unexpected token '" + cleanTokenArray[x+1].Value + "'", cleanTokenArray[x+1].FileName))
