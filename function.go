@@ -6,6 +6,7 @@ import (
 	"os"
 	"errors"
 	"time"
+	"bufio"
 )
 
 //function return type
@@ -178,6 +179,21 @@ func Zzz_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn
 	return ret
 }
 
+func R_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter must be a string type")
+	} else {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Printf("%s", arguments[0].StringValue)
+		text, _ := reader.ReadString('\n')
+		ret.StringValue = text
+	}
+
+	return ret
+}
+
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
@@ -194,4 +210,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//zzz(<integer>)
 	defineFunction(globalFunctionArray, "zzz", Zzz_execute, 1, true)
+
+	//r(<string>)
+	defineFunction(globalFunctionArray, "r", R_execute, 1, true)
 }
