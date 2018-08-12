@@ -194,6 +194,20 @@ func R_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
 	return ret
 }
 
+func Toi_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
+
+	if(arguments[0].Type == ARG_TYPE_FLOAT) {
+		ret.IntegerValue = int(arguments[0].FloatValue) + 0
+	} else if(arguments[0].Type == ARG_TYPE_STRING) {
+		ret.IntegerValue, _ = strconv.Atoi(arguments[0].StringValue)
+	} else if(arguments[0].Type == ARG_TYPE_INTEGER) {
+		ret.IntegerValue = arguments[0].IntegerValue
+	}
+
+	return ret
+}
+
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
@@ -213,4 +227,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//r(<string>)
 	defineFunction(globalFunctionArray, "r", R_execute, 1, true)
+
+	//toi(<anyvar>)
+	defineFunction(globalFunctionArray, "toi", Toi_execute, 1, true)
 }
