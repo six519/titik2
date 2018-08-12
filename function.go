@@ -7,6 +7,7 @@ import (
 	"errors"
 	"time"
 	"bufio"
+	"strings"
 )
 
 //function return type
@@ -188,7 +189,7 @@ func R_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Printf("%s", arguments[0].StringValue)
 		text, _ := reader.ReadString('\n')
-		ret.StringValue = text
+		ret.StringValue = strings.Trim(text, "\n")
 	}
 
 	return ret
