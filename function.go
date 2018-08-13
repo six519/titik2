@@ -209,6 +209,28 @@ func Toi_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn
 	return ret
 }
 
+func Tos_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if(arguments[0].Type == ARG_TYPE_FLOAT) {
+		ret.StringValue = strconv.FormatFloat(arguments[0].FloatValue, 'f', -1, 64)
+	} else if(arguments[0].Type == ARG_TYPE_STRING) {
+		ret.StringValue = arguments[0].StringValue
+	} else if(arguments[0].Type == ARG_TYPE_INTEGER) {
+		ret.StringValue = strconv.Itoa(arguments[0].IntegerValue)
+	} else if(arguments[0].Type == ARG_TYPE_BOOLEAN) {
+		if(arguments[0].BooleanValue) {
+			ret.StringValue = "true"
+		} else {
+			ret.StringValue = "false"
+		}	
+	} else {
+		ret.StringValue = ""
+	}
+
+	return ret
+}
+
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
@@ -231,4 +253,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//toi(<anyvar>)
 	defineFunction(globalFunctionArray, "toi", Toi_execute, 1, true)
+
+	//tos(<anyvar>)
+	defineFunction(globalFunctionArray, "tos", Tos_execute, 1, true)
 }
