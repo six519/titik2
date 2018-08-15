@@ -36,6 +36,7 @@ type FunctionReturn struct {
 	IntegerValue int
 	FloatValue float64
 	BooleanValue bool
+	ArrayValue []FunctionReturn
 }
 
 type FunctionArgument struct {
@@ -44,6 +45,7 @@ type FunctionArgument struct {
 	IntegerValue int
 	FloatValue float64
 	BooleanValue bool
+	ArrayValue []FunctionArgument
 }
 
 type Execute func([]FunctionArgument, *error) FunctionReturn
@@ -123,7 +125,33 @@ func P_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
 			ret.StringValue = "true"
 		} else {
 			ret.StringValue = "false"
-		}	
+		}
+	} else if(arguments[0].Type == ARG_TYPE_ARRAY) {
+		strVal := ""
+
+		for x := 0; x < len(arguments[0].ArrayValue); x++ {
+			if(arguments[0].ArrayValue[x].Type == ARG_TYPE_FLOAT) {
+				strVal = strVal + strconv.FormatFloat(arguments[0].ArrayValue[x].FloatValue, 'f', -1, 64)
+			} else if(arguments[0].ArrayValue[x].Type == ARG_TYPE_STRING) {
+				strVal = strVal + arguments[0].ArrayValue[x].StringValue
+			} else if(arguments[0].ArrayValue[x].Type == ARG_TYPE_INTEGER) {
+				strVal = strVal + strconv.Itoa(arguments[0].ArrayValue[x].IntegerValue)
+			} else if(arguments[0].ArrayValue[x].Type == ARG_TYPE_BOOLEAN) {
+				if(arguments[0].ArrayValue[x].BooleanValue) {
+					strVal = strVal + "true"
+				} else {
+					strVal = strVal + "false"
+				}
+			} else {
+				strVal = strVal + "Nil"
+			}
+
+			if((x + 1) != len(arguments[0].ArrayValue)) {
+				strVal = strVal + ", "
+			}
+		}
+
+		fmt.Printf("[%s]\n", strVal)
 	} else {
 		//Nil
 		fmt.Println("Nil")

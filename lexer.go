@@ -74,6 +74,9 @@ const (
 	TOKEN_TYPE_ELSE
 	TOKEN_TYPE_ELIF_START
 	TOKEN_TYPE_ELIF_PARAM_END
+	TOKEN_TYPE_GET_ARRAY_START
+	TOKEN_TYPE_GET_ARRAY_END
+	TOKEN_TYPE_ARRAY
 )
 
 //for debugging purpose only
@@ -132,6 +135,9 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_ELSE",
 	"TOKEN_TYPE_ELIF_START",
 	"TOKEN_TYPE_ELIF_PARAM_END",
+	"TOKEN_TYPE_GET_ARRAY_START",
+	"TOKEN_TYPE_GET_ARRAY_END",
+	"TOKEN_TYPE_ARRAY",
 }
 
 //token object
@@ -139,9 +145,11 @@ type Token struct {
 	Value string
 	FileName string
 	Context string
+	Array []Token
 	Type int
 	Line int
 	Column int
+	OtherInt int
 }
 
 type TokenArray struct {
@@ -161,9 +169,25 @@ func DumpToken(tokenArray []Token) {
 	for x := 0; x < len(tokenArray); x++ {
         fmt.Printf("Token Type: %s\n", TOKEN_TYPES_STRING[tokenArray[x].Type])
         fmt.Printf("Line #: %d\n", tokenArray[x].Line)
-        fmt.Printf("Column #: %d\n", tokenArray[x].Column)
-		fmt.Printf("Value: %s\n", tokenArray[x].Value)
+		fmt.Printf("Column #: %d\n", tokenArray[x].Column)
+		
+		if(tokenArray[x].Type == TOKEN_TYPE_ARRAY) {
+			strVal := ""
+
+			for x2 := 0; x2 < len(tokenArray[x].Array); x2++ {
+				strVal = strVal + tokenArray[x].Array[x2].Value
+				if((x2 + 1) != len(tokenArray[x].Array)) {
+					strVal = strVal + " , "
+				}
+			}
+
+			fmt.Printf("Value: [ %s ]\n", strVal)
+		} else {
+			fmt.Printf("Value: %s\n", tokenArray[x].Value)
+		}
+
 		fmt.Printf("Context: %s\n", tokenArray[x].Context)
+		fmt.Printf("OtherInt #: %d\n", tokenArray[x].OtherInt)
 		fmt.Printf("====================================\n")
 	}
 }
@@ -420,8 +444,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	}
 
 	//2nd token cleanup 
-	var ignoreOpenP bool = false
+	var ignoreOpen bool = false
 	var isOpenP bool = false
+	var isOpenB bool = false
 	var isFunctionDef bool = false
 	var isForLoop bool = false
 	var isForIf bool = false
@@ -429,18 +454,33 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var openFunctionCount int = 0
 	var f_count int = 0
 	var op_count map[string]int
+	var ob_count map[string]int
 	op_count = make(map[string]int)
+	ob_count = make(map[string]int)
 
 	var contextName = []string{"main_context"}
 
 	for x := 0; x < len(cleanTokenArray); x++ {
-		if(ignoreOpenP) {
+		if(ignoreOpen) {
 			//ignore open parenthesis if the last token is a function
-			ignoreOpenP = false
+			//or ignore open braces if the last token is a variable that accessing its index
+			ignoreOpen = false
 			continue
 		}
 		if(cleanTokenArray[x].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
 			op_count[contextName[len(contextName)-1]] += 1
+		}
+		if(cleanTokenArray[x].Type == TOKEN_TYPE_OPEN_BRACES) {
+			ob_count[contextName[len(contextName)-1]] += 1
+		}
+		if(cleanTokenArray[x].Type == TOKEN_TYPE_CLOSE_BRACES) {
+			if(ob_count[contextName[len(contextName)-1]] > 0) {
+				ob_count[contextName[len(contextName)-1]] -= 1
+			} else {
+				cleanTokenArray[x].Type = TOKEN_TYPE_GET_ARRAY_END
+				cleanTokenArray[x].Context = contextName[len(contextName)-1]
+				contextName = contextName[:len(contextName)-1]
+			}
 		}
 		if(cleanTokenArray[x].Type == TOKEN_TYPE_CLOSE_PARENTHESIS) {
 			if(op_count[contextName[len(contextName)-1]] > 0) {
@@ -505,7 +545,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					//for loop
 					isForLoop = true
 					cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_START
-					ignoreOpenP = true
+					ignoreOpen = true
 
 					thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
 					contextName = append(contextName, "fl_" + thisSuffix)
@@ -538,7 +578,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						contextName = append(contextName, "ef_" + thisSuffix)
 					}
 
-					ignoreOpenP = true
+					ignoreOpen = true
 					if((x + 1) <= len(cleanTokenArray) - 1 ) {
 						if(cleanTokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS) {
 							return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x+1].Line, cleanTokenArray[x+1].Column, "Unexpected token '" + cleanTokenArray[x+1].Value + "'", cleanTokenArray[x+1].FileName))
@@ -555,16 +595,16 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					cleanTokenArray[x].Type = TOKEN_TYPE_ELSE
 				}
 			} else {
-				//Check if the next token is '(', if yes then it's a function call
 				if((x + 1) <= len(cleanTokenArray) - 1 ) {
 					isOpenP = false
+					//Check if the next token is '(', if yes then it's a function call
 					if(cleanTokenArray[x+1].Type == TOKEN_TYPE_OPEN_PARENTHESIS) {
 						isOpenP = true
 					}
 					if(isOpenP) {
 						//set to function call
 						cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION
-						ignoreOpenP = true
+						ignoreOpen = true
 						f_count += 1
 						if((x - 1) >= 0) {
 							if(cleanTokenArray[x-1].Value == "fd") {
@@ -583,6 +623,17 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 							thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
 							contextName = append(contextName, cleanTokenArray[x].Value + "_" + thisSuffix)
 						}
+					}
+					isOpenB = false
+					//Check if the next token is '[', if yes then it's an array getter
+					if(cleanTokenArray[x+1].Type == TOKEN_TYPE_OPEN_BRACES) {
+						isOpenB = true
+					}
+					if(isOpenB) {
+						cleanTokenArray[x].Type = TOKEN_TYPE_GET_ARRAY_START
+						ignoreOpen = true
+						thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
+						contextName = append(contextName, "array_get" + thisSuffix)
 					}
 				}
 			}

@@ -41,6 +41,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 	currentContext := "main_context"
 	var operatorStack map[string][]Token
 	operatorStack = make(map[string][]Token)
+	var arrayArgCount map[string]int
+	arrayArgCount = make(map[string]int)
 	var functionStack []Token
 	var outputQueue []Token
 	var ignoreNewline bool = false
@@ -141,7 +143,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					}
 
 					//dontIgnorePopping := true
-					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_IF_PARAM_END) {
+					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_OPEN_BRACES) {
 						isValidToken = true
 						/*
 						if(len(tokensToEvaluate) > 0) {
@@ -153,7 +155,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						}
 						*/
 
-						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END) {
+						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES) {
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
 							for true {
@@ -170,7 +172,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 						}
 
-						if(currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_IF_START) {
+						if(currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_OPEN_BRACES) {
 							functionStack = append(functionStack, currentToken)
 							if(currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START) {
 								isFunctionDefinition = true
@@ -187,8 +189,26 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									}
 								}
 							}
-						} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END) {
-							outputQueue = append(outputQueue, functionStack[len(functionStack) - 1])
+							if(currentToken.Type == TOKEN_TYPE_OPEN_BRACES) {
+								if(len(tokensToEvaluate) > 0) {
+									if(tokensToEvaluate[0].Type != TOKEN_TYPE_CLOSE_BRACES) {
+										arrayArgCount[currentContext] = 1
+										if(tokensToEvaluate[0].Type == TOKEN_TYPE_OPEN_BRACES) {
+											return errors.New(SyntaxErrorMessage(tokensToEvaluate[0].Line, tokensToEvaluate[0].Column, "Unexpected token '" + tokensToEvaluate[0].Value + "'", tokensToEvaluate[0].FileName))
+										}
+									}
+								} else {
+									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unfinished statement", currentToken.FileName))
+								}
+							}
+						} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES) {
+							tokenToAppend := functionStack[len(functionStack) - 1]
+							
+							if(currentToken.Type == TOKEN_TYPE_CLOSE_BRACES) {
+								tokenToAppend.OtherInt = arrayArgCount[currentContext]
+							}
+
+							outputQueue = append(outputQueue, tokenToAppend)
 							functionStack = functionStack[:len(functionStack)-1]
 
 							if(currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END) {
@@ -197,6 +217,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 						} else {
 							//comma
+							//count parameter (currently for array only, not sure in the future (for function params?))
+							arrayArgCount[currentContext] += 1
 							//validate separator
 							if(len(tokensToEvaluate) > 0) {
 								if(tokensToEvaluate[0].Type != TOKEN_TYPE_FLOAT && tokensToEvaluate[0].Type != TOKEN_TYPE_INTEGER && tokensToEvaluate[0].Type != TOKEN_TYPE_STRING && tokensToEvaluate[0].Type != TOKEN_TYPE_IDENTIFIER && tokensToEvaluate[0].Type != TOKEN_TYPE_FUNCTION && tokensToEvaluate[0].Type != TOKEN_TYPE_OPEN_PARENTHESIS) {
@@ -975,7 +997,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							stack = stack[:len(stack)-1]
 		
 							//validate value
-							errVal := expectedTokenTypes(value, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE, TOKEN_TYPE_BOOLEAN)
+							errVal := expectedTokenTypes(value, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE, TOKEN_TYPE_BOOLEAN, TOKEN_TYPE_ARRAY)
 							if (errVal != nil) {
 								return errVal
 							}
@@ -1041,6 +1063,33 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								} else {
 									(*globalVariableArray)[varIndex].BooleanValue = false
 								}
+							} else if(value.Type == TOKEN_TYPE_ARRAY) {
+								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ARRAY
+								for arrayIndex := 0; arrayIndex < len(value.Array); arrayIndex++ {
+									thisVar := Variable{}
+
+									if(value.Array[arrayIndex].Type == TOKEN_TYPE_INTEGER) {
+										thisVar.Type = VARIABLE_TYPE_INTEGER
+										thisVar.IntegerValue, _ = strconv.Atoi(value.Array[arrayIndex].Value)
+									} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_STRING) {
+										thisVar.Type = VARIABLE_TYPE_STRING
+										thisVar.StringValue = value.Array[arrayIndex].Value
+									} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_FLOAT) {
+										thisVar.Type = VARIABLE_TYPE_FLOAT
+										thisVar.FloatValue, _ = strconv.ParseFloat(value.Array[arrayIndex].Value, 32)
+									} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_BOOLEAN) {
+										thisVar.Type = VARIABLE_TYPE_BOOLEAN
+										if(value.Array[arrayIndex].Value == "true") {
+											thisVar.BooleanValue = true
+										} else {
+											thisVar.BooleanValue = false
+										}
+									} else {
+										thisVar.Type = VARIABLE_TYPE_NONE
+									}
+
+									(*globalVariableArray)[varIndex].ArrayValue = append((*globalVariableArray)[varIndex].ArrayValue, thisVar)
+								}
 							} else {
 								//Nil
 								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
@@ -1098,6 +1147,31 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										} else {
 											fa.BooleanValue = false
 										}
+									} else if(param.Type == TOKEN_TYPE_ARRAY) {
+										fa.Type = ARG_TYPE_ARRAY
+										for thisArrayIndex := 0; thisArrayIndex < len(param.Array); thisArrayIndex++ {
+											thisArgument := FunctionArgument{}
+											if(param.Array[thisArrayIndex].Type == TOKEN_TYPE_INTEGER) {
+												thisArgument.Type = ARG_TYPE_INTEGER
+												thisArgument.IntegerValue, _ = strconv.Atoi(param.Array[thisArrayIndex].Value)
+											} else if(param.Array[thisArrayIndex].Type == TOKEN_TYPE_STRING) {
+												thisArgument.Type = ARG_TYPE_STRING
+												thisArgument.StringValue = param.Array[thisArrayIndex].Value
+											} else if(param.Array[thisArrayIndex].Type == TOKEN_TYPE_FLOAT) {
+												thisArgument.Type = ARG_TYPE_FLOAT
+												thisArgument.FloatValue, _ = strconv.ParseFloat(param.Array[thisArrayIndex].Value, 32)
+											} else if(param.Array[thisArrayIndex].Type == TOKEN_TYPE_BOOLEAN) {
+												thisArgument.Type = ARG_TYPE_BOOLEAN
+												if(param.Array[thisArrayIndex].Value == "true") {
+													thisArgument.BooleanValue = true
+												} else {
+													thisArgument.BooleanValue = false
+												}
+											} else {
+												thisArgument.Type = ARG_TYPE_NONE
+											}
+											fa.ArrayValue = append(fa.ArrayValue, thisArgument)
+										}
 									} else {
 										//Nil
 										fa.Type = ARG_TYPE_NONE
@@ -1139,6 +1213,35 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										//false
 										newToken.Value = "false"
 									}
+								} else if(funcReturn.Type == RET_TYPE_ARRAY) {
+									newToken.Type = TOKEN_TYPE_ARRAY
+									newToken.OtherInt = len(funcReturn.ArrayValue)
+
+									for thisArrayIndex := 0; thisArrayIndex < len(funcReturn.ArrayValue); thisArrayIndex++ {
+										thisNewToken := Token{}
+
+										if(funcReturn.ArrayValue[thisArrayIndex].Type == RET_TYPE_INTEGER) {
+											thisNewToken.Type = TOKEN_TYPE_INTEGER
+											thisNewToken.Value = strconv.Itoa(funcReturn.ArrayValue[thisArrayIndex].IntegerValue)
+										} else if(funcReturn.ArrayValue[thisArrayIndex].Type == RET_TYPE_STRING) {
+											thisNewToken.Type = TOKEN_TYPE_STRING
+											thisNewToken.Value = funcReturn.ArrayValue[thisArrayIndex].StringValue
+										} else if(funcReturn.ArrayValue[thisArrayIndex].Type == RET_TYPE_FLOAT) {
+											thisNewToken.Type = TOKEN_TYPE_FLOAT
+											thisNewToken.Value = strconv.FormatFloat(funcReturn.ArrayValue[thisArrayIndex].FloatValue, 'f', -1, 64)
+										} else if(funcReturn.ArrayValue[thisArrayIndex].Type == RET_TYPE_BOOLEAN) {
+											thisNewToken.Type = TOKEN_TYPE_BOOLEAN
+											if(funcReturn.ArrayValue[thisArrayIndex].BooleanValue) {
+												thisNewToken.Value = "true"
+											} else {
+												thisNewToken.Value = "false"
+											}
+										} else {
+											thisNewToken.Type = TOKEN_TYPE_NONE
+										}
+
+										newToken.Array = append(newToken.Array, thisNewToken)
+									}
 								} else {
 									//Nil
 									newToken.Type = TOKEN_TYPE_NONE
@@ -1169,6 +1272,29 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									} else if(functionArguments[ind].Type == ARG_TYPE_BOOLEAN) {
 										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_BOOLEAN
 										(*globalVariableArray)[varIndex].BooleanValue = functionArguments[ind].BooleanValue
+									} else if(functionArguments[ind].Type == ARG_TYPE_ARRAY) {
+										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ARRAY
+										for thisArrayIndex := 0; thisArrayIndex < len(functionArguments[ind].ArrayValue); thisArrayIndex++ {
+											thisVar := Variable{}
+
+											if(functionArguments[ind].ArrayValue[thisArrayIndex].Type == ARG_TYPE_INTEGER) {
+												thisVar.Type = VARIABLE_TYPE_INTEGER
+												thisVar.IntegerValue = functionArguments[ind].ArrayValue[thisArrayIndex].IntegerValue
+											} else if(functionArguments[ind].ArrayValue[thisArrayIndex].Type == ARG_TYPE_STRING) {
+												thisVar.Type = VARIABLE_TYPE_STRING
+												thisVar.StringValue = functionArguments[ind].ArrayValue[thisArrayIndex].StringValue
+											} else if(functionArguments[ind].ArrayValue[thisArrayIndex].Type == ARG_TYPE_FLOAT) {
+												thisVar.Type = VARIABLE_TYPE_FLOAT
+												thisVar.FloatValue = functionArguments[ind].ArrayValue[thisArrayIndex].FloatValue
+											} else if(functionArguments[ind].ArrayValue[thisArrayIndex].Type == ARG_TYPE_BOOLEAN) {
+												thisVar.Type = VARIABLE_TYPE_BOOLEAN
+												thisVar.BooleanValue = functionArguments[ind].ArrayValue[thisArrayIndex].BooleanValue
+											} else {
+												thisVar.Type = VARIABLE_TYPE_NONE
+											}
+
+											(*globalVariableArray)[varIndex].ArrayValue = append((*globalVariableArray)[varIndex].ArrayValue, thisVar)
+										}
 									} else {
 										//Nil
 										(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
@@ -1199,6 +1325,59 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 							stack = append(stack, newToken)
 						
+						} else if(currentToken.Type == TOKEN_TYPE_OPEN_BRACES) {
+							//array declaration
+							processedArg := 0
+							var tempArray []Token
+							newToken := currentToken
+							newToken.Type = TOKEN_TYPE_ARRAY
+							if(currentToken.OtherInt > 0) {
+								if(len(stack) == 0) {
+									if(len(outputQueue) > 0) {
+										return errors.New(SyntaxErrorMessage(outputQueue[0].Line, outputQueue[0].Column, "Unexpected token '" + outputQueue[0].Value + "'", outputQueue[0].FileName))
+									} else {
+										return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unexpected token '" + currentToken.Value + "'", currentToken.FileName))
+									}
+								}
+
+								for true {
+									var param Token
+
+									param = stack[len(stack)-1]
+									stack = stack[:len(stack)-1]
+
+									var errConvert error
+									if(param.Type == TOKEN_TYPE_IDENTIFIER) {
+										param, errConvert = convertVariableToToken(param, *globalVariableArray, scopeName)
+										if(errConvert != nil) {
+											return errConvert
+										}
+									}
+
+									if(param.Type == TOKEN_TYPE_ARRAY) {
+										return errors.New(SyntaxErrorMessage(param.Line, param.Column, "Unexpected token '" + param.Value + "'", param.FileName))
+									}
+
+									tempArray = append(tempArray, param)
+
+									processedArg += 1
+									if (processedArg == currentToken.OtherInt) {
+										break
+									}
+								}
+
+								if(len(tempArray) > 0) {
+									//reverse the array (so it's in proper position)
+									arrayLength := len(tempArray)
+									for thisArrayIndex := 0; thisArrayIndex < arrayLength; thisArrayIndex++ {
+										thisToken := tempArray[len(tempArray) - 1]
+										tempArray = tempArray[:len(tempArray)-1]
+										newToken.Array = append(newToken.Array, thisToken)
+									}
+								}
+							}
+							stack = append(stack, newToken)
+							//DumpToken(stack)
 						} else if(currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START) {
 							//check if function already exists
 							//if yes then raise an error
@@ -1279,7 +1458,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							}
 
-							errValue := expectedTokenTypes(returnValue, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE, TOKEN_TYPE_BOOLEAN)
+							errValue := expectedTokenTypes(returnValue, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE, TOKEN_TYPE_BOOLEAN, TOKEN_TYPE_ARRAY)
 							if (errValue != nil) {
 								return errValue
 							}

@@ -52,6 +52,33 @@ func DumpVariable(variables []Variable) {
 			fmt.Printf("Variable Value: %d\n", variables[x].IntegerValue)
 		} else if(variables[x].Type == VARIABLE_TYPE_BOOLEAN) {
 			fmt.Printf("Variable Value: %v\n", variables[x].BooleanValue)
+		} else if(variables[x].Type == VARIABLE_TYPE_ARRAY) {
+			strVal := ""
+
+			for x2 := 0; x2 < len(variables[x].ArrayValue); x2++ {
+				//strVal = strVal + variables[x].Array[x2].Value
+				if(variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_FLOAT) {
+					strVal = strVal + strconv.FormatFloat(variables[x].ArrayValue[x2].FloatValue, 'f', -1, 64)
+				} else if(variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_STRING) {
+					strVal = strVal + variables[x].ArrayValue[x2].StringValue
+				} else if(variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_INTEGER) {
+					strVal = strVal + strconv.Itoa(variables[x].ArrayValue[x2].IntegerValue)
+				} else if(variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_BOOLEAN) {
+					if(variables[x].ArrayValue[x2].BooleanValue) {
+						strVal = strVal + "true"
+					} else {
+						strVal = strVal + "false"
+					}
+				} else {
+					strVal = strVal + "Nil"
+				}
+
+				if((x2 + 1) != len(variables[x].ArrayValue)) {
+					strVal = strVal + " , "
+				}
+			}
+
+			fmt.Printf("Variable Value: [ %s ]\n", strVal)
 		} else {
 			//Nil type
 			fmt.Println("Variable Value: Nil")
@@ -135,6 +162,33 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 		} else {
 			//false
 			token.Value = "false"
+		}
+	} else if(variables[indx].Type == VARIABLE_TYPE_ARRAY) {
+		token.Type = TOKEN_TYPE_ARRAY
+		token.OtherInt = len(variables[indx].ArrayValue)
+		for x := 0; x < len(variables[indx].ArrayValue); x++ {
+			newToken := Token{}
+			if(variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_INTEGER) {
+				newToken.Type = TOKEN_TYPE_INTEGER
+				newToken.Value = strconv.Itoa(variables[indx].ArrayValue[x].IntegerValue)
+			} else if(variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_STRING) {
+				newToken.Type = TOKEN_TYPE_STRING
+				newToken.Value = variables[indx].ArrayValue[x].StringValue
+			} else if(variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_FLOAT) {
+				newToken.Type = TOKEN_TYPE_FLOAT
+				newToken.Value = strconv.FormatFloat(variables[indx].ArrayValue[x].FloatValue, 'f', -1, 64)
+			} else if(variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_BOOLEAN) {
+				newToken.Type = TOKEN_TYPE_BOOLEAN
+				if(variables[indx].ArrayValue[x].BooleanValue) {
+					newToken.Value = "true"
+				} else {
+					newToken.Value = "false"
+				}
+			} else {
+				newToken.Type = TOKEN_TYPE_NONE
+			}
+
+			token.Array = append(token.Array, newToken)
 		}
 	} else {
 		//Nil
