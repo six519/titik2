@@ -678,5 +678,25 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 		}
 	}
 
+	//3rd token cleanup (for open and close braces)
+	var contextName2 = []string{"main_context"}
+	var contextToReplace string = ""
+	for x := 0; x < len(finalTokenArray); x++ {
+		if(finalTokenArray[x].Type == TOKEN_TYPE_OPEN_BRACES) {
+			thisSuffix := strconv.Itoa(finalTokenArray[x].Column)
+			contextName2 = append(contextName2, "ob_" + thisSuffix)
+			contextToReplace = finalTokenArray[x].Context
+		}
+
+		if(finalTokenArray[x].Type == TOKEN_TYPE_CLOSE_BRACES) {
+			finalTokenArray[x].Context = contextName2[len(contextName2)-1]
+			contextName2 = contextName2[:len(contextName2)-1]
+		}
+
+		if(finalTokenArray[x].Context == contextToReplace) {
+			finalTokenArray[x].Context = contextName2[len(contextName2)-1]
+		}
+	}
+
 	return finalTokenArray, nil
 }
