@@ -143,7 +143,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					}
 
 					//dontIgnorePopping := true
-					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_OPEN_BRACES) {
+					if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_OPEN_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_START || currentToken.Type == TOKEN_TYPE_GET_ARRAY_END) {
 						isValidToken = true
 						/*
 						if(len(tokensToEvaluate) > 0) {
@@ -155,7 +155,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						}
 						*/
 
-						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES) {
+						if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA  || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_END) {
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
 							for true {
@@ -172,7 +172,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 						}
 
-						if(currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_OPEN_BRACES) {
+						if(currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_OPEN_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_START) {
 							functionStack = append(functionStack, currentToken)
 							if(currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START) {
 								isFunctionDefinition = true
@@ -201,7 +201,16 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unfinished statement", currentToken.FileName))
 								}
 							}
-						} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES) {
+							if(currentToken.Type == TOKEN_TYPE_GET_ARRAY_START) {
+								if(len(tokensToEvaluate) > 0) {
+									if(tokensToEvaluate[0].Type == TOKEN_TYPE_GET_ARRAY_END) {
+										return errors.New(SyntaxErrorMessage(tokensToEvaluate[0].Line, tokensToEvaluate[0].Column, "Unexpected token '" + tokensToEvaluate[0].Value + "'", tokensToEvaluate[0].FileName))
+									}
+								} else {
+									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unfinished statement", currentToken.FileName))
+								}
+							}
+						} else if(currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_END) {
 							tokenToAppend := functionStack[len(functionStack) - 1]
 							
 							if(currentToken.Type == TOKEN_TYPE_CLOSE_BRACES) {
@@ -1719,6 +1728,45 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 
 							stack = append(stack, currentToken) //TOKEN_TYPE_IF_END
+						} else if(currentToken.Type == TOKEN_TYPE_GET_ARRAY_START) {
+							//array getter
+							var errConvert error
+							var thisArrayToken Token
+
+							param := stack[len(stack)-1]
+							stack = stack[:len(stack)-1]
+
+							if(param.Type == TOKEN_TYPE_IDENTIFIER) {
+								param, errConvert = convertVariableToToken(param, *globalVariableArray, scopeName)
+								if(errConvert != nil) {
+									return errConvert
+								}
+							}
+
+							//validate param
+							errParam := expectedTokenTypes(param, TOKEN_TYPE_INTEGER)
+							if (errParam != nil) {
+								return errParam
+							}
+
+							//validate array
+							thisArrayToken, errConvert = convertVariableToToken(currentToken, *globalVariableArray, scopeName)
+							if(errConvert != nil) {
+								return errConvert
+							}
+
+							if(thisArrayToken.Type != TOKEN_TYPE_ARRAY) {
+								return errors.New(SyntaxErrorMessage(thisArrayToken.Line, thisArrayToken.Column, "Not a batch type", thisArrayToken.FileName))
+							}
+
+							intIndex, _ := strconv.Atoi(param.Value)
+
+							if(intIndex < 0 || len(thisArrayToken.Array) == 0 || intIndex > (len(thisArrayToken.Array) - 1)) {
+								return errors.New(SyntaxErrorMessage(param.Line, param.Column, "Index out of range", param.FileName))
+							}
+
+							stack = append(stack, thisArrayToken.Array[intIndex])
+
 						} else {
 							stack = append(stack, currentToken)
 						}
