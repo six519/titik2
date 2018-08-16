@@ -1756,7 +1756,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 
 							if(thisArrayToken.Type != TOKEN_TYPE_ARRAY) {
-								return errors.New(SyntaxErrorMessage(thisArrayToken.Line, thisArrayToken.Column, "Not a batch type", thisArrayToken.FileName))
+								return errors.New(SyntaxErrorMessage(thisArrayToken.Line, thisArrayToken.Column, "Not a lineup type", thisArrayToken.FileName))
 							}
 
 							intIndex, _ := strconv.Atoi(param.Value)
