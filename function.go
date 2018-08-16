@@ -271,6 +271,17 @@ func Len_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn
 	return ret
 }
 
+func Sav_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
+
+	for x := 0; x < len(os.Args); x++ {
+		funcReturn := FunctionReturn{Type: RET_TYPE_STRING, StringValue: os.Args[x]}
+		ret.ArrayValue = append(ret.ArrayValue, funcReturn)
+	}
+
+	return ret
+}
+
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
@@ -299,4 +310,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//len(<lineup>)
 	defineFunction(globalFunctionArray, "len", Len_execute, 1, true)
+
+	//sav()
+	defineFunction(globalFunctionArray, "sav", Sav_execute, 0, true)
 }
