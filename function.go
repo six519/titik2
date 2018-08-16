@@ -259,6 +259,18 @@ func Tos_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn
 	return ret
 }
 
+func Len_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
+
+	if(arguments[0].Type != ARG_TYPE_ARRAY) {
+		*errMessage = errors.New("Error: Parameter must be a lineup type")
+	} else {
+		ret.IntegerValue = len(arguments[0].ArrayValue)
+	}
+
+	return ret
+}
+
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
@@ -284,4 +296,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//tos(<anyvar>)
 	defineFunction(globalFunctionArray, "tos", Tos_execute, 1, true)
+
+	//len(<lineup>)
+	defineFunction(globalFunctionArray, "len", Len_execute, 1, true)
 }
