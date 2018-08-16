@@ -150,6 +150,9 @@ type Token struct {
 	Line int
 	Column int
 	OtherInt int
+	Array_is_ref bool
+	Array_ref_var_name string
+	Array_ref_index int
 }
 
 type TokenArray struct {

@@ -1010,10 +1010,23 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							if (errVal != nil) {
 								return errVal
 							}
-							//validate variable
-							errVar := expectedTokenTypes(variable, TOKEN_TYPE_IDENTIFIER)
-							if (errVar != nil) {
-								return errVar
+
+							if(variable.Array_is_ref) {
+								//an array reference
+								tmpIndex := variable.Array_ref_index
+								tmpToken := Token{Value: variable.Array_ref_var_name, Line: variable.Line, Column: variable.Column, FileName: variable.FileName}
+								variable, errConvert = convertVariableToToken(tmpToken, *globalVariableArray, scopeName)
+								if(errConvert != nil) {
+									return errConvert
+								}
+								variable.Array_ref_index = tmpIndex
+								variable.Array_is_ref = true
+							} else {
+								//validate variable
+								errVar := expectedTokenTypes(variable, TOKEN_TYPE_IDENTIFIER)
+								if (errVar != nil) {
+									return errVar
+								}
 							}
 
 							//check if variable exists as a function
@@ -1055,53 +1068,79 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							}
 		
-							//modify the value/type of variable below
-							if(value.Type == TOKEN_TYPE_INTEGER) {
-								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_INTEGER
-								(*globalVariableArray)[varIndex].IntegerValue, _ = strconv.Atoi(value.Value)
-							} else if(value.Type == TOKEN_TYPE_STRING) {
-								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_STRING
-								(*globalVariableArray)[varIndex].StringValue = value.Value
-							} else if(value.Type == TOKEN_TYPE_FLOAT) {
-								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
-								(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
-							} else if(value.Type == TOKEN_TYPE_BOOLEAN) {
-								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_BOOLEAN
-								if(value.Value == "true") {
-									(*globalVariableArray)[varIndex].BooleanValue = true
-								} else {
-									(*globalVariableArray)[varIndex].BooleanValue = false
-								}
-							} else if(value.Type == TOKEN_TYPE_ARRAY) {
-								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ARRAY
-								for arrayIndex := 0; arrayIndex < len(value.Array); arrayIndex++ {
-									thisVar := Variable{}
-
-									if(value.Array[arrayIndex].Type == TOKEN_TYPE_INTEGER) {
-										thisVar.Type = VARIABLE_TYPE_INTEGER
-										thisVar.IntegerValue, _ = strconv.Atoi(value.Array[arrayIndex].Value)
-									} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_STRING) {
-										thisVar.Type = VARIABLE_TYPE_STRING
-										thisVar.StringValue = value.Array[arrayIndex].Value
-									} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_FLOAT) {
-										thisVar.Type = VARIABLE_TYPE_FLOAT
-										thisVar.FloatValue, _ = strconv.ParseFloat(value.Array[arrayIndex].Value, 32)
-									} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_BOOLEAN) {
-										thisVar.Type = VARIABLE_TYPE_BOOLEAN
-										if(value.Array[arrayIndex].Value == "true") {
-											thisVar.BooleanValue = true
-										} else {
-											thisVar.BooleanValue = false
-										}
+							if(variable.Array_is_ref) {
+								//modify the variable by its index
+								if(value.Type == TOKEN_TYPE_INTEGER) {
+									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].Type = VARIABLE_TYPE_INTEGER
+									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].IntegerValue, _ = strconv.Atoi(value.Value)
+								} else if(value.Type == TOKEN_TYPE_STRING) {
+									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].Type = VARIABLE_TYPE_STRING
+									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].StringValue = value.Value
+								} else if(value.Type == TOKEN_TYPE_FLOAT) {
+									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].Type = VARIABLE_TYPE_FLOAT
+									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
+								} else if(value.Type == TOKEN_TYPE_BOOLEAN) {
+									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].Type = VARIABLE_TYPE_BOOLEAN
+									if(value.Value == "true") {
+										(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].BooleanValue = true
 									} else {
-										thisVar.Type = VARIABLE_TYPE_NONE
+										(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].BooleanValue = false
 									}
-
-									(*globalVariableArray)[varIndex].ArrayValue = append((*globalVariableArray)[varIndex].ArrayValue, thisVar)
+								} else if(value.Type == TOKEN_TYPE_ARRAY) {
+									return errors.New(SyntaxErrorMessage(value.Line, value.Column, "Unexpected token '" + value.Value + "'", value.FileName))
+								} else {
+									//Nil
+									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].Type = VARIABLE_TYPE_NONE
 								}
 							} else {
-								//Nil
-								(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
+								//modify the value/type of variable below
+								if(value.Type == TOKEN_TYPE_INTEGER) {
+									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_INTEGER
+									(*globalVariableArray)[varIndex].IntegerValue, _ = strconv.Atoi(value.Value)
+								} else if(value.Type == TOKEN_TYPE_STRING) {
+									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_STRING
+									(*globalVariableArray)[varIndex].StringValue = value.Value
+								} else if(value.Type == TOKEN_TYPE_FLOAT) {
+									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
+									(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
+								} else if(value.Type == TOKEN_TYPE_BOOLEAN) {
+									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_BOOLEAN
+									if(value.Value == "true") {
+										(*globalVariableArray)[varIndex].BooleanValue = true
+									} else {
+										(*globalVariableArray)[varIndex].BooleanValue = false
+									}
+								} else if(value.Type == TOKEN_TYPE_ARRAY) {
+									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ARRAY
+									for arrayIndex := 0; arrayIndex < len(value.Array); arrayIndex++ {
+										thisVar := Variable{}
+
+										if(value.Array[arrayIndex].Type == TOKEN_TYPE_INTEGER) {
+											thisVar.Type = VARIABLE_TYPE_INTEGER
+											thisVar.IntegerValue, _ = strconv.Atoi(value.Array[arrayIndex].Value)
+										} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_STRING) {
+											thisVar.Type = VARIABLE_TYPE_STRING
+											thisVar.StringValue = value.Array[arrayIndex].Value
+										} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_FLOAT) {
+											thisVar.Type = VARIABLE_TYPE_FLOAT
+											thisVar.FloatValue, _ = strconv.ParseFloat(value.Array[arrayIndex].Value, 32)
+										} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_BOOLEAN) {
+											thisVar.Type = VARIABLE_TYPE_BOOLEAN
+											if(value.Array[arrayIndex].Value == "true") {
+												thisVar.BooleanValue = true
+											} else {
+												thisVar.BooleanValue = false
+											}
+										} else {
+											thisVar.Type = VARIABLE_TYPE_NONE
+										}
+
+										(*globalVariableArray)[varIndex].ArrayValue = append((*globalVariableArray)[varIndex].ArrayValue, thisVar)
+									}
+								} else {
+									//Nil
+									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
+								}
 							}
 
 							stack = append(stack, value)
@@ -1764,6 +1803,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							if(intIndex < 0 || len(thisArrayToken.Array) == 0 || intIndex > (len(thisArrayToken.Array) - 1)) {
 								return errors.New(SyntaxErrorMessage(param.Line, param.Column, "Index out of range", param.FileName))
 							}
+
+							//add reference for assigment operation
+							thisArrayToken.Array[intIndex].Array_is_ref = true
+							thisArrayToken.Array[intIndex].Array_ref_index = intIndex
+							thisArrayToken.Array[intIndex].Array_ref_var_name = thisArrayToken.Value
+							thisArrayToken.Array[intIndex].Line = currentToken.Line
+							thisArrayToken.Array[intIndex].Column = currentToken.Column
+							thisArrayToken.Array[intIndex].FileName = currentToken.FileName
 
 							stack = append(stack, thisArrayToken.Array[intIndex])
 
