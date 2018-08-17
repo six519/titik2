@@ -21,6 +21,30 @@ var ANSI_COLORS = []string {
 	"\x1b[37;1m", //White
 }
 
+func escapeString(str string) string {
+	var retStr string
+
+	//escape newline
+	retStr = strings.Replace(str, "\\n", "\n", -1)
+
+	//escape carriage return
+	retStr = strings.Replace(retStr, "\\r", "\r", -1)
+
+	//escape tab
+	retStr = strings.Replace(retStr, "\\t", "\t", -1)
+
+	//escape form feed
+	retStr = strings.Replace(retStr, "\\f", "\f", -1)
+
+	//escape bell
+	retStr = strings.Replace(retStr, "\\a", "\a", -1)
+
+	//escape backspace
+	retStr = strings.Replace(retStr, "\\b", "\b", -1)
+
+	return retStr
+}
+
 func P_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
@@ -28,7 +52,7 @@ func P_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
 		fmt.Printf("%f\n", arguments[0].FloatValue)
 		ret.StringValue = strconv.FormatFloat(arguments[0].FloatValue, 'f', -1, 64)
 	} else if(arguments[0].Type == ARG_TYPE_STRING) {
-		fmt.Printf("%s\n", arguments[0].StringValue)
+		fmt.Printf("%s\n", escapeString(arguments[0].StringValue))
 		ret.StringValue = arguments[0].StringValue
 	} else if(arguments[0].Type == ARG_TYPE_INTEGER) {
 		//integer
@@ -83,7 +107,7 @@ func R_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
 		*errMessage = errors.New("Error: Parameter must be a string type")
 	} else {
 		reader := bufio.NewReader(os.Stdin)
-		fmt.Printf("%s", arguments[0].StringValue)
+		fmt.Printf("%s", escapeString(arguments[0].StringValue))
 		text, _ := reader.ReadString('\n')
 		ret.StringValue = strings.Trim(text, "\n")
 	}
