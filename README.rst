@@ -8,8 +8,8 @@ Intro
 
 This is for experimental and educational purpose only. ;)
 
-Sample Code
-===========
+Hello World Code
+================
 ::
 
     \
@@ -43,3 +43,8 @@ Sample Code
     df
 
     hello_world(strVariable) #call function
+
+Hello World Code Output
+=======================
+
+.. image:: http://ferdinandsilva.com/media/titik_output.png
