@@ -8,6 +8,13 @@ Intro
 
 This is for experimental and educational purpose only. ;)
 
+Install
+=======
+
+::
+
+    go get github.com/six519/titik2
+
 Hello World Code
 ================
 ::
