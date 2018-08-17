@@ -397,8 +397,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							} else {
 								//let's assume that it should be converted to float (for now)
 								result.Type = TOKEN_TYPE_FLOAT
-								tempLeftFloat, _ = strconv.ParseFloat(leftOperand.Value, 32)
-								tempRightFloat, _ = strconv.ParseFloat(rightOperand.Value, 32)
+								tempLeftFloat, _ = strconv.ParseFloat(leftOperand.Value, 64)
+								tempRightFloat, _ = strconv.ParseFloat(rightOperand.Value, 64)
 							}
 		
 							if(currentToken.Type == TOKEN_TYPE_PLUS) {
@@ -555,7 +555,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											if(rightOperand.Type == TOKEN_TYPE_INTEGER) {
 												rightOperandInt, _ = strconv.Atoi(rightOperand.Value)
 											} else {
-												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 												rightOperandInt = int(rightOperandFloat)
 											}
 											
@@ -572,8 +572,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										}
 									case TOKEN_TYPE_FLOAT:
 										if(rightOperand.Type == TOKEN_TYPE_INTEGER || rightOperand.Type == TOKEN_TYPE_FLOAT) {
-											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 32)
-											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 64)
+											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 											
 											if(leftOperandFloat == rightOperandFloat) {
 												result.Value = "true"
@@ -640,7 +640,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											if(rightOperand.Type == TOKEN_TYPE_INTEGER) {
 												rightOperandInt, _ = strconv.Atoi(rightOperand.Value)
 											} else {
-												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 												rightOperandInt = int(rightOperandFloat)
 											}
 											
@@ -657,8 +657,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										}
 									case TOKEN_TYPE_FLOAT:
 										if(rightOperand.Type == TOKEN_TYPE_INTEGER || rightOperand.Type == TOKEN_TYPE_FLOAT) {
-											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 32)
-											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 64)
+											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 											
 											if(leftOperandFloat != rightOperandFloat) {
 												result.Value = "true"
@@ -725,7 +725,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											if(rightOperand.Type == TOKEN_TYPE_INTEGER) {
 												rightOperandInt, _ = strconv.Atoi(rightOperand.Value)
 											} else {
-												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 												rightOperandInt = int(rightOperandFloat)
 											}
 											
@@ -742,8 +742,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										}
 									case TOKEN_TYPE_FLOAT:
 										if(rightOperand.Type == TOKEN_TYPE_INTEGER || rightOperand.Type == TOKEN_TYPE_FLOAT) {
-											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 32)
-											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 64)
+											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 											
 											if(leftOperandFloat > rightOperandFloat) {
 												result.Value = "true"
@@ -775,7 +775,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											if(rightOperand.Type == TOKEN_TYPE_INTEGER) {
 												rightOperandInt, _ = strconv.Atoi(rightOperand.Value)
 											} else {
-												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 												rightOperandInt = int(rightOperandFloat)
 											}
 											
@@ -792,8 +792,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										}
 									case TOKEN_TYPE_FLOAT:
 										if(rightOperand.Type == TOKEN_TYPE_INTEGER || rightOperand.Type == TOKEN_TYPE_FLOAT) {
-											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 32)
-											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 64)
+											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 											
 											if(leftOperandFloat >= rightOperandFloat) {
 												result.Value = "true"
@@ -860,7 +860,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											if(rightOperand.Type == TOKEN_TYPE_INTEGER) {
 												rightOperandInt, _ = strconv.Atoi(rightOperand.Value)
 											} else {
-												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 												rightOperandInt = int(rightOperandFloat)
 											}
 											
@@ -877,8 +877,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										}
 									case TOKEN_TYPE_FLOAT:
 										if(rightOperand.Type == TOKEN_TYPE_INTEGER || rightOperand.Type == TOKEN_TYPE_FLOAT) {
-											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 32)
-											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 64)
+											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 											
 											if(leftOperandFloat <= rightOperandFloat) {
 												result.Value = "true"
@@ -945,7 +945,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											if(rightOperand.Type == TOKEN_TYPE_INTEGER) {
 												rightOperandInt, _ = strconv.Atoi(rightOperand.Value)
 											} else {
-												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+												rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 												rightOperandInt = int(rightOperandFloat)
 											}
 											
@@ -962,8 +962,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										}
 									case TOKEN_TYPE_FLOAT:
 										if(rightOperand.Type == TOKEN_TYPE_INTEGER || rightOperand.Type == TOKEN_TYPE_FLOAT) {
-											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 32)
-											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 32)
+											leftOperandFloat, _ := strconv.ParseFloat(leftOperand.Value, 64)
+											rightOperandFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
 											
 											if(leftOperandFloat < rightOperandFloat) {
 												result.Value = "true"
@@ -1078,7 +1078,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].StringValue = value.Value
 								} else if(value.Type == TOKEN_TYPE_FLOAT) {
 									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].Type = VARIABLE_TYPE_FLOAT
-									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
+									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].FloatValue, _ = strconv.ParseFloat(value.Value, 64)
 								} else if(value.Type == TOKEN_TYPE_BOOLEAN) {
 									(*globalVariableArray)[varIndex].ArrayValue[variable.Array_ref_index].Type = VARIABLE_TYPE_BOOLEAN
 									if(value.Value == "true") {
@@ -1102,7 +1102,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									(*globalVariableArray)[varIndex].StringValue = value.Value
 								} else if(value.Type == TOKEN_TYPE_FLOAT) {
 									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
-									(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 32)
+									(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 64)
 								} else if(value.Type == TOKEN_TYPE_BOOLEAN) {
 									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_BOOLEAN
 									if(value.Value == "true") {
@@ -1123,7 +1123,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											thisVar.StringValue = value.Array[arrayIndex].Value
 										} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_FLOAT) {
 											thisVar.Type = VARIABLE_TYPE_FLOAT
-											thisVar.FloatValue, _ = strconv.ParseFloat(value.Array[arrayIndex].Value, 32)
+											thisVar.FloatValue, _ = strconv.ParseFloat(value.Array[arrayIndex].Value, 64)
 										} else if(value.Array[arrayIndex].Type == TOKEN_TYPE_BOOLEAN) {
 											thisVar.Type = VARIABLE_TYPE_BOOLEAN
 											if(value.Array[arrayIndex].Value == "true") {
@@ -1187,7 +1187,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										fa.StringValue = param.Value
 									} else if(param.Type == TOKEN_TYPE_FLOAT) {
 										fa.Type = ARG_TYPE_FLOAT
-										fa.FloatValue, _ = strconv.ParseFloat(param.Value, 32)
+										fa.FloatValue, _ = strconv.ParseFloat(param.Value, 64)
 									} else if(param.Type == TOKEN_TYPE_BOOLEAN) {
 										fa.Type = ARG_TYPE_BOOLEAN
 										if(param.Value == "true") {
@@ -1207,7 +1207,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 												thisArgument.StringValue = param.Array[thisArrayIndex].Value
 											} else if(param.Array[thisArrayIndex].Type == TOKEN_TYPE_FLOAT) {
 												thisArgument.Type = ARG_TYPE_FLOAT
-												thisArgument.FloatValue, _ = strconv.ParseFloat(param.Array[thisArrayIndex].Value, 32)
+												thisArgument.FloatValue, _ = strconv.ParseFloat(param.Array[thisArrayIndex].Value, 64)
 											} else if(param.Array[thisArrayIndex].Type == TOKEN_TYPE_BOOLEAN) {
 												thisArgument.Type = ARG_TYPE_BOOLEAN
 												if(param.Array[thisArrayIndex].Value == "true") {
