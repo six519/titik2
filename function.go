@@ -3,9 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
-	"os"
 	"errors"
-	"time"
 )
 
 //function return type
@@ -103,30 +101,6 @@ func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec E
 }
 
 //native functions
-func Ex_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
-	ret := FunctionReturn{Type: RET_TYPE_NONE}
-
-	if(arguments[0].Type != ARG_TYPE_INTEGER) {
-		*errMessage = errors.New("Error: Parameter must be an integer type")
-	} else {
-		os.Exit(arguments[0].IntegerValue)
-	}
-
-	return ret
-}
-
-func Abt_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
-	ret := FunctionReturn{Type: RET_TYPE_NONE}
-
-	if(arguments[0].Type != ARG_TYPE_STRING) {
-		*errMessage = errors.New("Error: Parameter must be a string type")
-	} else {
-		*errMessage = errors.New(arguments[0].StringValue)
-	}
-
-	return ret
-}
-
 func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
 
@@ -134,18 +108,6 @@ func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error) Fun
 		*errMessage = errors.New("Error: Parameter must be a boolean type")
 	} else {
 		ret.BooleanValue = !arguments[0].BooleanValue
-	}
-
-	return ret
-}
-
-func Zzz_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
-	ret := FunctionReturn{Type: RET_TYPE_NONE}
-
-	if(arguments[0].Type != ARG_TYPE_INTEGER) {
-		*errMessage = errors.New("Error: Parameter must be an integer type")
-	} else {
-		time.Sleep(time.Duration(arguments[0].IntegerValue) * time.Millisecond)
 	}
 
 	return ret
@@ -194,17 +156,6 @@ func Len_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn
 		*errMessage = errors.New("Error: Parameter must be a lineup type")
 	} else {
 		ret.IntegerValue = len(arguments[0].ArrayValue)
-	}
-
-	return ret
-}
-
-func Sav_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
-	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
-
-	for x := 0; x < len(os.Args); x++ {
-		funcReturn := FunctionReturn{Type: RET_TYPE_STRING, StringValue: os.Args[x]}
-		ret.ArrayValue = append(ret.ArrayValue, funcReturn)
 	}
 
 	return ret
