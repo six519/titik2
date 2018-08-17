@@ -6,8 +6,6 @@ import (
 	"os"
 	"errors"
 	"time"
-	"bufio"
-	"strings"
 )
 
 //function return type
@@ -105,61 +103,6 @@ func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec E
 }
 
 //native functions
-func P_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
-	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
-
-	if(arguments[0].Type == ARG_TYPE_FLOAT) {
-		fmt.Printf("%f\n", arguments[0].FloatValue)
-		ret.StringValue = strconv.FormatFloat(arguments[0].FloatValue, 'f', -1, 64)
-	} else if(arguments[0].Type == ARG_TYPE_STRING) {
-		fmt.Printf("%s\n", arguments[0].StringValue)
-		ret.StringValue = arguments[0].StringValue
-	} else if(arguments[0].Type == ARG_TYPE_INTEGER) {
-		//integer
-		fmt.Printf("%d\n", arguments[0].IntegerValue)
-		ret.StringValue = strconv.Itoa(arguments[0].IntegerValue)
-	} else if(arguments[0].Type == ARG_TYPE_BOOLEAN) {
-		//boolean
-		fmt.Printf("%v\n", arguments[0].BooleanValue)
-		if(arguments[0].BooleanValue) {
-			ret.StringValue = "true"
-		} else {
-			ret.StringValue = "false"
-		}
-	} else if(arguments[0].Type == ARG_TYPE_ARRAY) {
-		strVal := ""
-
-		for x := 0; x < len(arguments[0].ArrayValue); x++ {
-			if(arguments[0].ArrayValue[x].Type == ARG_TYPE_FLOAT) {
-				strVal = strVal + strconv.FormatFloat(arguments[0].ArrayValue[x].FloatValue, 'f', -1, 64)
-			} else if(arguments[0].ArrayValue[x].Type == ARG_TYPE_STRING) {
-				strVal = strVal + arguments[0].ArrayValue[x].StringValue
-			} else if(arguments[0].ArrayValue[x].Type == ARG_TYPE_INTEGER) {
-				strVal = strVal + strconv.Itoa(arguments[0].ArrayValue[x].IntegerValue)
-			} else if(arguments[0].ArrayValue[x].Type == ARG_TYPE_BOOLEAN) {
-				if(arguments[0].ArrayValue[x].BooleanValue) {
-					strVal = strVal + "true"
-				} else {
-					strVal = strVal + "false"
-				}
-			} else {
-				strVal = strVal + "Nil"
-			}
-
-			if((x + 1) != len(arguments[0].ArrayValue)) {
-				strVal = strVal + ", "
-			}
-		}
-
-		fmt.Printf("[%s]\n", strVal)
-	} else {
-		//Nil
-		fmt.Println("Nil")
-	}
-
-	return ret
-}
-
 func Ex_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
@@ -203,21 +146,6 @@ func Zzz_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn
 		*errMessage = errors.New("Error: Parameter must be an integer type")
 	} else {
 		time.Sleep(time.Duration(arguments[0].IntegerValue) * time.Millisecond)
-	}
-
-	return ret
-}
-
-func R_execute(arguments []FunctionArgument, errMessage *error) FunctionReturn {
-	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
-
-	if(arguments[0].Type != ARG_TYPE_STRING) {
-		*errMessage = errors.New("Error: Parameter must be a string type")
-	} else {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Printf("%s", arguments[0].StringValue)
-		text, _ := reader.ReadString('\n')
-		ret.StringValue = strings.Trim(text, "\n")
 	}
 
 	return ret
@@ -313,4 +241,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//sav()
 	defineFunction(globalFunctionArray, "sav", Sav_execute, 0, true)
+
+	//sc(<integer>)
+	defineFunction(globalFunctionArray, "sc", Sc_execute, 1, true)
 }
