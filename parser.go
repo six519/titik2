@@ -588,7 +588,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										}
 									case TOKEN_TYPE_STRING:
 										if(rightOperand.Type == TOKEN_TYPE_STRING) {
-											if(leftOperand.Value == rightOperand.Value) {
+											if(unescapeString(leftOperand.Value) == unescapeString(rightOperand.Value)) {
 												result.Value = "true"
 											} else {
 												result.Value = "false"
