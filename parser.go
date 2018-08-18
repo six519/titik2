@@ -1821,9 +1821,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 					*stackReference = stack
 
+					//REMOVE THE VALIDATION ERROR NOTE: not sure if this one should be removed!!!
+					/*
 					if(len(stack) > 1) {
-						return errors.New(SyntaxErrorMessage(stack[0].Line, stack[0].Column, "Invalid statement", stack[0].FileName))
-					} /* else {
+						return errors.New(SyntaxErrorMessage(stack[0].Line, stack[0].Column, "Invalid statements", stack[0].FileName))
+					} 
+					*/
+					
+					/* else {
 						if(stack[0].Type == TOKEN_TYPE_IDENTIFIER) {
 							return errors.New(SyntaxErrorMessage(stack[0].Line, stack[0].Column, "Unexpected token '" + stack[0].Value + "'", stack[0].FileName))
 						}
