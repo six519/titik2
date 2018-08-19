@@ -9,6 +9,8 @@ func main() {
 	var globalVariableArray []Variable
 	var globalFunctionArray []Function
 	var globalNativeVarList []string
+	var globalStringTag map[string]string
+	globalStringTag = make(map[string]string)
 
 	//initialize native functions
 	initNativeFunctions(&globalFunctionArray)
@@ -25,7 +27,7 @@ func main() {
 	} else if (os.Args[1] == "-h") {
 		Help(os.Args[0])
 	} else if (os.Args[1] == "-i") {
-		InteractiveShell(&globalVariableArray, &globalFunctionArray, &globalNativeVarList)
+		InteractiveShell(&globalVariableArray, &globalFunctionArray, &globalNativeVarList, &globalStringTag)
 	} else {
 		var gotReturn bool = false
 		var returnToken Token
@@ -49,7 +51,7 @@ func main() {
 		}
 		//parser object
 		prsr := Parser{}
-		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main", &globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference)
+		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main", &globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, &globalStringTag)
 
 		if(parserErr != nil) {
 			fmt.Println(parserErr)
