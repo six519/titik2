@@ -43,7 +43,7 @@ type FunctionArgument struct {
 	ArrayValue []FunctionArgument
 }
 
-type Execute func([]FunctionArgument, *error, *[]Variable, *[]Function, string, *[]string) FunctionReturn
+type Execute func([]FunctionArgument, *error, *[]Variable, *[]Function, string, *[]string, *map[string]string) FunctionReturn
 
 type Function struct {
 	Name string
@@ -100,7 +100,7 @@ func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec E
 }
 
 //native functions
-func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string) FunctionReturn {
+func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalStringTag *map[string]string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
 
 	if(arguments[0].Type != ARG_TYPE_BOOLEAN) {
@@ -112,7 +112,7 @@ func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, glo
 	return ret
 }
 
-func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string) FunctionReturn {
+func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalStringTag *map[string]string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
 
 	if(arguments[0].Type != ARG_TYPE_ARRAY) {
