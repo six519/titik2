@@ -42,6 +42,36 @@ func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 		} else {
 			ret.StringValue = "false"
 		}
+	} else if(arguments[0].Type == ARG_TYPE_ASSOCIATIVE_ARRAY) {
+		strVal := ""
+		x := 0
+
+		for k,v := range arguments[0].AssociativeArrayValue {
+
+			if(v.Type == ARG_TYPE_FLOAT) {
+				strVal = strVal + k + ":" + strconv.FormatFloat(v.FloatValue, 'f', -1, 64)
+			} else if(v.Type == ARG_TYPE_STRING) {
+				strVal = strVal + k + ":" + v.StringValue
+			} else if(v.Type == ARG_TYPE_INTEGER) {
+				strVal = strVal + k + ":" + strconv.Itoa(v.IntegerValue)
+			} else if(v.Type == ARG_TYPE_BOOLEAN) {
+				if(v.BooleanValue) {
+					strVal = strVal + k + ":" + "true"
+				} else {
+					strVal = strVal + k + ":" + "false"
+				}
+			} else {
+				strVal = strVal + k + ":" + "Nil"
+			}
+
+			if((x + 1) != len(arguments[0].AssociativeArrayValue)) {
+				strVal = strVal + ", "
+			}
+
+			x += 1
+		}
+
+		fmt.Printf("{%s}\n", strVal)
 	} else if(arguments[0].Type == ARG_TYPE_ARRAY) {
 		strVal := ""
 

@@ -13,6 +13,7 @@ const (
 	VARIABLE_TYPE_STRING
 	VARIABLE_TYPE_FLOAT
 	VARIABLE_TYPE_ARRAY
+	VARIABLE_TYPE_ASSOCIATIVE_ARRAY
 	VARIABLE_TYPE_BOOLEAN
 )
 
@@ -22,6 +23,7 @@ var VARIABLE_TYPES_STRING = []string {
 	"VARIABLE_TYPE_STRING",
 	"VARIABLE_TYPE_FLOAT",
 	"VARIABLE_TYPE_ARRAY",
+	"VARIABLE_TYPE_ASSOCIATIVE_ARRAY",
 	"VARIABLE_TYPE_BOOLEAN",
 }
 
@@ -35,6 +37,7 @@ type Variable struct {
 	BooleanValue bool
 	IsConstant bool
 	ArrayValue []Variable
+	AssociativeArrayValue map[string]*Variable
 }
 
 func DumpVariable(variables []Variable) {
@@ -163,6 +166,36 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 			//false
 			token.Value = "false"
 		}
+	} else if(variables[indx].Type == VARIABLE_TYPE_ASSOCIATIVE_ARRAY) {
+		token.Type = TOKEN_TYPE_ASSOCIATIVE_ARRAY
+		token.OtherInt = len(variables[indx].AssociativeArrayValue)
+		token.AssociativeArray = make(map[string]Token)
+
+		for k,v := range variables[indx].AssociativeArrayValue {
+			newToken := Token{}
+			if(v.Type == VARIABLE_TYPE_INTEGER) {
+				newToken.Type = TOKEN_TYPE_INTEGER
+				newToken.Value = strconv.Itoa(v.IntegerValue)
+			} else if(v.Type == VARIABLE_TYPE_STRING) {
+				newToken.Type = TOKEN_TYPE_STRING
+				newToken.Value = v.StringValue
+			} else if(v.Type == VARIABLE_TYPE_FLOAT) {
+				newToken.Type = TOKEN_TYPE_FLOAT
+				newToken.Value = strconv.FormatFloat(v.FloatValue, 'f', -1, 64)
+			} else if(v.Type == VARIABLE_TYPE_BOOLEAN) {
+				newToken.Type = TOKEN_TYPE_BOOLEAN
+				if(v.BooleanValue) {
+					newToken.Value = "true"
+				} else {
+					newToken.Value = "false"
+				}
+			} else {
+				newToken.Type = TOKEN_TYPE_NONE
+			}
+
+			token.AssociativeArray[k] = newToken
+		}
+		
 	} else if(variables[indx].Type == VARIABLE_TYPE_ARRAY) {
 		token.Type = TOKEN_TYPE_ARRAY
 		token.OtherInt = len(variables[indx].ArrayValue)

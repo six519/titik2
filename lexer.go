@@ -77,6 +77,8 @@ const (
 	TOKEN_TYPE_GET_ARRAY_START
 	TOKEN_TYPE_GET_ARRAY_END
 	TOKEN_TYPE_ARRAY
+	TOKEN_TYPE_KEY_VALUE_PAIR
+	TOKEN_TYPE_ASSOCIATIVE_ARRAY
 )
 
 //for debugging purpose only
@@ -138,6 +140,8 @@ var TOKEN_TYPES_STRING = []string {
 	"TOKEN_TYPE_GET_ARRAY_START",
 	"TOKEN_TYPE_GET_ARRAY_END",
 	"TOKEN_TYPE_ARRAY",
+	"TOKEN_TYPE_KEY_VALUE_PAIR",
+	"TOKEN_TYPE_ASSOCIATIVE_ARRAY",
 }
 
 //token object
@@ -146,13 +150,16 @@ type Token struct {
 	FileName string
 	Context string
 	Array []Token
+	AssociativeArray map[string]Token
 	Type int
 	Line int
 	Column int
 	OtherInt int
 	Array_is_ref bool
+	Array_is_assoc bool
 	Array_ref_var_name string
 	Array_ref_index int
+	Array_ref_index_str string
 }
 
 type TokenArray struct {
@@ -679,23 +686,44 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	}
 
 	//3rd token cleanup (for open and close braces)
-	var contextName2 = []string{"main_context"}
-	var contextToReplace string = ""
+	var contextNameBrace = []string{"main_context"}
+	var contextToReplaceBrace string = ""
+	var contextNameBracket = []string{"main_context"}
+	var contextToReplaceBracket string = ""
 	for x := 0; x < len(finalTokenArray); x++ {
+	
+		//braces
 		if(finalTokenArray[x].Type == TOKEN_TYPE_OPEN_BRACES) {
 			thisSuffix := strconv.Itoa(finalTokenArray[x].Column)
-			contextName2 = append(contextName2, "ob_" + thisSuffix)
-			contextToReplace = finalTokenArray[x].Context
+			contextNameBrace = append(contextNameBrace, "ob_" + thisSuffix)
+			contextToReplaceBrace = finalTokenArray[x].Context
 		}
 
 		if(finalTokenArray[x].Type == TOKEN_TYPE_CLOSE_BRACES) {
-			finalTokenArray[x].Context = contextName2[len(contextName2)-1]
-			contextName2 = contextName2[:len(contextName2)-1]
+			finalTokenArray[x].Context = contextNameBrace[len(contextNameBrace)-1]
+			contextNameBrace = contextNameBrace[:len(contextNameBrace)-1]
 		}
 
-		if(finalTokenArray[x].Context == contextToReplace) {
-			finalTokenArray[x].Context = contextName2[len(contextName2)-1]
+		if(finalTokenArray[x].Context == contextToReplaceBrace) {
+			finalTokenArray[x].Context = contextNameBrace[len(contextNameBrace)-1]
 		}
+
+		//bracket
+		if(finalTokenArray[x].Type == TOKEN_TYPE_OPEN_BRACKET) {
+			thisSuffix := strconv.Itoa(finalTokenArray[x].Column)
+			contextNameBracket = append(contextNameBracket, "obr_" + thisSuffix)
+			contextToReplaceBracket = finalTokenArray[x].Context
+		}
+
+		if(finalTokenArray[x].Type == TOKEN_TYPE_CLOSE_BRACKET) {
+			finalTokenArray[x].Context = contextNameBracket[len(contextNameBracket)-1]
+			contextNameBracket = contextNameBracket[:len(contextNameBracket)-1]
+		}
+
+		if(finalTokenArray[x].Context == contextToReplaceBracket) {
+			finalTokenArray[x].Context = contextNameBracket[len(contextNameBracket)-1]
+		}
+
 	}
 
 	return finalTokenArray, nil

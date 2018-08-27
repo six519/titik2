@@ -12,6 +12,7 @@ const (
 	RET_TYPE_INTEGER
 	RET_TYPE_FLOAT
 	RET_TYPE_ARRAY
+	RET_TYPE_ASSOCIATIVE_ARRAY
 	RET_TYPE_BOOLEAN
 )
 
@@ -22,6 +23,7 @@ const (
 	ARG_TYPE_INTEGER
 	ARG_TYPE_FLOAT
 	ARG_TYPE_ARRAY
+	ARG_TYPE_ASSOCIATIVE_ARRAY
 	ARG_TYPE_BOOLEAN
 )
 
@@ -32,6 +34,7 @@ type FunctionReturn struct {
 	FloatValue float64
 	BooleanValue bool
 	ArrayValue []FunctionReturn
+	AssociativeArrayValue map[string]FunctionReturn
 }
 
 type FunctionArgument struct {
@@ -41,6 +44,7 @@ type FunctionArgument struct {
 	FloatValue float64
 	BooleanValue bool
 	ArrayValue []FunctionArgument
+	AssociativeArrayValue map[string]FunctionArgument
 }
 
 type Execute func([]FunctionArgument, *error, *[]Variable, *[]Function, string, *[]string, *map[string]string) FunctionReturn
@@ -115,10 +119,14 @@ func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, glo
 func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalStringTag *map[string]string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
 
-	if(arguments[0].Type != ARG_TYPE_ARRAY) {
-		*errMessage = errors.New("Error: Parameter must be a lineup type")
+	if(arguments[0].Type != ARG_TYPE_ARRAY && arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY) {
+		*errMessage = errors.New("Error: Parameter must be a lineup or glossary type")
 	} else {
-		ret.IntegerValue = len(arguments[0].ArrayValue)
+		if(arguments[0].Type == ARG_TYPE_ARRAY) {
+			ret.IntegerValue = len(arguments[0].ArrayValue)
+		} else {
+			ret.IntegerValue = len(arguments[0].AssociativeArrayValue)
+		}
 	}
 
 	return ret
