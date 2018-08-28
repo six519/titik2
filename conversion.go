@@ -4,7 +4,7 @@ import (
 	"strconv"
 )
 
-func Toi_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalStringTag *map[string]string) FunctionReturn {
+func Toi_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
 
 	if(arguments[0].Type == ARG_TYPE_FLOAT) {
@@ -18,7 +18,7 @@ func Toi_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 	return ret
 }
 
-func Tos_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalStringTag *map[string]string) FunctionReturn {
+func Tos_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
 	if(arguments[0].Type == ARG_TYPE_FLOAT) {
