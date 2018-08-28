@@ -21,7 +21,7 @@ var ANSI_COLORS = []string {
 	"\x1b[37;1m", //White
 }
 
-func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string) FunctionReturn {
+func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
 	if(arguments[0].Type == ARG_TYPE_FLOAT) {
@@ -106,7 +106,7 @@ func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 	return ret
 }
 
-func R_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string) FunctionReturn {
+func R_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
@@ -121,7 +121,7 @@ func R_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 	return ret
 }
 
-func Sc_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string) FunctionReturn {
+func Sc_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_INTEGER) {
