@@ -166,4 +166,15 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//sc(<integer>)
 	defineFunction(globalFunctionArray, "sc", Sc_execute, 1, true)
+
+
+	//WEB FUNCTIONALITIES
+	//http_au(<string>, <string>)
+	defineFunction(globalFunctionArray, "http_au", Http_au_execute, 2, true)
+
+	//http_run(<string>)
+	defineFunction(globalFunctionArray, "http_run", Http_run_execute, 1, true)
+
+	//http_p(<string>)
+	defineFunction(globalFunctionArray, "http_p", Http_p_execute, 1, true)
 }

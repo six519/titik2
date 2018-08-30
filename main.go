@@ -13,7 +13,7 @@ func main() {
 
 	//init web object
 	webObject = WebObject{}
-	webObject.Init()
+	webObject.Init(&globalVariableArray, &globalFunctionArray, &globalNativeVarList)
 
 	//initialize native functions
 	initNativeFunctions(&globalFunctionArray)
