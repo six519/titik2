@@ -180,4 +180,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//http_gm()
 	defineFunction(globalFunctionArray, "http_gm", Http_gm_execute, 0, true)
+
+	//http_su(<string>, <string>)
+	defineFunction(globalFunctionArray, "http_su", Http_su_execute, 2, true)
 }

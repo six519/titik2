@@ -20,6 +20,7 @@ type WebObject struct {
 	scopeName string
 	thisWriter map[string]http.ResponseWriter
 	thisRequest map[string]*http.Request
+	staticURL string
 }
 
 func (webObject *WebObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -30,6 +31,7 @@ func (webObject *WebObject) Init(globalVariableArray *[]Variable, globalFunction
 	webObject.globalNativeVarList = globalNativeVarList
 	webObject.thisWriter = make(map[string]http.ResponseWriter)
 	webObject.thisRequest = make(map[string]*http.Request)
+	webObject.staticURL = ""
 }
 
 func (webObject *WebObject) AddURL(key string, value string) {
@@ -113,7 +115,37 @@ func Http_au_execute(arguments []FunctionArgument, errMessage *error, globalVari
 	} else if(arguments[1].Type != ARG_TYPE_STRING) {
 		*errMessage = errors.New("Error: Parameter 1 must be a string type")
 	} else {
-		(*webObject).AddURL(arguments[1].StringValue, arguments[0].StringValue)
+
+		if(arguments[1].StringValue == (*webObject).staticURL) {
+			*errMessage = errors.New("Error: URL " + arguments[1].StringValue + " already exists as static URL")
+		} else {
+			(*webObject).AddURL(arguments[1].StringValue, arguments[0].StringValue)
+		}
+	}
+
+	return ret
+}
+
+func Http_su_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 2 must be a string type")
+	} else if(arguments[1].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 1 must be a string type")
+	} else {
+		//(*webObject).AddURL(arguments[1].StringValue, arguments[0].StringValue)
+		if(len((*webObject).staticURL) == 0) {
+			_, ok := (*webObject).URLs[arguments[1].StringValue]
+			if(ok) {
+				*errMessage = errors.New("Error: URL " + arguments[1].StringValue + " already exists")
+			} else {
+				(*webObject).staticURL = arguments[1].StringValue
+				http.Handle(arguments[1].StringValue, http.StripPrefix(arguments[1].StringValue, http.FileServer(http.Dir(arguments[0].StringValue))))
+			}
+		} else {
+			*errMessage = errors.New("Error: Static URL already exists")
+		}
 	}
 
 	return ret
