@@ -6,6 +6,11 @@ import (
 	"net/http"
 )
 
+func InternalServerError(writer http.ResponseWriter, msg string) {
+	writer.WriteHeader(http.StatusInternalServerError)
+	writer.Write([]byte(msg))
+}
+
 type WebObject struct {
 	IsProcessing bool
 	URLs map[string]string
@@ -51,15 +56,13 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 		isExists, funcIndex := isFunctionExists(t, *webObject.globalFunctionArray)
 
 		if(!isExists) {
-			writer.WriteHeader(http.StatusInternalServerError)
-			writer.Write([]byte("Error: Function handler doesn't exists"))
+			InternalServerError(writer, "Error: Function handler doesn't exists")
 		} else {
 
 			array := *webObject.globalFunctionArray
 
 			if(array[funcIndex].ArgumentCount > 0) {
-				writer.WriteHeader(http.StatusInternalServerError)
-				writer.Write([]byte("Error: Function argument is greater than zero"))
+				InternalServerError(writer, "Error: Function argument is greater than zero")
 			} else {
 				//execute titik function
 				//newToken := Token{}
@@ -75,8 +78,7 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 				parserErr := prsr.Parse(array[funcIndex].Tokens, webObject.globalVariableArray, webObject.globalFunctionArray, thisScopeName, webObject.globalNativeVarList, &thisGotReturn, &thisReturnToken, false, &thisNeedBreak, &thisStackReference, webObject)
 		
 				if(parserErr != nil) {
-					writer.WriteHeader(http.StatusInternalServerError)
-					writer.Write([]byte("Error: " + parserErr.Error()))
+					InternalServerError(writer, "Error: " + parserErr.Error())
 				}
 
 				if(thisGotReturn) {
