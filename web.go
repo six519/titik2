@@ -19,7 +19,7 @@ type WebObject struct {
 	globalNativeVarList *[]string
 	scopeName string
 	thisWriter map[string]http.ResponseWriter
-	thisRequest *http.Request
+	thisRequest map[string]*http.Request
 }
 
 func (webObject *WebObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -29,6 +29,7 @@ func (webObject *WebObject) Init(globalVariableArray *[]Variable, globalFunction
 	webObject.globalFunctionArray = globalFunctionArray
 	webObject.globalNativeVarList = globalNativeVarList
 	webObject.thisWriter = make(map[string]http.ResponseWriter)
+	webObject.thisRequest = make(map[string]*http.Request)
 }
 
 func (webObject *WebObject) AddURL(key string, value string) {
@@ -39,7 +40,7 @@ func (webObject *WebObject) AddURL(key string, value string) {
 func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http.Request) {
 	
 	//webObject.thisWriter = writer
-	webObject.thisRequest = request
+	//webObject.thisRequest = request
 
 	thisPath := request.URL.Path[1:]
 
@@ -69,6 +70,7 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 				//newToken := Token{}
 				thisScopeName := array[funcIndex].Name + generateRandomNumbers()
 				webObject.thisWriter[thisScopeName] = writer
+				webObject.thisRequest[thisScopeName] = request
 
 				var thisGotReturn bool = false
 				var thisReturnToken Token
@@ -95,6 +97,7 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 				}
 
 				delete(webObject.thisWriter, thisScopeName) //cleanup map
+				delete(webObject.thisRequest, thisScopeName) //cleanup map
 
 			}
 		}
