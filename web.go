@@ -18,7 +18,7 @@ type WebObject struct {
 	globalFunctionArray *[]Function
 	globalNativeVarList *[]string
 	scopeName string
-	thisWriter http.ResponseWriter
+	thisWriter map[string]http.ResponseWriter
 	thisRequest *http.Request
 }
 
@@ -28,6 +28,7 @@ func (webObject *WebObject) Init(globalVariableArray *[]Variable, globalFunction
 	webObject.globalVariableArray = globalVariableArray
 	webObject.globalFunctionArray = globalFunctionArray
 	webObject.globalNativeVarList = globalNativeVarList
+	webObject.thisWriter = make(map[string]http.ResponseWriter)
 }
 
 func (webObject *WebObject) AddURL(key string, value string) {
@@ -37,7 +38,7 @@ func (webObject *WebObject) AddURL(key string, value string) {
 
 func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http.Request) {
 	
-	webObject.thisWriter = writer
+	//webObject.thisWriter = writer
 	webObject.thisRequest = request
 
 	thisPath := request.URL.Path[1:]
@@ -67,6 +68,7 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 				//execute titik function
 				//newToken := Token{}
 				thisScopeName := array[funcIndex].Name + generateRandomNumbers()
+				webObject.thisWriter[thisScopeName] = writer
 
 				var thisGotReturn bool = false
 				var thisReturnToken Token
@@ -91,6 +93,8 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 						http.Redirect(writer, request, thisReturnToken.Value, http.StatusFound)
 					}
 				}
+
+				delete(webObject.thisWriter, thisScopeName) //cleanup map
 
 			}
 		}
@@ -148,7 +152,7 @@ func Http_p_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 			return ret
 		}
 
-		fmt.Fprintln((*webObject).thisWriter, arguments[0].StringValue)
+		fmt.Fprintln((*webObject).thisWriter[scopeName], arguments[0].StringValue)
 	}
 
 	return ret
