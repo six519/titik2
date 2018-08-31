@@ -160,3 +160,16 @@ func Http_p_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 
 	return ret
 }
+
+func Http_gm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if(!(*webObject).IsProcessing) {
+		*errMessage = errors.New("Error: Web server should be running")
+		return ret
+	}
+
+	ret.StringValue = (*webObject).thisRequest[scopeName].Method
+
+	return ret
+}

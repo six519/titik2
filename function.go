@@ -177,4 +177,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//http_p(<string>)
 	defineFunction(globalFunctionArray, "http_p", Http_p_execute, 1, true)
+
+	//http_gm()
+	defineFunction(globalFunctionArray, "http_gm", Http_gm_execute, 0, true)
 }
