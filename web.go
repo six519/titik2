@@ -84,6 +84,12 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 				if(thisGotReturn) {
 					//the function returns a value
 					//newToken = thisReturnToken
+					if(thisReturnToken.Type != TOKEN_TYPE_STRING) {
+						InternalServerError(writer, "Error: Invalid return type")
+					} else {
+						//redirect page if there's a return (the return should be string)
+						http.Redirect(writer, request, thisReturnToken.Value, http.StatusFound)
+					}
 				}
 
 			}
