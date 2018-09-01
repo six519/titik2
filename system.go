@@ -4,13 +4,14 @@ import (
 	"os"
 	"errors"
 	"time"
+	"strconv"
 )
 
 func Ex_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_INTEGER) {
-		*errMessage = errors.New("Error: Parameter must be an integer type")
+		*errMessage = errors.New("Error: Parameter must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		os.Exit(arguments[0].IntegerValue)
 	}
@@ -22,7 +23,7 @@ func Abt_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
-		*errMessage = errors.New("Error: Parameter must be a string type")
+		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		*errMessage = errors.New(arguments[0].StringValue)
 	}
@@ -34,7 +35,7 @@ func Zzz_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_INTEGER) {
-		*errMessage = errors.New("Error: Parameter must be an integer type")
+		*errMessage = errors.New("Error: Parameter must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		time.Sleep(time.Duration(arguments[0].IntegerValue) * time.Millisecond)
 	}

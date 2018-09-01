@@ -110,7 +110,7 @@ func R_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
-		*errMessage = errors.New("Error: Parameter must be a string type")
+		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Printf("%s", escapeString(arguments[0].StringValue))
@@ -125,10 +125,10 @@ func Sc_execute(arguments []FunctionArgument, errMessage *error, globalVariableA
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_INTEGER) {
-		*errMessage = errors.New("Error: Parameter must be an integer type")
+		*errMessage = errors.New("Error: Parameter must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		if(arguments[0].IntegerValue > (len(ANSI_COLORS) - 1) || arguments[0].IntegerValue < 0) {
-			*errMessage = errors.New("Error: Parameter out of range")
+			*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
 			fmt.Printf("%s", ANSI_COLORS[arguments[0].IntegerValue])
 		}

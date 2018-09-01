@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"errors"
+	"strconv"
 )
 
 //function return type
@@ -108,7 +109,7 @@ func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, glo
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
 
 	if(arguments[0].Type != ARG_TYPE_BOOLEAN) {
-		*errMessage = errors.New("Error: Parameter must be a boolean type")
+		*errMessage = errors.New("Error: Parameter must be a boolean type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		ret.BooleanValue = !arguments[0].BooleanValue
 	}
@@ -120,7 +121,7 @@ func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
 
 	if(arguments[0].Type != ARG_TYPE_ARRAY && arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY) {
-		*errMessage = errors.New("Error: Parameter must be a lineup or glossary type")
+		*errMessage = errors.New("Error: Parameter must be a lineup or glossary type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		if(arguments[0].Type == ARG_TYPE_ARRAY) {
 			ret.IntegerValue = len(arguments[0].ArrayValue)
