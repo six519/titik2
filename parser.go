@@ -1335,7 +1335,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							if((*globalFunctionArray)[funcIndex].IsNative) {
 								//execute native function
 								var thisError error
-								funcReturn := (*globalFunctionArray)[funcIndex].Run(functionArguments, &thisError, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, webObject)
+								funcReturn := (*globalFunctionArray)[funcIndex].Run(functionArguments, &thisError, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, webObject, currentToken.Line, currentToken.Column, currentToken.FileName)
 								if(thisError != nil) {
 									return thisError
 								}
