@@ -133,6 +133,45 @@ func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 	return ret
 }
 
+func I_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		if(scopeName != "main") {
+			*errMessage = errors.New("Error: You cannot include file inside a function on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			//open titik file to include
+			lxr := Lexer{FileName: "./" + arguments[0].StringValue + ".ttk" }
+			fileErr := lxr.ReadSourceFile()
+			if (fileErr != nil) {
+				*errMessage = errors.New(fileErr.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			} else {
+				//generate token below
+				tokenArray, tokenErr := lxr.GenerateToken()
+				if (tokenErr != nil) {
+					*errMessage = tokenErr
+				} else {
+					var gotReturn bool = false
+					var returnToken Token
+					var needBreak bool = false
+					var stackReference []Token
+
+					//parser object
+					prsr := Parser{}
+					parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main", globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, webObject)
+					if(parserErr != nil) {
+						*errMessage = parserErr
+					}
+				}
+			}
+		}
+	}
+
+	return ret
+}
+
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
@@ -168,6 +207,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//sc(<integer>)
 	defineFunction(globalFunctionArray, "sc", Sc_execute, 1, true)
 
+	//i(<string>)
+	defineFunction(globalFunctionArray, "i", I_execute, 1, true)
 
 	//WEB FUNCTIONALITIES
 	//http_au(<string>, <string>)

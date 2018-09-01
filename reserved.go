@@ -5,7 +5,6 @@ var RESERVED_WORDS = []string {
 	"lf", //end of for loop
 	"wl", //while loop
 	"lw", //end of while loop
-	"i", //include
 	"if", //if
 	"fi", //end of if
 	"ef", //else if
@@ -18,6 +17,7 @@ var RESERVED_WORDS = []string {
 	/*
 	"zzz", //sleep
 	"p", //print
+	"i", //include
 	"tof", //convert to float
 	"toi", //convert to integer
 	"tos", //convert to string
