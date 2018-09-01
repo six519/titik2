@@ -88,7 +88,7 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 				parserErr := prsr.Parse(array[funcIndex].Tokens, webObject.globalVariableArray, webObject.globalFunctionArray, thisScopeName, webObject.globalNativeVarList, &thisGotReturn, &thisReturnToken, false, &thisNeedBreak, &thisStackReference, webObject)
 		
 				if(parserErr != nil) {
-					InternalServerError(writer, "Error: " + parserErr.Error() + " on line number " + strconv.Itoa(webObject.startedLine) + " and column number " + strconv.Itoa(webObject.startedColumn) + ", Filename: " + webObject.startedFileName)
+					InternalServerError(writer, parserErr.Error())
 				}
 
 				if(thisGotReturn) {
