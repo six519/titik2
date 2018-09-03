@@ -2081,6 +2081,21 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						}
 					}
 					*/
+					if(len(stack) > 0) {
+						if(stack[0].Type == TOKEN_TYPE_IDENTIFIER) {
+							//check if existing as function
+							isExists, _ := isFunctionExists(stack[0], *globalFunctionArray)
+							if(isExists) {
+								return errors.New(SyntaxErrorMessage(stack[0].Line, stack[0].Column, "Unexpected token '" + stack[0].Value + "'", stack[0].FileName))
+							} else {
+								//variable
+								isExists, _ := isVariableExists(stack[0], *globalVariableArray, scopeName)
+								if(!isExists) {
+									return errors.New(SyntaxErrorMessage(stack[0].Line, stack[0].Column, "Variable doesn't exists '" + stack[0].Value + "'", stack[0].FileName))
+								}
+							}
+						}
+					}
 				}
 				
 			}
