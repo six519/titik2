@@ -45,8 +45,8 @@ func (webObject *WebObject) AddURL(key string, value string) {
 
 func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http.Request) {
 	
-	//webObject.thisWriter = writer
-	//webObject.thisRequest = request
+	//default type to html
+	writer.Header().Set("Content-Type", "text/html")
 
 	thisPath := request.URL.Path[1:]
 
@@ -213,6 +213,34 @@ func Http_gm_execute(arguments []FunctionArgument, errMessage *error, globalVari
 	}
 
 	ret.StringValue = (*webObject).thisRequest[scopeName].Method
+
+	return ret
+}
+
+func Http_gq_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
+
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		if(!(*webObject).IsProcessing) {
+			*errMessage = errors.New("Error: Web server should be running on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			return ret
+		}
+	
+		thisQuery := (*webObject).thisRequest[scopeName].URL.Query()
+	
+		val, ok := thisQuery[arguments[0].StringValue]
+
+		if(ok) {
+			for x := 0;x < len(val); x++ {
+				funcReturn := FunctionReturn{Type: RET_TYPE_STRING}
+				funcReturn.StringValue = val[x]
+				ret.ArrayValue = append(ret.ArrayValue, funcReturn)
+			}
+		}
+	}
 
 	return ret
 }

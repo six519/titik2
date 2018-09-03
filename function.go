@@ -225,4 +225,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//http_su(<string>, <string>)
 	defineFunction(globalFunctionArray, "http_su", Http_su_execute, 2, true)
+
+	//http_gq(<string>)
+	defineFunction(globalFunctionArray, "http_gq", Http_gq_execute, 1, true)
 }
