@@ -47,6 +47,8 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 	
 	//default type to html
 	writer.Header().Set("Content-Type", "text/html")
+	//always process form POST
+	request.ParseMultipartForm(32 << 20) //handle 32M upload (for now)
 
 	thisPath := request.URL.Path[1:]
 
@@ -239,6 +241,30 @@ func Http_gq_execute(arguments []FunctionArgument, errMessage *error, globalVari
 				funcReturn.StringValue = val[x]
 				ret.ArrayValue = append(ret.ArrayValue, funcReturn)
 			}
+		}
+	}
+
+	return ret
+}
+
+func Http_gfp_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
+
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		if(!(*webObject).IsProcessing) {
+			*errMessage = errors.New("Error: Web server should be running on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			return ret
+		}
+	
+		thisPostForm := (*webObject).thisRequest[scopeName].Form[arguments[0].StringValue]
+
+		for x := 0;x < len(thisPostForm); x++ {
+			funcReturn := FunctionReturn{Type: RET_TYPE_STRING}
+			funcReturn.StringValue = thisPostForm[x]
+			ret.ArrayValue = append(ret.ArrayValue, funcReturn)
 		}
 	}
 
