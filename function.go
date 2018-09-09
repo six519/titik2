@@ -231,4 +231,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//http_gfp(<string>)
 	defineFunction(globalFunctionArray, "http_gfp", Http_gfp_execute, 1, true)
+
+	//http_lt(<string>)
+	defineFunction(globalFunctionArray, "http_lt", Http_lt_execute, 2, true)
 }

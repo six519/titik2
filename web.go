@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"html/template"
 )
 
 func InternalServerError(writer http.ResponseWriter, msg string) {
@@ -266,6 +267,51 @@ func Http_gfp_execute(arguments []FunctionArgument, errMessage *error, globalVar
 			funcReturn.StringValue = thisPostForm[x]
 			ret.ArrayValue = append(ret.ArrayValue, funcReturn)
 		}
+	}
+
+	return ret
+}
+
+func Http_lt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if(arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY) {
+		*errMessage = errors.New("Error: Parameter 2 must be a glossary type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[1].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		//get all associative arrays
+		//and convert all to string
+		//and add to map
+		var stringMap map[string]string
+		stringMap = make(map[string]string)
+
+		for k,v := range arguments[0].AssociativeArrayValue {
+			if(v.Type == ARG_TYPE_FLOAT) {
+				stringMap[k] = strconv.FormatFloat(v.FloatValue, 'f', -1, 64)
+			} else if(v.Type == ARG_TYPE_STRING) {
+				stringMap[k] = v.StringValue
+			} else if(v.Type == ARG_TYPE_INTEGER) {
+				stringMap[k] = strconv.Itoa(v.IntegerValue)
+			} else if(v.Type == ARG_TYPE_BOOLEAN) {
+				if(v.BooleanValue) {
+					stringMap[k] = "true"
+				} else {
+					stringMap[k] = "false"
+				}	
+			} else {
+				stringMap[k] = ""
+			}
+		}
+
+		t, err := template.ParseFiles(arguments[1].StringValue)
+
+		if(err != nil) {
+			*errMessage = errors.New("Error: Can't load template file on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			t.Execute((*webObject).thisWriter[scopeName], stringMap)
+		}
+
 	}
 
 	return ret
