@@ -128,3 +128,12 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 
 	return ret
 }
+
+func Mysql_cr_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	delete((*globalSettings).stringSettings, scopeName)
+	delete((*globalSettings).mySQLResults, scopeName)
+
+	return ret
+}
