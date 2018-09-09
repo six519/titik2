@@ -211,37 +211,37 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	defineFunction(globalFunctionArray, "i", I_execute, 1, true)
 
 	//WEB FUNCTIONALITIES
-	//http_au(<string>, <string>)
+	//http_au(<string>, <string>) - Add URL
 	defineFunction(globalFunctionArray, "http_au", Http_au_execute, 2, true)
 
-	//http_run(<string>)
+	//http_run(<string>) - Run server
 	defineFunction(globalFunctionArray, "http_run", Http_run_execute, 1, true)
 
-	//http_p(<string>)
+	//http_p(<string>) - Print
 	defineFunction(globalFunctionArray, "http_p", Http_p_execute, 1, true)
 
-	//http_gm()
+	//http_gm() - Get method
 	defineFunction(globalFunctionArray, "http_gm", Http_gm_execute, 0, true)
 
-	//http_su(<string>, <string>)
+	//http_su(<string>, <string>) - Static URL
 	defineFunction(globalFunctionArray, "http_su", Http_su_execute, 2, true)
 
-	//http_gq(<string>)
+	//http_gq(<string>) - Get query
 	defineFunction(globalFunctionArray, "http_gq", Http_gq_execute, 1, true)
 
-	//http_gfp(<string>)
+	//http_gfp(<string>) - Get form POST
 	defineFunction(globalFunctionArray, "http_gfp", Http_gfp_execute, 1, true)
 
-	//http_lt(<string>)
+	//http_lt(<string>) - Load template
 	defineFunction(globalFunctionArray, "http_lt", Http_lt_execute, 2, true)
 
 	//MYSQL FUNCTIONALITIES
-	//mysql_set(<string>, <string>, <string>, <string>)
+	//mysql_set(<string>, <string>, <string>, <string>) - Set connection
 	defineFunction(globalFunctionArray, "mysql_set", Mysql_set_execute, 4, true)
 
-	//mysql_q(<string>)
+	//mysql_q(<string>) - Query
 	defineFunction(globalFunctionArray, "mysql_q", Mysql_q_execute, 1, true)
 
-	//mysql_cr(<string>)
+	//mysql_cr(<string>) - Clear resources
 	defineFunction(globalFunctionArray, "mysql_cr", Mysql_cr_execute, 0, true)
 }
