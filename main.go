@@ -9,11 +9,11 @@ func main() {
 	var globalVariableArray []Variable
 	var globalFunctionArray []Function
 	var globalNativeVarList []string
-	var webObject WebObject
+	var globalSettings GlobalSettingsObject
 
-	//init web object
-	webObject = WebObject{}
-	webObject.Init(&globalVariableArray, &globalFunctionArray, &globalNativeVarList)
+	//init global settings
+	globalSettings = GlobalSettingsObject{}
+	globalSettings.Init(&globalVariableArray, &globalFunctionArray, &globalNativeVarList)
 
 	//initialize native functions
 	initNativeFunctions(&globalFunctionArray)
@@ -30,7 +30,7 @@ func main() {
 	} else if (os.Args[1] == "-h") {
 		Help(os.Args[0])
 	} else if (os.Args[1] == "-i") {
-		InteractiveShell(&globalVariableArray, &globalFunctionArray, &globalNativeVarList, &webObject)
+		InteractiveShell(&globalVariableArray, &globalFunctionArray, &globalNativeVarList, &globalSettings)
 	} else {
 		var gotReturn bool = false
 		var returnToken Token
@@ -54,7 +54,7 @@ func main() {
 		}
 		//parser object
 		prsr := Parser{}
-		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main", &globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, &webObject)
+		parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main", &globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, &globalSettings)
 
 		if(parserErr != nil) {
 			fmt.Println(parserErr)

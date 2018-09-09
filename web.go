@@ -16,9 +16,7 @@ func InternalServerError(writer http.ResponseWriter, msg string) {
 type WebObject struct {
 	IsProcessing bool
 	URLs map[string]string
-	globalVariableArray *[]Variable
-	globalFunctionArray *[]Function
-	globalNativeVarList *[]string
+	globalSettings *GlobalSettingsObject
 	scopeName string
 	thisWriter map[string]http.ResponseWriter
 	thisRequest map[string]*http.Request
@@ -28,12 +26,10 @@ type WebObject struct {
 	startedFileName string
 }
 
-func (webObject *WebObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
+func (webObject *WebObject) Init(globalSettings *GlobalSettingsObject) {
 	webObject.IsProcessing = false
 	webObject.URLs = make(map[string]string)
-	webObject.globalVariableArray = globalVariableArray
-	webObject.globalFunctionArray = globalFunctionArray
-	webObject.globalNativeVarList = globalNativeVarList
+	webObject.globalSettings = globalSettings
 	webObject.thisWriter = make(map[string]http.ResponseWriter)
 	webObject.thisRequest = make(map[string]*http.Request)
 	webObject.staticURL = ""
@@ -64,13 +60,13 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 	} else {
 		//try to load titik function
 		t := Token{Value: webObject.URLs[thisPath]}
-		isExists, funcIndex := isFunctionExists(t, *webObject.globalFunctionArray)
+		isExists, funcIndex := isFunctionExists(t, *webObject.globalSettings.globalFunctionArray)
 
 		if(!isExists) {
 			InternalServerError(writer, "Error: Function handler doesn't exists on line number " + strconv.Itoa(webObject.startedLine) + " and column number " + strconv.Itoa(webObject.startedColumn) + ", Filename: " + webObject.startedFileName)
 		} else {
 
-			array := *webObject.globalFunctionArray
+			array := *webObject.globalSettings.globalFunctionArray
 
 			if(array[funcIndex].ArgumentCount > 0) {
 				InternalServerError(writer, "Error: Function argument is greater than zero on line number " + strconv.Itoa(webObject.startedLine) + " and column number " + strconv.Itoa(webObject.startedColumn) + ", Filename: " + webObject.startedFileName)
@@ -88,7 +84,7 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 				
 				//execute user defined function
 				prsr := Parser{}
-				parserErr := prsr.Parse(array[funcIndex].Tokens, webObject.globalVariableArray, webObject.globalFunctionArray, thisScopeName, webObject.globalNativeVarList, &thisGotReturn, &thisReturnToken, false, &thisNeedBreak, &thisStackReference, webObject)
+				parserErr := prsr.Parse(array[funcIndex].Tokens, webObject.globalSettings.globalVariableArray, webObject.globalSettings.globalFunctionArray, thisScopeName, webObject.globalSettings.globalNativeVarList, &thisGotReturn, &thisReturnToken, false, &thisNeedBreak, &thisStackReference, webObject.globalSettings)
 		
 				if(parserErr != nil) {
 					InternalServerError(writer, parserErr.Error())
@@ -114,7 +110,7 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 
 }
 
-func Http_au_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func Http_au_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
@@ -123,17 +119,17 @@ func Http_au_execute(arguments []FunctionArgument, errMessage *error, globalVari
 		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 
-		if(arguments[1].StringValue == (*webObject).staticURL) {
+		if(arguments[1].StringValue == (*globalSettings).webObject.staticURL) {
 			*errMessage = errors.New("Error: URL " + arguments[1].StringValue + " already exists as static URL on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
-			(*webObject).AddURL(arguments[1].StringValue, arguments[0].StringValue)
+			(*globalSettings).webObject.AddURL(arguments[1].StringValue, arguments[0].StringValue)
 		}
 	}
 
 	return ret
 }
 
-func Http_su_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func Http_su_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
@@ -141,13 +137,13 @@ func Http_su_execute(arguments []FunctionArgument, errMessage *error, globalVari
 	} else if(arguments[1].Type != ARG_TYPE_STRING) {
 		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
-		//(*webObject).AddURL(arguments[1].StringValue, arguments[0].StringValue)
-		if(len((*webObject).staticURL) == 0) {
-			_, ok := (*webObject).URLs[arguments[1].StringValue]
+		//(*globalSettings).webObject.AddURL(arguments[1].StringValue, arguments[0].StringValue)
+		if(len((*globalSettings).webObject.staticURL) == 0) {
+			_, ok := (*globalSettings).webObject.URLs[arguments[1].StringValue]
 			if(ok) {
 				*errMessage = errors.New("Error: URL " + arguments[1].StringValue + " already exists on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 			} else {
-				(*webObject).staticURL = arguments[1].StringValue
+				(*globalSettings).webObject.staticURL = arguments[1].StringValue
 				http.Handle(arguments[1].StringValue, http.StripPrefix(arguments[1].StringValue, http.FileServer(http.Dir(arguments[0].StringValue))))
 			}
 		} else {
@@ -158,27 +154,27 @@ func Http_su_execute(arguments []FunctionArgument, errMessage *error, globalVari
 	return ret
 }
 
-func Http_run_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func Http_run_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
 		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 
-		_, ok := (*webObject).URLs["/"]
+		_, ok := (*globalSettings).webObject.URLs["/"]
 
 		if(!ok) {
 			*errMessage = errors.New("Error: Please handle web root's HTTP requests on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 			return ret
 		}
 
-		(*webObject).IsProcessing = true
-		(*webObject).scopeName = scopeName
-		(*webObject).startedLine = line_number
-		(*webObject).startedColumn = column_number
-		(*webObject).startedFileName = file_name
+		(*globalSettings).webObject.IsProcessing = true
+		(*globalSettings).webObject.scopeName = scopeName
+		(*globalSettings).webObject.startedLine = line_number
+		(*globalSettings).webObject.startedColumn = column_number
+		(*globalSettings).webObject.startedFileName = file_name
 
-		http.HandleFunc("/", (*webObject).handleHTTP)
+		http.HandleFunc("/", (*globalSettings).webObject.handleHTTP)
 		err := http.ListenAndServe(arguments[0].StringValue, nil)
 
 		if(err != nil) {
@@ -189,50 +185,50 @@ func Http_run_execute(arguments []FunctionArgument, errMessage *error, globalVar
 	return ret
 }
 
-func Http_p_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func Http_p_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
 		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 
-		if(!(*webObject).IsProcessing) {
+		if(!(*globalSettings).webObject.IsProcessing) {
 			*errMessage = errors.New("Error: Web server should be running on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 			return ret
 		}
 
-		fmt.Fprintln((*webObject).thisWriter[scopeName], arguments[0].StringValue)
+		fmt.Fprintln((*globalSettings).webObject.thisWriter[scopeName], arguments[0].StringValue)
 	}
 
 	return ret
 }
 
-func Http_gm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func Http_gm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if(!(*webObject).IsProcessing) {
+	if(!(*globalSettings).webObject.IsProcessing) {
 		*errMessage = errors.New("Error: Web server should be running on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		return ret
 	}
 
-	ret.StringValue = (*webObject).thisRequest[scopeName].Method
+	ret.StringValue = (*globalSettings).webObject.thisRequest[scopeName].Method
 
 	return ret
 }
 
-func Http_gq_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func Http_gq_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
 
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
 		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
-		if(!(*webObject).IsProcessing) {
+		if(!(*globalSettings).webObject.IsProcessing) {
 			*errMessage = errors.New("Error: Web server should be running on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 			return ret
 		}
 	
-		thisQuery := (*webObject).thisRequest[scopeName].URL.Query()
+		thisQuery := (*globalSettings).webObject.thisRequest[scopeName].URL.Query()
 	
 		val, ok := thisQuery[arguments[0].StringValue]
 
@@ -248,19 +244,19 @@ func Http_gq_execute(arguments []FunctionArgument, errMessage *error, globalVari
 	return ret
 }
 
-func Http_gfp_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func Http_gfp_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
 
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
 		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
-		if(!(*webObject).IsProcessing) {
+		if(!(*globalSettings).webObject.IsProcessing) {
 			*errMessage = errors.New("Error: Web server should be running on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 			return ret
 		}
 	
-		thisPostForm := (*webObject).thisRequest[scopeName].Form[arguments[0].StringValue]
+		thisPostForm := (*globalSettings).webObject.thisRequest[scopeName].Form[arguments[0].StringValue]
 
 		for x := 0;x < len(thisPostForm); x++ {
 			funcReturn := FunctionReturn{Type: RET_TYPE_STRING}
@@ -272,7 +268,7 @@ func Http_gfp_execute(arguments []FunctionArgument, errMessage *error, globalVar
 	return ret
 }
 
-func Http_lt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func Http_lt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY) {
@@ -309,7 +305,7 @@ func Http_lt_execute(arguments []FunctionArgument, errMessage *error, globalVari
 		if(err != nil) {
 			*errMessage = errors.New("Error: Can't load template file on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
-			t.Execute((*webObject).thisWriter[scopeName], stringMap)
+			t.Execute((*globalSettings).webObject.thisWriter[scopeName], stringMap)
 		}
 
 	}

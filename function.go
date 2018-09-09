@@ -48,7 +48,7 @@ type FunctionArgument struct {
 	AssociativeArrayValue map[string]FunctionArgument
 }
 
-type Execute func([]FunctionArgument, *error, *[]Variable, *[]Function, string, *[]string, *WebObject, int, int, string) FunctionReturn
+type Execute func([]FunctionArgument, *error, *[]Variable, *[]Function, string, *[]string, *GlobalSettingsObject, int, int, string) FunctionReturn
 
 type Function struct {
 	Name string
@@ -105,7 +105,7 @@ func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec E
 }
 
 //native functions
-func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
 
 	if(arguments[0].Type != ARG_TYPE_BOOLEAN) {
@@ -117,7 +117,7 @@ func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, glo
 	return ret
 }
 
-func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
 
 	if(arguments[0].Type != ARG_TYPE_ARRAY && arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY) {
@@ -133,7 +133,7 @@ func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 	return ret
 }
 
-func I_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, webObject *WebObject, line_number int, column_number int, file_name string) FunctionReturn {
+func I_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
@@ -160,7 +160,7 @@ func I_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 
 					//parser object
 					prsr := Parser{}
-					parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main", globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, webObject)
+					parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main", globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, globalSettings)
 					if(parserErr != nil) {
 						*errMessage = parserErr
 					}

@@ -4,6 +4,21 @@ import (
 	"strings"
 )
 
+type GlobalSettingsObject struct {
+	webObject WebObject
+	globalVariableArray *[]Variable
+	globalFunctionArray *[]Function
+	globalNativeVarList *[]string
+}
+
+func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
+	globalSettings.globalVariableArray = globalVariableArray
+	globalSettings.globalFunctionArray = globalFunctionArray
+	globalSettings.globalNativeVarList = globalNativeVarList
+	globalSettings.webObject = WebObject{}
+	globalSettings.webObject.Init(globalSettings)
+}
+
 func escapeString(str string) string {
 	var retStr string
 

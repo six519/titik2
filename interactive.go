@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string, webObject *WebObject) {
+func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject) {
 	var indicator string
 	var isContinue bool = false
 	var stringContainer string
@@ -74,7 +74,7 @@ func InteractiveShell(globalVariableArray *[]Variable, globalFunctionArray *[]Fu
 				var stackReference []Token
 
 				prsr := Parser{}
-				parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main", globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, webObject)
+				parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main", globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, globalSettings)
 		
 				if(parserErr != nil) {
 					fmt.Println(parserErr)
