@@ -9,7 +9,8 @@ type GlobalSettingsObject struct {
 	globalVariableArray *[]Variable
 	globalFunctionArray *[]Function
 	globalNativeVarList *[]string
-	stringSettings map[string]string
+	stringSettings map[string]map[string]string
+	mySQLResults map[string]map[string][]string //NOTE: TEMPORARY ONLY
 }
 
 func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -19,13 +20,8 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.webObject = WebObject{}
 	globalSettings.webObject.Init(globalSettings)
 
-	globalSettings.stringSettings = make(map[string]string)
-
-	//MySQL settings
-	globalSettings.stringSettings["MYSQL_USER"] = ""
-	globalSettings.stringSettings["MYSQL_PASSWORD"] = ""
-	globalSettings.stringSettings["MYSQL_HOST"] = ""
-	globalSettings.stringSettings["MYSQL_DATABASE"] = ""
+	globalSettings.stringSettings = make(map[string]map[string]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
+	globalSettings.mySQLResults = make(map[string]map[string][]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
 }
 
 func escapeString(str string) string {

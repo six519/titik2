@@ -25,10 +25,13 @@ func Mysql_set_execute(arguments []FunctionArgument, errMessage *error, globalVa
 		//username
 		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
-		(*globalSettings).stringSettings["MYSQL_USER"] = arguments[3].StringValue
-		(*globalSettings).stringSettings["MYSQL_PASSWORD"] = arguments[2].StringValue
-		(*globalSettings).stringSettings["MYSQL_HOST"] = arguments[1].StringValue
-		(*globalSettings).stringSettings["MYSQL_DATABASE"] = arguments[0].StringValue
+
+		(*globalSettings).stringSettings[scopeName] = make(map[string]string) //TODO: CLEAN UP (MAYBE AFTER FUNCTION CALL?)
+
+		(*globalSettings).stringSettings[scopeName]["MYSQL_USER"] = arguments[3].StringValue
+		(*globalSettings).stringSettings[scopeName]["MYSQL_PASSWORD"] = arguments[2].StringValue
+		(*globalSettings).stringSettings[scopeName]["MYSQL_HOST"] = arguments[1].StringValue
+		(*globalSettings).stringSettings[scopeName]["MYSQL_DATABASE"] = arguments[0].StringValue
 	}
 
 	return ret
@@ -46,7 +49,7 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 
 		strSlices := strings.Split(strQuery, " ")
 
-		db, err := sql.Open("mysql", (*globalSettings).stringSettings["MYSQL_USER"] + ":" + (*globalSettings).stringSettings["MYSQL_PASSWORD"] + "@" + (*globalSettings).stringSettings["MYSQL_HOST"] + "/" + (*globalSettings).stringSettings["MYSQL_DATABASE"])
+		db, err := sql.Open("mysql", (*globalSettings).stringSettings[scopeName]["MYSQL_USER"] + ":" + (*globalSettings).stringSettings[scopeName]["MYSQL_PASSWORD"] + "@" + (*globalSettings).stringSettings[scopeName]["MYSQL_HOST"] + "/" + (*globalSettings).stringSettings[scopeName]["MYSQL_DATABASE"])
 		defer db.Close()
 	
 		if(err != nil) {
@@ -54,6 +57,55 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 		} else {
 			if(strSlices[0] == "select") {
 				//select query
+				rows, err := db.Query(arguments[0].StringValue)
+
+				if(err != nil) {
+					*errMessage = errors.New("Error: " + err.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+				} else {
+					columns, err2 := rows.Columns()
+		
+					if(err2 != nil) {
+						*errMessage = errors.New("Error: " + err2.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+					} else {
+						values := make([]sql.RawBytes, len(columns))
+						scanArgs := make([]interface{}, len(values))
+						for i := range values {
+							scanArgs[i] = &values[i]
+						}
+		
+						for rows.Next() {
+							err3 := rows.Scan(scanArgs...)
+							if err3 != nil {
+								ret.BooleanValue = false
+								*errMessage = errors.New("Error: " + err3.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+								break
+							} else {
+
+								var value string
+								for i, col := range values {
+		
+									if col == nil {
+										value = ""
+									} else {
+										value = string(col)
+									}
+
+									_, ok := (*globalSettings).mySQLResults[scopeName]
+
+									if(!ok) {
+										(*globalSettings).mySQLResults[scopeName] = make(map[string][]string) //TODO: THIS SHOULD BE CLEANUP (AFTER FUNCTION CALL?)
+									}
+
+									(*globalSettings).mySQLResults[scopeName][columns[i]] = append((*globalSettings).mySQLResults[scopeName][columns[i]], value)
+									
+								}
+
+								ret.BooleanValue = true		
+							}
+						}
+					}
+				}
+
 			} else {
 				//other query (insert/delete)
 				stmt, err2 := db.Prepare(arguments[0].StringValue)
