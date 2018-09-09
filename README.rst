@@ -8,6 +8,13 @@ Intro
 
 This is for experimental and educational purpose only. ;)
 
+Install Dependency
+==================
+
+::
+
+    go get github.com/go-sql-driver/mysql
+
 Install
 =======
 
