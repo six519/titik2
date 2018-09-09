@@ -242,6 +242,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//mysql_q(<string>) - Query
 	defineFunction(globalFunctionArray, "mysql_q", Mysql_q_execute, 1, true)
 
-	//mysql_cr(<string>) - Clear resources
+	//mysql_cr() - Clear resources
 	defineFunction(globalFunctionArray, "mysql_cr", Mysql_cr_execute, 0, true)
+
+	//mysql_fa(<string>) - Fetch all
+	defineFunction(globalFunctionArray, "mysql_fa", Mysql_fa_execute, 1, true)
 }

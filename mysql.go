@@ -137,3 +137,30 @@ func Mysql_cr_execute(arguments []FunctionArgument, errMessage *error, globalVar
 
 	return ret
 }
+
+func Mysql_fa_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
+
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+	
+		_, ok := (*globalSettings).mySQLResults[scopeName]
+
+		if(ok) {
+			val, ok2 := (*globalSettings).mySQLResults[scopeName][arguments[0].StringValue]
+
+			if(ok2) {
+				for x := 0;x < len(val); x++ {
+					funcReturn := FunctionReturn{Type: RET_TYPE_STRING}
+					funcReturn.StringValue = val[x]
+					ret.ArrayValue = append(ret.ArrayValue, funcReturn)
+				}
+			}
+		}
+
+	}
+
+	return ret
+}
