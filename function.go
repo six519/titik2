@@ -234,4 +234,11 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//http_lt(<string>)
 	defineFunction(globalFunctionArray, "http_lt", Http_lt_execute, 2, true)
+
+	//MYSQL FUNCTIONALITIES
+	//mysql_set(<string>, <string>, <string>, <string>)
+	defineFunction(globalFunctionArray, "mysql_set", Mysql_set_execute, 4, true)
+
+	//mysql_q(<string>)
+	defineFunction(globalFunctionArray, "mysql_q", Mysql_q_execute, 1, true)
 }
