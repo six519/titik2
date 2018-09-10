@@ -1185,6 +1185,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										(*globalVariableArray)[varIndex].AssociativeArrayValue[k] = thisVar
 									}
 								} else if(value.Type == TOKEN_TYPE_ARRAY) {
+									//reset slice
+									(*globalVariableArray)[varIndex].ArrayValue = nil
+									//set type
 									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ARRAY
 									for arrayIndex := 0; arrayIndex < len(value.Array); arrayIndex++ {
 										thisVar := Variable{}
