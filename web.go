@@ -303,7 +303,7 @@ func Http_lt_execute(arguments []FunctionArgument, errMessage *error, globalVari
 		t, err := template.ParseFiles(arguments[1].StringValue)
 
 		if(err != nil) {
-			*errMessage = errors.New("Error: Can't load template file on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			*errMessage = errors.New("Error: " + err.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
 			t.Execute((*globalSettings).webObject.thisWriter[scopeName], stringMap)
 		}
