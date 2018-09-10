@@ -40,6 +40,34 @@ type Variable struct {
 	AssociativeArrayValue map[string]*Variable
 }
 
+func cleanupVariables(variables *[]Variable, scopeName string) {
+	varCount := 0
+	//count the variables first
+	for x := 0; x < len(*variables); x++ {
+		if((*variables)[x].ScopeName == scopeName) {
+			varCount = varCount + 1
+		}
+	}
+	if(varCount > 0) {
+		for true {
+
+			for x := 0; x < len(*variables); x++ {
+				if((*variables)[x].ScopeName == scopeName) {
+					copy((*variables)[x:], (*variables)[x+1:])
+					//(*variables)[len((*variables))-1] = nil
+					(*variables) = (*variables)[:len((*variables))-1]
+					varCount = varCount - 1
+					break
+				}
+			}
+
+			if(varCount == 0) {
+				break
+			}
+		}
+	}
+}
+
 func DumpVariable(variables []Variable) {
 	fmt.Printf("====================================\n")
 

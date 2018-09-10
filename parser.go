@@ -1525,8 +1525,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									newToken = thisReturnToken
 								}
 
-								//TODO: NEED CLEANUP OF VARIABLES BELOW
 								//DELETE GENERATED VARIABLES with thisScopeName
+								cleanupVariables(globalVariableArray, thisScopeName)
 							}
 
 							stack = append(stack, newToken)
