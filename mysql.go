@@ -72,7 +72,14 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 						for i := range values {
 							scanArgs[i] = &values[i]
 						}
+
+						_, ok := (*globalSettings).mySQLResults[scopeName]
+
+						if(ok) {
+							delete((*globalSettings).mySQLResults, scopeName)
+						}
 		
+						(*globalSettings).mySQLResults[scopeName] = make(map[string][]string) //TODO: THIS SHOULD BE CLEANUP (AFTER FUNCTION CALL?)
 						for rows.Next() {
 							err3 := rows.Scan(scanArgs...)
 							if err3 != nil {
@@ -88,12 +95,6 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 										value = ""
 									} else {
 										value = string(col)
-									}
-
-									_, ok := (*globalSettings).mySQLResults[scopeName]
-
-									if(!ok) {
-										(*globalSettings).mySQLResults[scopeName] = make(map[string][]string) //TODO: THIS SHOULD BE CLEANUP (AFTER FUNCTION CALL?)
 									}
 
 									(*globalSettings).mySQLResults[scopeName][columns[i]] = append((*globalSettings).mySQLResults[scopeName][columns[i]], value)
