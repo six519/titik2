@@ -197,6 +197,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											if(tokensToEvaluate[0].Type == TOKEN_TYPE_OPEN_BRACES) {
 												return errors.New(SyntaxErrorMessage(tokensToEvaluate[0].Line, tokensToEvaluate[0].Column, "Unexpected token '" + tokensToEvaluate[0].Value + "'", tokensToEvaluate[0].FileName))
 											}
+										} else {
+											arrayArgCount[currentContext] = 0
 										}
 									}
 									if(currentToken.Type == TOKEN_TYPE_OPEN_BRACKET) {
@@ -205,6 +207,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											if(tokensToEvaluate[0].Type == TOKEN_TYPE_OPEN_BRACKET) {
 												return errors.New(SyntaxErrorMessage(tokensToEvaluate[0].Line, tokensToEvaluate[0].Column, "Unexpected token '" + tokensToEvaluate[0].Value + "'", tokensToEvaluate[0].FileName))
 											}
+										} else {
+											arrayArgCount[currentContext] = 0
 										}
 									}
 								} else {
