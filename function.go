@@ -235,6 +235,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//http_lt(<string>) - Load template
 	defineFunction(globalFunctionArray, "http_lt", Http_lt_execute, 2, true)
 
+	//http_gp() - Get path
+	defineFunction(globalFunctionArray, "http_gp", Http_gp_execute, 0, true)
+
 	//MYSQL FUNCTIONALITIES
 	//mysql_set(<string>, <string>, <string>, <string>) - Set connection
 	defineFunction(globalFunctionArray, "mysql_set", Mysql_set_execute, 4, true)

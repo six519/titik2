@@ -312,3 +312,16 @@ func Http_lt_execute(arguments []FunctionArgument, errMessage *error, globalVari
 
 	return ret
 }
+
+func Http_gp_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if(!(*globalSettings).webObject.IsProcessing) {
+		*errMessage = errors.New("Error: Web server should be running on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		return ret
+	}
+
+	ret.StringValue = (*globalSettings).webObject.thisRequest[scopeName].URL.Path
+
+	return ret
+}
