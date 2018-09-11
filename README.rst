@@ -61,4 +61,4 @@ Hello World Code
 Hello World Code Output
 =======================
 
-.. image:: http://ferdinandsilva.com/media/titik_output.png
+.. image:: http://ferdinandsilva.com/static/titik_output.png
