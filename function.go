@@ -253,4 +253,11 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//mysql_fa(<string>) - Fetch all
 	defineFunction(globalFunctionArray, "mysql_fa", Mysql_fa_execute, 1, true)
+
+	//STRING FUNCTIONALITIES
+	//str_rpl(<string>, <string>, <string>) - String replace
+	defineFunction(globalFunctionArray, "str_rpl", Str_rpl_execute, 3, true)
+
+	//str_spl(<string>, <string>) - String split
+	defineFunction(globalFunctionArray, "str_spl", Str_spl_execute, 2, true)
 }
