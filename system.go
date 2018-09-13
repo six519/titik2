@@ -5,6 +5,9 @@ import (
 	"errors"
 	"time"
 	"strconv"
+	"os/exec"
+	"strings"
+	"fmt"
 )
 
 func Ex_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
@@ -26,6 +29,30 @@ func Abt_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		*errMessage = errors.New(arguments[0].StringValue)
+	}
+
+	return ret
+}
+
+func Exe_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		cmds := strings.Split(arguments[0].StringValue, " ")
+	
+		cmd := exec.Command(cmds[0], cmds[1:]...)
+		out, err := cmd.Output()
+	
+		if(err != nil) {
+			fmt.Println(err.Error())
+		} else {
+			ret.BooleanValue = true
+			if(out != nil) {
+				fmt.Println(string(out))
+			}
+		}
 	}
 
 	return ret

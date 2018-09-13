@@ -180,6 +180,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//ex(<integer>)
 	defineFunction(globalFunctionArray, "ex", Ex_execute, 1, true)
 
+	//exe(<string>)
+	defineFunction(globalFunctionArray, "exe", Exe_execute, 1, true)
+
 	//abt(<string>)
 	defineFunction(globalFunctionArray, "abt", Abt_execute, 1, true)
 
