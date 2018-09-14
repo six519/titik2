@@ -143,7 +143,7 @@ func I_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 			*errMessage = errors.New("Error: You cannot include file inside a function on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
 			//open titik file to include
-			lxr := Lexer{FileName: "./" + arguments[0].StringValue + ".ttk" }
+			lxr := Lexer{FileName: arguments[0].StringValue + ".ttk" }
 			fileErr := lxr.ReadSourceFile()
 			if (fileErr != nil) {
 				*errMessage = errors.New(fileErr.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
