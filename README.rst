@@ -8,8 +8,8 @@ Intro
 
 This is for experimental and educational purpose only. ;)
 
-Binary Release
-==============
+Binary Release (Installation Instructions)
+==========================================
 
 Click here_
 
