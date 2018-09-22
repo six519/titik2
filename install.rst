@@ -1,54 +1,41 @@
-Install On Linux (Ubuntu, Debian)
-=================================
+Installation Instructions
+=========================
+
+
+Linux (Ubuntu, Debian)
+----------------------
 
 ::
 
     wget -qO - 'https://bintray.com/user/downloadSubjectPublicKey?username=six519' | sudo apt-key add -
-
-::
-
     echo "deb https://dl.bintray.com/six519/debian all main" | sudo tee -a /etc/apt/sources.list
-
-::
-
     sudo apt update
-
-::
-
     sudo apt install titik
 
-Install On Linux (Red Hat, CentOS, Fedora)
-==========================================
+Linux (Red Hat, CentOS, Fedora)
+-------------------------------
 
 ::
 
     wget https://bintray.com/six519/rpm/rpm -O bintray-six519-rpm.repo
-
-::
-
     sudo mv bintray-six519-rpm.repo /etc/yum.repos.d/
-
-::
-
     sudo yum update
-
-::
-
     sudo yum install titik
 
-Install On OS X
-===============
+Mac OS X
+--------
+
+Need to install Homebrew_ first
+
+.. _Homebrew: https://brew.sh/
 
 ::
 
     brew tap six519/tap
-
-::
-
     brew install titik
 
-Install On FreeBSD
-==================
+FreeBSD
+-------
 
 ::
     
