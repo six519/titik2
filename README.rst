@@ -8,6 +8,14 @@ Intro
 
 This is for experimental and educational purpose only. ;)
 
+Binary Release
+==============
+
+Click here_
+
+.. _here: https://github.com/six519/titik2/blob/master/install.rst
+
+
 Install Dependency
 ==================
 
