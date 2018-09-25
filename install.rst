@@ -40,3 +40,14 @@ FreeBSD
 ::
     
     sudo pkg add https://dl.bintray.com/six519/Generic/titik-2.0.0.txz
+
+Windows
+-------
+
+Need to install Chocolatey_ first
+
+.. _Chocolatey: https://chocolatey.org/
+
+::
+
+    choco install titik
