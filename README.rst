@@ -74,6 +74,6 @@ Hello World Code Output
 Language Reference
 ==================
 
-Click here_
+Click me_
 
-.. _here: https://github.com/six519/titik2/blob/master/language_reference.rst
+.. _me: https://github.com/six519/titik2/blob/master/language_reference.rst
