@@ -70,3 +70,10 @@ Hello World Code Output
 =======================
 
 .. image:: http://ferdinandsilva.com/static/titik_output.png
+
+Language Reference
+==================
+
+Click here_
+
+.. _here: https://github.com/six519/titik2/blob/master/language_reference.rst
