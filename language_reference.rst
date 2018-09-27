@@ -54,13 +54,13 @@ Operators
 +----------+-----------------+-----------------------------------------------------------------------+
 | Operator |       Name      |                  Example                                              |
 +==========+=================+=======================================================================+
-|      \+  |    Addition     | .. image:: http://ferdinandsilva.com/static/sum.png                    |
+|      \+  |    Addition     | .. image:: http://ferdinandsilva.com/static/sum.png                   |
 +----------+-----------------+-----------------------------------------------------------------------+
-|      \-  |   Subtraction   | .. image:: http://ferdinandsilva.com/static/difference.png             |
+|      \-  |   Subtraction   | .. image:: http://ferdinandsilva.com/static/difference.png            |
 +----------+-----------------+-----------------------------------------------------------------------+
-|      \*  | Multiplication  | .. image:: http://ferdinandsilva.com/static/product.png                |
+|      \*  | Multiplication  | .. image:: http://ferdinandsilva.com/static/product.png               |
 +----------+-----------------+-----------------------------------------------------------------------+
-|       /  |   Division      | .. image:: http://ferdinandsilva.com/static/quotient.png               |
+|       /  |   Division      | .. image:: http://ferdinandsilva.com/static/quotient.png              |
 +----------+-----------------+-----------------------------------------------------------------------+
 
 **Comparison Operators**
@@ -68,11 +68,11 @@ Operators
 +----------+-----------------+-----------------------------------------------------------------------+
 | Operator |       Name      |                  Example                                              |
 +==========+=================+=======================================================================+
-|    \=    | Equal           | .. image:: http://ferdinandsilva.com/static/equal.png                  |
+|    \=    | Equal           | .. image:: http://ferdinandsilva.com/static/equal.png                 |
 +----------+-----------------+-----------------------------------------------------------------------+
-|     >    | Greater than    | .. image:: http://ferdinandsilva.com/static/greater.png                |
+|     >    | Greater than    | .. image:: http://ferdinandsilva.com/static/greater.png               |
 +----------+-----------------+-----------------------------------------------------------------------+
-|     <    | Less than       | .. image:: http://ferdinandsilva.com/static/less.png                   |
+|     <    | Less than       | .. image:: http://ferdinandsilva.com/static/less.png                  |
 +----------+-----------------+-----------------------------------------------------------------------+
 
 If Statement
