@@ -19,7 +19,7 @@ Variables
 
 - A variable name must start with a letter or the underscore character
 - A variable name cannot start with a number
-- A variable name can only contain alpha-numeric characters and underscores (A-z, 0-9, and _ )
+- A variable name can only contain alpha-numeric characters and underscores (A-z, 0-9, !, and _ )
 - Variable names are case-sensitive (name and nAme are two different variables)
 
 **Data Types:**
@@ -39,6 +39,18 @@ Variables
 - *Nil* - a special data type that represents a variable with no value
 
     .. image:: http://ferdinandsilva.com/static/nil.png
+
+- *Boolean* - a value that is either TRUE or FALSE
+
+    .. image:: http://ferdinandsilva.com/static/boolean.png
+
+- *Lineup* - is an ordered sequence of items. All the items in a lineup do not need to be of the same type.
+
+    .. image:: http://ferdinandsilva.com/static/lineup.png
+
+- *Glossary* - is an unordered collection of items. It has a key: value pair.
+
+    .. image:: http://ferdinandsilva.com/static/glossary.png
 
 **Constant:**
 
