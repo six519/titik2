@@ -165,7 +165,7 @@ When a break statement is encountered inside a loop, the loop is imstatictely te
 
 **Example**
 
-.. image:: http://ferdinandsilva.com/static/break.png
+.. image:: http://ferdinandsilva.com/static/break2.png
 
 Functions
 ---------
