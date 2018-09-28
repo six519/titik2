@@ -369,3 +369,38 @@ HTTP Functions
     **Declaration:**
     ::
         Nil http_au(string, string)
+
+- **http_su** - set the static directory for the given URL pattern.
+
+    **Declaration:**
+    ::
+        Nil http_su(string, string)
+
+- **http_run** - starts an HTTP server with a given address.
+
+    **Declaration:**
+    ::
+        Nil http_run(string)
+
+- **http_p** - print a string to a web browser.
+
+    **Declaration:**
+    ::
+        Nil http_p(string)
+
+Hello World Code (Web)
+----------------------
+
+::
+
+    fd index()
+        http_p("<h1>Hello World</h1>")
+    df
+
+    http_au("/", "index")
+    http_run(":8080")
+
+Hello World Code (Web) Output
+-----------------------------
+
+.. image:: http://ferdinandsilva.com/static/web.png
