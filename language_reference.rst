@@ -1,6 +1,48 @@
 Language Reference
 ==================
 
+Hello World Code
+----------------
+
+::
+
+    \
+        Multiline comment
+        (Hello World Code)
+        Source code at: https://github.com/six519/titik2
+    \
+
+    floatVariable = 25.55
+    strVariable = "Mabuhay " + 'Ka' #concatenation
+
+    #function definition
+    fd hello_world(var)
+        intVariable = 0
+        #if statement
+        if(var == 'Mabuhay Ka')
+
+            #loop statement
+            fl (1, 8)
+                intVariable = intVariable + 1
+                sc(intVariable) #change text color
+                p(var) #It will print "Mabuhay Ka" 5 times
+                zzz(2000) #sleep for 2 seconds
+            lf
+            
+            sc(0) #reset the text color
+        el
+            #else
+            p('Not Mabuhay Ka')
+        fi
+    df
+
+    hello_world(strVariable) #call function
+
+Hello World Code Output
+-----------------------
+
+.. image:: http://ferdinandsilva.com/static/titik_output.png
+
 Comments
 --------
 
@@ -318,3 +360,12 @@ MySQL Functions
     **Declaration:**
     ::
         lineup mysql_fa(string)
+
+HTTP Functions
+~~~~~~~~~~~~~~
+
+- **http_au** - registers the Titik function for the given URL pattern.
+
+    **Declaration:**
+    ::
+        Nil http_au(string, string)
