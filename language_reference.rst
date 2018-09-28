@@ -187,8 +187,8 @@ Functions
 Built-in Functions
 ------------------
 
-Console
-~~~~~~~
+Console Functions
+~~~~~~~~~~~~~~~~~
 
 - **p** - writes string to the standard output (stdout).
 
@@ -208,8 +208,8 @@ Console
     ::
         Nil sc(integer 0..8)
 
-Conversion
-~~~~~~~~~~
+Conversion Functions
+~~~~~~~~~~~~~~~~~~~~
 
 - **toi** - convert any data type to integer type.
 
@@ -223,8 +223,8 @@ Conversion
     ::
         string tos(any data type)
 
-String
-~~~~~~
+String Functions
+~~~~~~~~~~~~~~~~
 
 - **str_rpl** - returns a copy of the first parameter in which the occurrences of second parameter have been replaced with third parameter.
 
@@ -238,8 +238,8 @@ String
     ::
         lineup str_spl(string, string)
 
-System
-~~~~~~
+System Functions
+~~~~~~~~~~~~~~~~
 
 - **ex** - terminates program execution and returns the status value to the system.
 
@@ -270,3 +270,24 @@ System
     **Declaration:**
     ::
         lineup sav()
+
+Other Functions
+~~~~~~~~~~~~~~~
+
+- **!** - (reverse boolean), converts boolean data type true to false and vice versa.
+
+    **Declaration:**
+    ::
+        bool !(bool)
+
+- **len** - returns the item count of a glossary or lineup variable.
+
+    **Declaration:**
+    ::
+        integer len(any)
+
+- **i** - used to include a titik file in another file.
+
+    **Declaration:**
+    ::
+        Nil i(string)
