@@ -161,7 +161,7 @@ Execute a block of code a specified number of times where start counter is lower
 
 **Break Statement**
 
-When a break statement is encountered inside a loop, the loop is imstatictely terminated and the program control resumes at the next statement following the loop.
+When a break statement is encountered inside a loop, the loop is immediately terminated and the program control resumes at the next statement following the loop.
 
 **Example**
 
