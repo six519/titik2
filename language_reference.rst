@@ -211,8 +211,62 @@ Console
 Conversion
 ~~~~~~~~~~
 
-- **toi** - convert float/string to integer type.
+- **toi** - convert any data type to integer type.
 
     **Declaration:**
     ::
-        integer toi(string or float)
+        integer toi(any data type)
+
+- **tos** - convert any data type to string type.
+
+    **Declaration:**
+    ::
+        string tos(any data type)
+
+String
+~~~~~~
+
+- **str_rpl** - returns a copy of the first parameter in which the occurrences of second parameter have been replaced with third parameter.
+
+    **Declaration:**
+    ::
+        string str_rpl(string, string, string)
+
+- **str_spl** - split a string into a lineup.
+
+    **Declaration:**
+    ::
+        lineup str_spl(string, string)
+
+System
+~~~~~~
+
+- **ex** - terminates program execution and returns the status value to the system.
+
+    **Declaration:**
+    ::
+        Nil ex(integer)
+
+- **abt** - print a message and exit the current script.
+
+    **Declaration:**
+    ::
+        Nil abt(string)
+
+- **exe** - executes an internal operating system command.
+
+    **Declaration:**
+    ::
+        glossary exe(string)
+
+- **zzz** - delays program execution for a given number of milliseconds.
+
+    **Declaration:**
+    ::
+        Nil zzz(integer)
+
+- **sav** - returns raw command-line arguments.
+
+    **Declaration:**
+    ::
+        lineup sav()
