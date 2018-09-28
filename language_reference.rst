@@ -291,3 +291,30 @@ Other Functions
     **Declaration:**
     ::
         Nil i(string)
+
+MySQL Functions
+~~~~~~~~~~~~~~~
+
+- **mysql_set** - initialize MySQL connection.
+
+    **Declaration:**
+    ::
+        Nil mysql_set(string, string, string, string)
+
+- **mysql_q** - executes SQL statement.
+
+    **Declaration:**
+    ::
+        bool mysql_q(string)
+
+- **mysql_cr** - cleanup MySQL resources.
+
+    **Declaration:**
+    ::
+        Nil mysql_cr()
+
+- **mysql_fa** - get a result row as a lineup by column name.
+
+    **Declaration:**
+    ::
+        lineup mysql_fa(string)
