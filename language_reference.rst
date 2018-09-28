@@ -116,13 +116,13 @@ Executes some code if condition is true and another code if that condition is fa
 ::
     if (condition)
         code to be executed if condition is true
-    e 
+    el 
         code to be executed if condition is false
     fi
 
 **Example**
 
-.. image:: http://ferdinandsilva.com/static/ifelse.png
+.. image:: http://ferdinandsilva.com/static/ifelse2.png
 
 **If...ElseIf...Else Statement**
 
@@ -134,13 +134,13 @@ Executes different codes for more than two conditions.
         code to be executed if this condition is true
     ef (condition)
         code to be executed if this condition is true
-    e
+    el
         code to be executed if all conditions are false
     fi
 
 **Example**
 
-.. image:: http://ferdinandsilva.com/static/ifelseif.png
+.. image:: http://ferdinandsilva.com/static/ifelseif2.png
 
 Looping Statements
 ------------------
@@ -151,13 +151,13 @@ Execute a block of code a specified number of times where start counter is lower
 
 **Syntax**
 ::
-    fl (start counter to end counter)
+    fl (start counter, end counter)
         code to be executed
     lf
 
 **Example**
 
-.. image:: http://ferdinandsilva.com/static/forward.png
+.. image:: http://ferdinandsilva.com/static/forloop.png
 
 **Break Statement**
 
