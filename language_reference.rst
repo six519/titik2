@@ -195,3 +195,24 @@ Console
     **Declaration:**
     ::
         string p(string)
+
+- **r** - presents a prompt to the user and read a string from standard input (stdin).
+
+    **Declaration:**
+    ::
+        string r(string)
+
+- **sc** - a function to set the text color on a console screen.
+
+    **Declaration:**
+    ::
+        Nil sc(integer 0..8)
+
+Conversion
+~~~~~~~~~~
+
+- **toi** - convert float/string to integer type.
+
+    **Declaration:**
+    ::
+        integer toi(string or float)
