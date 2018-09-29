@@ -37,15 +37,10 @@ Need to install Homebrew_ first
 FreeBSD
 -------
 
-Install dependencies
-
-::
-
-    sudo pkg install go
-    sudo pkg install git
-
 ::
     
+    sudo pkg install go
+    sudo pkg install git
     sudo pkg add https://dl.bintray.com/six519/Generic/titik-2.0.0.txz
 
 Windows (64 bit only)
