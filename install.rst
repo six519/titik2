@@ -52,6 +52,7 @@ Got missing dependency error? Just run:
 ::
 
     sudo pkg install go
+    sudo pkg install git
 
 Windows (64 bit only)
 ---------------------
