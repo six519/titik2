@@ -41,6 +41,18 @@ FreeBSD
     
     sudo pkg add https://dl.bintray.com/six519/Generic/titik-2.0.0.txz
 
+Got certificate verification failed error? Just run:
+
+::
+
+    sudo pkg install ca_root_nss
+
+Got missing dependency error? Just run:
+
+::
+
+    sudo pkg install go
+
 Windows (64 bit only)
 ---------------------
 
