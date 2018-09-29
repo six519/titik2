@@ -398,6 +398,30 @@ HTTP Functions
     ::
         Nil http_p(string)
 
+- **http_gq** - parses query string and returns the corresponding values.
+
+    **Declaration:**
+    ::
+        lineup http_gq(string)
+
+- **http_gfp** - returns HTTP POST parameter.
+
+    **Declaration:**
+    ::
+        lineup http_gfp(string)
+
+- **http_lt** - loads HTML template file.
+
+    **Declaration:**
+    ::
+        Nil http_lt(string, glossary)
+
+- **http_gp** - get current URL path.
+
+    **Declaration:**
+    ::
+        string http_gp()
+
 Hello World Code (Web)
 ----------------------
 
