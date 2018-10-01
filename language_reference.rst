@@ -122,7 +122,7 @@ Operators
 +----------+-----------------------------+-----------------------------------------------------------------------+
 | Operator |       Name                  |                  Example                                              |
 +==========+=============================+=======================================================================+
-|    \=\=  | Equal                       | .. image:: http://ferdinandsilva.com/static/equal.png                 |
+|    \=\=  | Equal                       | .. image:: http://ferdinandsilva.com/static/equal2.png                |
 +----------+-----------------------------+-----------------------------------------------------------------------+
 |     >    | Greater than                | .. image:: http://ferdinandsilva.com/static/greater.png               |
 +----------+-----------------------------+-----------------------------------------------------------------------+
@@ -158,7 +158,7 @@ Executes some code if one condition is true.
 
 **Example**
 
-.. image:: http://ferdinandsilva.com/static/equal.png
+.. image:: http://ferdinandsilva.com/static/equal2.png
 
 **If...Else Statement**
 
