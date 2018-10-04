@@ -274,6 +274,15 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 					if(currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY || currentToken.Type == TOKEN_TYPE_EQUALS || currentToken.Type == TOKEN_TYPE_AMPERSAND || currentToken.Type == TOKEN_TYPE_OR || currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN || currentToken.Type == TOKEN_TYPE_EQUALITY || currentToken.Type == TOKEN_TYPE_INEQUALITY || currentToken.Type == TOKEN_TYPE_LESS_THAN_OR_EQUALS || currentToken.Type == TOKEN_TYPE_LESS_THAN || currentToken.Type == TOKEN_TYPE_GREATER_THAN_OR_EQUALS || currentToken.Type == TOKEN_TYPE_GREATER_THAN || currentToken.Type == TOKEN_TYPE_COLON) {
 						//the token is operator
+
+						//add validation
+						if len(tokensToEvaluate) > 0 {
+							//if next token is an operator then raise an error
+							if(tokensToEvaluate[0].Type == TOKEN_TYPE_PLUS || tokensToEvaluate[0].Type == TOKEN_TYPE_MINUS || tokensToEvaluate[0].Type == TOKEN_TYPE_DIVIDE || tokensToEvaluate[0].Type == TOKEN_TYPE_MULTIPLY || tokensToEvaluate[0].Type == TOKEN_TYPE_EQUALS || tokensToEvaluate[0].Type == TOKEN_TYPE_AMPERSAND || tokensToEvaluate[0].Type == TOKEN_TYPE_OR || tokensToEvaluate[0].Type == TOKEN_TYPE_FUNCTION_RETURN || tokensToEvaluate[0].Type == TOKEN_TYPE_EQUALITY || tokensToEvaluate[0].Type == TOKEN_TYPE_INEQUALITY || tokensToEvaluate[0].Type == TOKEN_TYPE_LESS_THAN_OR_EQUALS || tokensToEvaluate[0].Type == TOKEN_TYPE_LESS_THAN || tokensToEvaluate[0].Type == TOKEN_TYPE_GREATER_THAN_OR_EQUALS || tokensToEvaluate[0].Type == TOKEN_TYPE_GREATER_THAN || tokensToEvaluate[0].Type == TOKEN_TYPE_COLON) {
+								return errors.New(SyntaxErrorMessage(tokensToEvaluate[0].Line, tokensToEvaluate[0].Column, "Unexpected token '" + tokensToEvaluate[0].Value + "'", tokensToEvaluate[0].FileName))
+							}
+						}
+
 						for true {
 							if(len(operatorStack[currentContext]) > 0) {
 
