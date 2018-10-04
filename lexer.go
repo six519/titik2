@@ -392,14 +392,17 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 							setToken(true, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_INTEGER, lexer.FileName, "") //init token
 						}
 						tokenArray[len(tokenArray) - 1].Value += currentChar
+					} else if([]rune(currentChar)[0] == 13) {
+						//for windows
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_NEWLINE, lexer.FileName, "\n") //set token
 					} else {
 						return finalTokenArray, errors.New(SyntaxErrorMessage(x + 1, x2 + 1, "Invalid token", lexer.FileName))
 					}
 				case TOKENIZER_STATE_GET_SINGLE_COMMENT:
 					//get single comment
-					if(currentChar == "\n") {
+					if(currentChar == "\n" || []rune(currentChar)[0] == 13) { //add char 13 for windows
 						tokenizerState = TOKENIZER_STATE_GET_WORD
-						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_NEWLINE, lexer.FileName, currentChar) //set token
+						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_NEWLINE, lexer.FileName, "\n") //set token
 					} else {
 						tokenArray[len(tokenArray) - 1].Value += currentChar
 					}
@@ -408,6 +411,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					if(currentChar == "\\") {
 						tokenizerState = TOKENIZER_STATE_GET_WORD
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_CLOSE_MULTI_COMMENT, lexer.FileName, currentChar) //set token
+					} else if([]rune(currentChar)[0] == 13) {
+						//for windows
+						tokenArray[len(tokenArray) - 1].Value += "\n"
 					} else {
 						tokenArray[len(tokenArray) - 1].Value += currentChar
 					}
@@ -416,6 +422,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					if(currentChar == stringOpener) {
 						tokenizerState = TOKENIZER_STATE_GET_WORD
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_CLOSE_STRING, lexer.FileName, currentChar) //set token
+					} else if([]rune(currentChar)[0] == 13) {
+						//for windows
+						tokenArray[len(tokenArray) - 1].Value += "\n"
 					} else {
 						tokenArray[len(tokenArray) - 1].Value += currentChar
 					}
