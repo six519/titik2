@@ -15,21 +15,6 @@ Click here_
 
 .. _here: https://github.com/six519/titik2/blob/master/install.rst
 
-
-Install Dependency
-==================
-
-::
-
-    go get github.com/go-sql-driver/mysql
-
-Install
-=======
-
-::
-
-    go get github.com/six519/titik2
-
 Hello World Code
 ================
 ::
