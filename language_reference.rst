@@ -331,6 +331,12 @@ System Functions
     ::
         lineup sav()
 
+- **gcp** - get current working directory.
+
+    **Declaration:**
+    ::
+        string gcp()
+
 Other Functions
 ~~~~~~~~~~~~~~~
 
