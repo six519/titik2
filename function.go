@@ -231,6 +231,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//gcp()
 	defineFunction(globalFunctionArray, "gcp", Gcp_execute, 0, true)
 
+	//flrm(string)
+	defineFunction(globalFunctionArray, "flrm", Flrm_execute, 1, true)
+
 	//WEB FUNCTIONALITIES
 	//http_au(<string>, <string>) - Add URL
 	defineFunction(globalFunctionArray, "http_au", Http_au_execute, 2, true)
