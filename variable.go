@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"errors"
 	"strconv"
+	"runtime"
 )
 
 //variable types (basic)
@@ -280,6 +281,7 @@ func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *
 	//define string constants
 	defineConstantString("__AUTHOR__", TITIK_AUTHOR, globalVariableArray, globalNativeVarList)
 	defineConstantString("__VERSION_STRING__", TITIK_STRING_VERSION, globalVariableArray, globalNativeVarList)
+	defineConstantString("__OS__", runtime.GOOS, globalVariableArray, globalNativeVarList)
 
 	//define boolean constants
 	defineConstantBoolean("T", true, globalVariableArray, globalNativeVarList)

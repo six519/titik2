@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"errors"
 	"strconv"
+	"path/filepath"
+	"runtime"
+	"strings"
 )
 
 //function return type
@@ -142,8 +145,20 @@ func I_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 		if(scopeName != "main") {
 			*errMessage = errors.New("Error: You cannot include file inside a function on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
+			suffix := ""
+			fileToLoad := arguments[0].StringValue
+
+			if(runtime.GOOS == "windows") {
+				suffix = "\\"
+				fileToLoad = strings.Replace(fileToLoad, "/", "\\", -1)
+			} else {
+				suffix = "/"
+			}
+
+			dir, _ := filepath.Abs(filepath.Dir(file_name))
+
 			//open titik file to include
-			lxr := Lexer{FileName: arguments[0].StringValue + ".ttk" }
+			lxr := Lexer{FileName: dir + suffix + fileToLoad + ".ttk" }
 			fileErr := lxr.ReadSourceFile()
 			if (fileErr != nil) {
 				*errMessage = errors.New(fileErr.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
@@ -212,6 +227,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//i(<string>)
 	defineFunction(globalFunctionArray, "i", I_execute, 1, true)
+
+	//gcp()
+	defineFunction(globalFunctionArray, "gcp", Gcp_execute, 0, true)
 
 	//WEB FUNCTIONALITIES
 	//http_au(<string>, <string>) - Add URL

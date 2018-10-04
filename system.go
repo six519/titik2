@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"strings"
 	"fmt"
+	"path/filepath"
 )
 
 func Ex_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
@@ -86,6 +87,18 @@ func Sav_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 		funcReturn := FunctionReturn{Type: RET_TYPE_STRING, StringValue: os.Args[x]}
 		ret.ArrayValue = append(ret.ArrayValue, funcReturn)
 	}
+
+	return ret
+}
+
+func Gcp_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+    dir, err := filepath.Abs(filepath.Dir(file_name))
+	
+	if err == nil {
+		ret.StringValue = dir
+    }
 
 	return ret
 }
