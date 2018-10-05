@@ -6,6 +6,13 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	/*
+	//IF WINDOWS
+	"runtime"
+	"syscall"
+	"unsafe"
+	//END IF WINDOWS
+	*/
 )
 
 type GlobalSettingsObject struct {
@@ -15,6 +22,11 @@ type GlobalSettingsObject struct {
 	globalNativeVarList *[]string
 	stringSettings map[string]map[string]string
 	mySQLResults map[string]map[string][]string //NOTE: TEMPORARY ONLY
+	/*
+	//IF WINDOWS
+	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
+	//END IF WINDOWS
+	*/
 }
 
 func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -26,6 +38,19 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 
 	globalSettings.stringSettings = make(map[string]map[string]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
 	globalSettings.mySQLResults = make(map[string]map[string][]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
+
+	/*
+	//IF WINDOWS
+	if runtime.GOOS == "windows" {
+		//get console handle
+		//for windows
+		kernel32 := syscall.NewLazyDLL("kernel32.dll")
+		getConsoleScreenBufferInfoProc := kernel32.NewProc("GetConsoleScreenBufferInfo")
+		handle, _ := syscall.GetStdHandle(syscall.STD_OUTPUT_HANDLE)
+		_, _, _ = getConsoleScreenBufferInfoProc.Call(uintptr(handle), uintptr(unsafe.Pointer(&globalSettings.consoleInfo)), 0)
+	}
+	//END IF WINDOWS
+	*/
 }
 
 func escapeString(str string) string {
