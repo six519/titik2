@@ -216,7 +216,7 @@ func Sc_execute(arguments []FunctionArgument, errMessage *error, globalVariableA
 				case 8:
 					_, _, _ = setConsoleTextAttributeProc.Call(uintptr(handle), uintptr(FOREGROUND_WHITE), 0)
 				default:
-					_, _, _ = setConsoleTextAttributeProc.Call(uintptr(handle), uintptr(*globalSettings.consoleInfo.Attributes), 0)
+					_, _, _ = setConsoleTextAttributeProc.Call(uintptr(handle), uintptr((*globalSettings).consoleInfo.Attributes), 0)
 			}
 		}
 	}
