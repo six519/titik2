@@ -110,7 +110,26 @@ func Flrm_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		
-        err := os.Remove(arguments[0].StringValue)
+        err := os.RemoveAll(arguments[0].StringValue)
+
+        if err == nil {
+            ret.BooleanValue = true
+        }
+	}
+
+	return ret
+}
+
+func Flmv_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[1].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		
+        err := os.Rename(arguments[1].StringValue, arguments[0].StringValue)
 
         if err == nil {
             ret.BooleanValue = true
