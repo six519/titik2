@@ -322,13 +322,29 @@ System Functions
     ::
         lineup sav()
 
-.. 
-    (TODO: REMOVE BELOW AS COMMENT)
-    - **gcp** - get current working directory.
+- **gcp** - get current working directory.
 
-        **Declaration:**
-        ::
-            string gcp()
+    **Declaration:**
+    ::
+        string gcp()
+
+- **flrm** - removes path and any children it contains.
+
+    **Declaration:**
+    ::
+        bool flrm(string)
+
+- **flmv** - moves old path to new path.
+
+    **Declaration:**
+    ::
+        bool flmv(string, string)
+
+- **flcp** - copy old path to new path.
+
+    **Declaration:**
+    ::
+        bool flcp(string, string)
 
 Other Functions
 ~~~~~~~~~~~~~~~
