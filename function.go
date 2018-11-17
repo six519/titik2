@@ -123,11 +123,13 @@ func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, glo
 func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
 
-	if(arguments[0].Type != ARG_TYPE_ARRAY && arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY) {
-		*errMessage = errors.New("Error: Parameter must be a lineup or glossary type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	if(arguments[0].Type != ARG_TYPE_ARRAY && arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY && arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter must be a lineup or glossary or string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		if(arguments[0].Type == ARG_TYPE_ARRAY) {
 			ret.IntegerValue = len(arguments[0].ArrayValue)
+		} else if(arguments[0].Type == ARG_TYPE_STRING) {
+			ret.IntegerValue = len(arguments[0].StringValue)
 		} else {
 			ret.IntegerValue = len(arguments[0].AssociativeArrayValue)
 		}
@@ -287,4 +289,13 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//str_spl(<string>, <string>) - String split
 	defineFunction(globalFunctionArray, "str_spl", Str_spl_execute, 2, true)
+
+	//str_l(<string>) - String to lower
+	defineFunction(globalFunctionArray, "str_l", Str_l_execute, 1, true)
+
+	//str_u(<string>) - String to upper
+	defineFunction(globalFunctionArray, "str_u", Str_u_execute, 1, true)
+
+	//str_t(<string>) - String trim
+	defineFunction(globalFunctionArray, "str_t", Str_t_execute, 1, true)
 }

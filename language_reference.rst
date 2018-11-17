@@ -289,6 +289,24 @@ String Functions
     ::
         lineup str_spl(string, string)
 
+- **str_l** - converts a string to lowercase letters.
+
+    **Declaration:**
+    ::
+        string str_l(string)
+
+- **str_u** - converts a string to uppercase letters.
+
+    **Declaration:**
+    ::
+        string str_u(string)
+
+- **str_t** - removes whitespace from the left and right side of a string.
+
+    **Declaration:**
+    ::
+        string str_t(string)
+
 System Functions
 ~~~~~~~~~~~~~~~~
 
@@ -355,7 +373,7 @@ Other Functions
     ::
         bool !(bool)
 
-- **len** - returns the item count of a glossary or lineup variable.
+- **len** - returns the item count of a glossary/lineup/string variable.
 
     **Declaration:**
     ::
