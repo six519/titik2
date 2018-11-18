@@ -385,6 +385,12 @@ Other Functions
     ::
         Nil i(string)
 
+- **in** - used to check if a variable is a Nil type.
+
+    **Declaration:**
+    ::
+        bool in(any)
+
 MySQL Functions
 ~~~~~~~~~~~~~~~
 

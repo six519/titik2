@@ -189,6 +189,16 @@ func I_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 	return ret
 }
 
+func In_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
+
+	if(arguments[0].Type == ARG_TYPE_NONE) {
+		ret.BooleanValue = true
+	}
+
+	return ret
+}
+
 func initNativeFunctions(globalFunctionArray *[]Function) {
 	
 	//p(<anyvar>)
@@ -241,6 +251,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//flcp(string, string)
 	defineFunction(globalFunctionArray, "flcp", Flcp_execute, 2, true)
+
+	//in(<anyvar>)
+	defineFunction(globalFunctionArray, "in", In_execute, 1, true)
 
 	//WEB FUNCTIONALITIES
 	//http_au(<string>, <string>) - Add URL
