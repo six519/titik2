@@ -311,4 +311,14 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//str_t(<string>) - String trim
 	defineFunction(globalFunctionArray, "str_t", Str_t_execute, 1, true)
+
+	//MATH FUNCTIONALITIES
+	//abs(<float/integer>) - Absolute
+	defineFunction(globalFunctionArray, "abs", Abs_execute, 1, true)
+
+	//acs(<float/integer>) - Arccosine
+	defineFunction(globalFunctionArray, "acs", Acs_execute, 1, true)
+
+	//acsh(<float/integer>) - Inverse hyperbolic cosine of x
+	defineFunction(globalFunctionArray, "acsh", Acsh_execute, 1, true)
 }
