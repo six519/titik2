@@ -322,6 +322,12 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//acsh(<float/integer>) - Inverse hyperbolic cosine of x
 	defineFunction(globalFunctionArray, "acsh", Acsh_execute, 1, true)
 
+	//asn(<float/integer>) - arc sine of a number
+	defineFunction(globalFunctionArray, "asn", Asn_execute, 1, true)
+
+	//asnh(<float/integer>) - returns the inverse hyperbolic sine of x
+	defineFunction(globalFunctionArray, "asnh", Asn_execute, 1, true)
+
 	//SQLITE FUNCTIONALITIES
 	//sqlite_set(<string>) - Set file
 	defineFunction(globalFunctionArray, "sqlite_set", Sqlite_set_execute, 1, true)
