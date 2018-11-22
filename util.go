@@ -20,7 +20,7 @@ type GlobalSettingsObject struct {
 	globalVariableArray *[]Variable
 	globalFunctionArray *[]Function
 	globalNativeVarList *[]string
-	stringSettings map[string]map[string]string
+	mySQLSettings map[string]map[string]string
 	mySQLResults map[string]map[string][]string //NOTE: TEMPORARY ONLY
 	/*
 	//IF WINDOWS
@@ -36,7 +36,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.webObject = WebObject{}
 	globalSettings.webObject.Init(globalSettings)
 
-	globalSettings.stringSettings = make(map[string]map[string]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
+	globalSettings.mySQLSettings = make(map[string]map[string]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
 	globalSettings.mySQLResults = make(map[string]map[string][]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
 
 	/*

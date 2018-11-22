@@ -26,12 +26,12 @@ func Mysql_set_execute(arguments []FunctionArgument, errMessage *error, globalVa
 		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 
-		(*globalSettings).stringSettings[scopeName] = make(map[string]string) //TODO: CLEAN UP (MAYBE AFTER FUNCTION CALL?)
+		(*globalSettings).mySQLSettings[scopeName] = make(map[string]string) //TODO: CLEAN UP (MAYBE AFTER FUNCTION CALL?)
 
-		(*globalSettings).stringSettings[scopeName]["MYSQL_USER"] = arguments[3].StringValue
-		(*globalSettings).stringSettings[scopeName]["MYSQL_PASSWORD"] = arguments[2].StringValue
-		(*globalSettings).stringSettings[scopeName]["MYSQL_HOST"] = arguments[1].StringValue
-		(*globalSettings).stringSettings[scopeName]["MYSQL_DATABASE"] = arguments[0].StringValue
+		(*globalSettings).mySQLSettings[scopeName]["MYSQL_USER"] = arguments[3].StringValue
+		(*globalSettings).mySQLSettings[scopeName]["MYSQL_PASSWORD"] = arguments[2].StringValue
+		(*globalSettings).mySQLSettings[scopeName]["MYSQL_HOST"] = arguments[1].StringValue
+		(*globalSettings).mySQLSettings[scopeName]["MYSQL_DATABASE"] = arguments[0].StringValue
 	}
 
 	return ret
@@ -49,7 +49,7 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 
 		strSlices := strings.Split(strQuery, " ")
 
-		db, err := sql.Open("mysql", (*globalSettings).stringSettings[scopeName]["MYSQL_USER"] + ":" + (*globalSettings).stringSettings[scopeName]["MYSQL_PASSWORD"] + "@" + (*globalSettings).stringSettings[scopeName]["MYSQL_HOST"] + "/" + (*globalSettings).stringSettings[scopeName]["MYSQL_DATABASE"])
+		db, err := sql.Open("mysql", (*globalSettings).mySQLSettings[scopeName]["MYSQL_USER"] + ":" + (*globalSettings).mySQLSettings[scopeName]["MYSQL_PASSWORD"] + "@" + (*globalSettings).mySQLSettings[scopeName]["MYSQL_HOST"] + "/" + (*globalSettings).mySQLSettings[scopeName]["MYSQL_DATABASE"])
 		defer db.Close()
 	
 		if(err != nil) {
@@ -133,7 +133,7 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 func Mysql_cr_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	delete((*globalSettings).stringSettings, scopeName)
+	delete((*globalSettings).mySQLSettings, scopeName)
 	delete((*globalSettings).mySQLResults, scopeName)
 
 	return ret
