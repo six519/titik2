@@ -326,7 +326,10 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	defineFunction(globalFunctionArray, "asn", Asn_execute, 1, true)
 
 	//asnh(<float/integer>) - returns the inverse hyperbolic sine of x
-	defineFunction(globalFunctionArray, "asnh", Asn_execute, 1, true)
+	defineFunction(globalFunctionArray, "asnh", Asnh_execute, 1, true)
+
+	//atn(<float/integer>) - returns the arctangent, in radians, of x
+	defineFunction(globalFunctionArray, "atn", Atn_execute, 1, true)
 
 	//SQLITE FUNCTIONALITIES
 	//sqlite_set(<string>) - Set file
