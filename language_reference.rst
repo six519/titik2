@@ -418,6 +418,33 @@ MySQL Functions
     ::
         lineup mysql_fa(string)
 
+SQLite Functions
+~~~~~~~~~~~~~~~
+
+- **sqlite_set** - set SQLite file to open.
+
+    **Declaration:**
+    ::
+        Nil sqlite_set(string)
+
+- **sqlite_q** - executes SQL statement.
+
+    **Declaration:**
+    ::
+        bool sqlite_q(string)
+
+- **sqlite_cr** - cleanup SQLite resources.
+
+    **Declaration:**
+    ::
+        Nil sqlite_cr()
+
+- **sqlite_fa** - get a result row as a lineup by column name.
+
+    **Declaration:**
+    ::
+        lineup sqlite_fa(string)
+
 HTTP Functions
 ~~~~~~~~~~~~~~
 
