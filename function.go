@@ -334,4 +334,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//sqlite_fa(<string>) - Fetch all
 	defineFunction(globalFunctionArray, "sqlite_fa", Sqlite_fa_execute, 1, true)
+
+	//CRYPTOGRAPHIC FUNCTIONALITIES
+	//m5(<string>) - md5
+	defineFunction(globalFunctionArray, "m5", M5_execute, 1, true)
 }
