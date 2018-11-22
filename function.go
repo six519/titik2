@@ -321,4 +321,17 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//acsh(<float/integer>) - Inverse hyperbolic cosine of x
 	defineFunction(globalFunctionArray, "acsh", Acsh_execute, 1, true)
+
+	//SQLITE FUNCTIONALITIES
+	//sqlite_set(<string>) - Set file
+	defineFunction(globalFunctionArray, "sqlite_set", Sqlite_set_execute, 1, true)
+
+	//sqlite_q(<string>) - Query
+	defineFunction(globalFunctionArray, "sqlite_q", Sqlite_q_execute, 1, true)
+
+	//sqlite_cr() - Clear resources
+	defineFunction(globalFunctionArray, "sqlite_cr", Sqlite_cr_execute, 0, true)
+
+	//sqlite_fa(<string>) - Fetch all
+	defineFunction(globalFunctionArray, "sqlite_fa", Sqlite_fa_execute, 1, true)
 }

@@ -22,6 +22,9 @@ type GlobalSettingsObject struct {
 	globalNativeVarList *[]string
 	mySQLSettings map[string]map[string]string
 	mySQLResults map[string]map[string][]string //NOTE: TEMPORARY ONLY
+	sQLiteSettings map[string]map[string]string
+	sQLiteResults map[string]map[string][]string
+
 	/*
 	//IF WINDOWS
 	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
@@ -38,6 +41,9 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 
 	globalSettings.mySQLSettings = make(map[string]map[string]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
 	globalSettings.mySQLResults = make(map[string]map[string][]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
+	
+	globalSettings.sQLiteSettings = make(map[string]map[string]string)
+	globalSettings.sQLiteResults = make(map[string]map[string][]string)
 
 	/*
 	//IF WINDOWS
