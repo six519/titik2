@@ -496,6 +496,15 @@ HTTP Functions
     ::
         string http_gp()
 
+Cryptographic Functions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+- **m5** - get MD5 sum of a string.
+
+    **Declaration:**
+    ::
+        string m5(string)
+
 Hello World Code (Web)
 ----------------------
 
