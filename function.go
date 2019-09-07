@@ -363,4 +363,10 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//netx() - socket close
 	defineFunction(globalFunctionArray, "netx", Netx_execute, 0, true)
+
+	//netw() - socket write
+	defineFunction(globalFunctionArray, "netw", Netw_execute, 1, true)
+
+	//netr() - socket read
+	defineFunction(globalFunctionArray, "netr", Netr_execute, 0, true)
 }
