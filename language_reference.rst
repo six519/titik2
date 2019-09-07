@@ -206,9 +206,13 @@ Execute a block of code a specified number of times where start counter is lower
         code to be executed
     lf
 
-**Example**
+**Example 1**
 
 .. image:: http://ferdinandsilva.com/static/forloop2.png
+
+**Example 2 (Infinite Loop)**
+
+.. image:: http://ferdinandsilva.com/static/infinite.png
 
 **Break Statement**
 
