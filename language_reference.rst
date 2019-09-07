@@ -505,6 +505,12 @@ Cryptographic Functions
     ::
         string m5(string)
 
+- **s1** - get SHA1 sum of a string.
+
+    **Declaration:**
+    ::
+        string s1(string)
+
 Hello World Code (Web)
 ----------------------
 

@@ -347,4 +347,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//CRYPTOGRAPHIC FUNCTIONALITIES
 	//m5(<string>) - md5
 	defineFunction(globalFunctionArray, "m5", M5_execute, 1, true)
+
+	//s1(<string>) - sha1
+	defineFunction(globalFunctionArray, "s1", S1_execute, 1, true)
 }
