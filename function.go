@@ -356,4 +356,11 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//s512(<string>) - sha512
 	defineFunction(globalFunctionArray, "s512", S512_execute, 1, true)
+
+	//SOCKET FUNCTIONALITIES
+	//netc(<string>, <string>) - socket connect
+	defineFunction(globalFunctionArray, "netc", Netc_execute, 2, true)
+
+	//netx() - socket close
+	defineFunction(globalFunctionArray, "netx", Netx_execute, 0, true)
 }

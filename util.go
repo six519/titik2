@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"net"
 	/*
 	//IF WINDOWS
 	"runtime"
@@ -24,6 +25,7 @@ type GlobalSettingsObject struct {
 	mySQLResults map[string]map[string][]string //NOTE: TEMPORARY ONLY
 	sQLiteSettings map[string]map[string]string
 	sQLiteResults map[string]map[string][]string
+	netConnection map[string]net.Conn
 
 	/*
 	//IF WINDOWS
@@ -44,6 +46,8 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	
 	globalSettings.sQLiteSettings = make(map[string]map[string]string)
 	globalSettings.sQLiteResults = make(map[string]map[string][]string)
+
+	globalSettings.netConnection = make(map[string]net.Conn)
 
 	/*
 	//IF WINDOWS
