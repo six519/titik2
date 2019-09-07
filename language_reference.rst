@@ -527,6 +527,33 @@ Cryptographic Functions
     ::
         string s512(string)
 
+Socket Functions
+~~~~~~~~~~~~~~~~
+
+- **netc** - initiates TCP/UDP server connection.
+
+    **Declaration:**
+    ::
+        Nil netc(string, string)
+
+- **netx** - closes socket connection.
+
+    **Declaration:**
+    ::
+        Nil netx()
+
+- **netw** - transmits TCP/UDP message.
+
+    **Declaration:**
+    ::
+        Nil netw(string)
+
+- **netr** - receives TCP/UDP message.
+
+    **Declaration:**
+    ::
+        string netr()
+
 Hello World Code (Web)
 ----------------------
 
