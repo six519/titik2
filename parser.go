@@ -1781,28 +1781,65 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							iParam1, _ := strconv.Atoi(param1.Value)
 							iParam2, _ := strconv.Atoi(param2.Value)
 
-							for loop_index := iParam1 ; loop_index <= iParam2; loop_index++ {
+							if(iParam2 < iParam1) {
+								return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "First parameter should be lower than or equals to second parameter", currentToken.FileName))
+							}
 
-								var loopGotReturn bool = false
-								var loopReturnToken Token
-								var loopNeedBreak bool = false
-								var loopStackReference []Token
-								
-								prsr := Parser{}
-								parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &loopGotReturn, &loopReturnToken, true, &loopNeedBreak, &loopStackReference, globalSettings)
-						
-								if(parserErr != nil) {
-									return parserErr
-								}
-								if(loopGotReturn) {
-									*gotReturn = loopGotReturn
-									*returnToken = loopReturnToken
-									return nil
-								}
+							var isInfiniteLoop = false
+							if(iParam2 == iParam1) {
+								isInfiniteLoop = true
+							}
 
-								if(loopNeedBreak) {
-									//break the loop
-									break
+							if(isInfiniteLoop) {
+								for {
+
+									var loopGotReturn bool = false
+									var loopReturnToken Token
+									var loopNeedBreak bool = false
+									var loopStackReference []Token
+									
+									prsr := Parser{}
+									parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &loopGotReturn, &loopReturnToken, true, &loopNeedBreak, &loopStackReference, globalSettings)
+							
+									if(parserErr != nil) {
+										return parserErr
+									}
+									if(loopGotReturn) {
+										*gotReturn = loopGotReturn
+										*returnToken = loopReturnToken
+										return nil
+									}
+	
+									if(loopNeedBreak) {
+										//break the loop
+										break
+									}
+								}
+							} else {
+								iParam2 -= 1
+								for loop_index := iParam1 ; loop_index <= iParam2; loop_index++ {
+
+									var loopGotReturn bool = false
+									var loopReturnToken Token
+									var loopNeedBreak bool = false
+									var loopStackReference []Token
+									
+									prsr := Parser{}
+									parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &loopGotReturn, &loopReturnToken, true, &loopNeedBreak, &loopStackReference, globalSettings)
+							
+									if(parserErr != nil) {
+										return parserErr
+									}
+									if(loopGotReturn) {
+										*gotReturn = loopGotReturn
+										*returnToken = loopReturnToken
+										return nil
+									}
+	
+									if(loopNeedBreak) {
+										//break the loop
+										break
+									}
 								}
 							}
 
