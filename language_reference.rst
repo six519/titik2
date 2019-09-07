@@ -208,7 +208,7 @@ Execute a block of code a specified number of times where start counter is lower
 
 **Example**
 
-.. image:: http://ferdinandsilva.com/static/forloop.png
+.. image:: http://ferdinandsilva.com/static/forloop2.png
 
 **Break Statement**
 
