@@ -350,4 +350,10 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//s1(<string>) - sha1
 	defineFunction(globalFunctionArray, "s1", S1_execute, 1, true)
+
+	//s256(<string>) - sha256
+	defineFunction(globalFunctionArray, "s256", S256_execute, 1, true)
+
+	//s512(<string>) - sha512
+	defineFunction(globalFunctionArray, "s512", S512_execute, 1, true)
 }

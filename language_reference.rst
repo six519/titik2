@@ -511,6 +511,18 @@ Cryptographic Functions
     ::
         string s1(string)
 
+- **s256** - get SHA256 sum of a string.
+
+    **Declaration:**
+    ::
+        string s256(string)
+
+- **s512** - get SHA512 sum of a string.
+
+    **Declaration:**
+    ::
+        string s512(string)
+
 Hello World Code (Web)
 ----------------------
 
