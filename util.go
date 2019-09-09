@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"net"
+	"database/sql"
 	/*
 	//IF WINDOWS
 	"runtime"
@@ -21,11 +22,11 @@ type GlobalSettingsObject struct {
 	globalVariableArray *[]Variable
 	globalFunctionArray *[]Function
 	globalNativeVarList *[]string
-	mySQLSettings map[string]map[string]string
 	mySQLResults map[string]map[string][]string //NOTE: TEMPORARY ONLY
 	sQLiteSettings map[string]map[string]string
 	sQLiteResults map[string]map[string][]string
 	netConnection map[string]net.Conn
+	mySQLConnection map[string]*sql.DB
 
 	/*
 	//IF WINDOWS
@@ -41,13 +42,13 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.webObject = WebObject{}
 	globalSettings.webObject.Init(globalSettings)
 
-	globalSettings.mySQLSettings = make(map[string]map[string]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
 	globalSettings.mySQLResults = make(map[string]map[string][]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
 	
 	globalSettings.sQLiteSettings = make(map[string]map[string]string)
 	globalSettings.sQLiteResults = make(map[string]map[string][]string)
 
 	globalSettings.netConnection = make(map[string]net.Conn)
+	globalSettings.mySQLConnection = make(map[string]*sql.DB)
 
 	/*
 	//IF WINDOWS

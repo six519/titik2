@@ -287,14 +287,14 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//mysql_set(<string>, <string>, <string>, <string>) - Set connection
 	defineFunction(globalFunctionArray, "mysql_set", Mysql_set_execute, 4, true)
 
-	//mysql_q(<string>) - Query
-	defineFunction(globalFunctionArray, "mysql_q", Mysql_q_execute, 1, true)
+	//mysql_q(<string>, <string>) - Query
+	defineFunction(globalFunctionArray, "mysql_q", Mysql_q_execute, 2, true)
 
-	//mysql_cr() - Clear resources
-	defineFunction(globalFunctionArray, "mysql_cr", Mysql_cr_execute, 0, true)
+	//mysql_cr(<string>) - Clear resources
+	defineFunction(globalFunctionArray, "mysql_cr", Mysql_cr_execute, 1, true)
 
-	//mysql_fa(<string>) - Fetch all
-	defineFunction(globalFunctionArray, "mysql_fa", Mysql_fa_execute, 1, true)
+	//mysql_fa(<string>, <string>) - Fetch all
+	defineFunction(globalFunctionArray, "mysql_fa", Mysql_fa_execute, 2, true)
 
 	//STRING FUNCTIONALITIES
 	//str_rpl(<string>, <string>, <string>) - String replace

@@ -10,7 +10,7 @@ import (
 )
 
 func Mysql_set_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
-	ret := FunctionReturn{Type: RET_TYPE_NONE}
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
 	if(arguments[0].Type != ARG_TYPE_STRING) {
 		//database name
@@ -26,12 +26,16 @@ func Mysql_set_execute(arguments []FunctionArgument, errMessage *error, globalVa
 		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 
-		(*globalSettings).mySQLSettings[scopeName] = make(map[string]string) //TODO: CLEAN UP (MAYBE AFTER FUNCTION CALL?)
+		db, err := sql.Open("mysql", arguments[3].StringValue + ":" + arguments[2].StringValue + "@" + arguments[1].StringValue + "/" + arguments[0].StringValue)
 
-		(*globalSettings).mySQLSettings[scopeName]["MYSQL_USER"] = arguments[3].StringValue
-		(*globalSettings).mySQLSettings[scopeName]["MYSQL_PASSWORD"] = arguments[2].StringValue
-		(*globalSettings).mySQLSettings[scopeName]["MYSQL_HOST"] = arguments[1].StringValue
-		(*globalSettings).mySQLSettings[scopeName]["MYSQL_DATABASE"] = arguments[0].StringValue
+		if(err != nil) {
+			*errMessage = errors.New("Error: " + err.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			connection_reference := "con_" + generateRandomNumbers()
+			(*globalSettings).mySQLConnection[connection_reference] = db
+			ret.StringValue = connection_reference
+		}
+
 	}
 
 	return ret
@@ -40,8 +44,10 @@ func Mysql_set_execute(arguments []FunctionArgument, errMessage *error, globalVa
 func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
 
-	if(arguments[0].Type != ARG_TYPE_STRING) {
-		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	if(arguments[1].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		strQuery := strings.ToLower(arguments[0].StringValue)
 		strQuery = strings.Trim(strQuery, " ")
@@ -49,15 +55,12 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 
 		strSlices := strings.Split(strQuery, " ")
 
-		db, err := sql.Open("mysql", (*globalSettings).mySQLSettings[scopeName]["MYSQL_USER"] + ":" + (*globalSettings).mySQLSettings[scopeName]["MYSQL_PASSWORD"] + "@" + (*globalSettings).mySQLSettings[scopeName]["MYSQL_HOST"] + "/" + (*globalSettings).mySQLSettings[scopeName]["MYSQL_DATABASE"])
-		defer db.Close()
-	
-		if(err != nil) {
-			*errMessage = errors.New("Error: " + err.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		if((*globalSettings).mySQLConnection[arguments[1].StringValue] == nil) {
+			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
 			if(strSlices[0] == "select") {
 				//select query
-				rows, err := db.Query(arguments[0].StringValue)
+				rows, err := (*globalSettings).mySQLConnection[arguments[1].StringValue].Query(arguments[0].StringValue)
 
 				if(err != nil) {
 					*errMessage = errors.New("Error: " + err.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
@@ -73,13 +76,13 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 							scanArgs[i] = &values[i]
 						}
 
-						_, ok := (*globalSettings).mySQLResults[scopeName]
+						_, ok := (*globalSettings).mySQLResults[arguments[1].StringValue]
 
 						if(ok) {
-							delete((*globalSettings).mySQLResults, scopeName)
+							delete((*globalSettings).mySQLResults, arguments[1].StringValue)
 						}
 		
-						(*globalSettings).mySQLResults[scopeName] = make(map[string][]string) //TODO: THIS SHOULD BE CLEANUP (AFTER FUNCTION CALL?)
+						(*globalSettings).mySQLResults[arguments[1].StringValue] = make(map[string][]string) //TODO: THIS SHOULD BE CLEANUP (AFTER FUNCTION CALL?)
 						for rows.Next() {
 							err3 := rows.Scan(scanArgs...)
 							if err3 != nil {
@@ -97,7 +100,7 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 										value = string(col)
 									}
 
-									(*globalSettings).mySQLResults[scopeName][columns[i]] = append((*globalSettings).mySQLResults[scopeName][columns[i]], value)
+									(*globalSettings).mySQLResults[arguments[1].StringValue][columns[i]] = append((*globalSettings).mySQLResults[arguments[1].StringValue][columns[i]], value)
 									
 								}
 
@@ -109,7 +112,7 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 
 			} else {
 				//other query (insert/delete)
-				stmt, err2 := db.Prepare(arguments[0].StringValue)
+				stmt, err2 := (*globalSettings).mySQLConnection[arguments[1].StringValue].Prepare(arguments[0].StringValue)
 
 				if(err2 != nil) {
 					*errMessage = errors.New("Error: " + err2.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
@@ -133,8 +136,29 @@ func Mysql_q_execute(arguments []FunctionArgument, errMessage *error, globalVari
 func Mysql_cr_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	delete((*globalSettings).mySQLSettings, scopeName)
-	delete((*globalSettings).mySQLResults, scopeName)
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		if ((*globalSettings).mySQLConnection[arguments[0].StringValue] == nil) {
+			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			err := (*globalSettings).mySQLConnection[arguments[0].StringValue].Close()
+	
+			if(err != nil) {
+				*errMessage = errors.New("Error: " + err.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			} else {
+				delete((*globalSettings).mySQLConnection, arguments[0].StringValue)
+
+				_, ok := (*globalSettings).mySQLResults[arguments[0].StringValue]
+				if(ok) {
+					delete((*globalSettings).mySQLResults, arguments[0].StringValue)
+				}
+
+			}
+		}
+	}
+
+	//delete((*globalSettings).mySQLResults, scopeName)
 
 	return ret
 }
@@ -143,14 +167,16 @@ func Mysql_fa_execute(arguments []FunctionArgument, errMessage *error, globalVar
 	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
 
 
-	if(arguments[0].Type != ARG_TYPE_STRING) {
-		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	if(arguments[1].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 	
-		_, ok := (*globalSettings).mySQLResults[scopeName]
+		_, ok := (*globalSettings).mySQLResults[arguments[1].StringValue]
 
 		if(ok) {
-			val, ok2 := (*globalSettings).mySQLResults[scopeName][arguments[0].StringValue]
+			val, ok2 := (*globalSettings).mySQLResults[arguments[1].StringValue][arguments[0].StringValue]
 
 			if(ok2) {
 				for x := 0;x < len(val); x++ {
