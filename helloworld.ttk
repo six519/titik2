@@ -1,8 +1,8 @@
-\
+^
     Multiline comment
     (Hello World Code)
     Source code at: https://github.com/six519/titik2
-\
+^
 
 floatVariable = 25.55
 strVariable = "Mabuhay " + 'Ka' #concatenation
@@ -14,7 +14,7 @@ fd hello_world(var)
     if(var == 'Mabuhay Ka')
 
         #loop statement
-        fl (1, 8)
+        fl (0, 8)
             intVariable = intVariable + 1
             sc(intVariable) #change text color
             p(var) #It will print "Mabuhay Ka" 5 times

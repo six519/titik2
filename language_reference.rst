@@ -6,10 +6,10 @@ Hello World Code
 
 ::
 
-    \
+    ^
         (Hello World Code)
         Source code at: https://github.com/six519/titik2
-    \
+    ^
 
     strVariable = "Mabuhay Ka"
 
@@ -17,7 +17,7 @@ Hello World Code
     fd hello_world(var)
         intVariable = 0
         #loop statement
-        fl (1, 8)
+        fl (0, 8)
             intVariable = intVariable + 1
             sc(intVariable) #change text color
             p(var) #It will print "Mabuhay Ka" 5 times
