@@ -398,29 +398,29 @@ Other Functions
 MySQL Functions
 ~~~~~~~~~~~~~~~
 
-- **mysql_set** - initialize MySQL connection.
+- **mysql_set** - initialize MySQL connection and returns the connection reference string.
 
     **Declaration:**
     ::
-        Nil mysql_set(string, string, string, string)
+        string mysql_set(string, string, string, string)
 
 - **mysql_q** - executes SQL statement.
 
     **Declaration:**
     ::
-        bool mysql_q(string)
+        bool mysql_q(string, string)
 
 - **mysql_cr** - cleanup MySQL resources.
 
     **Declaration:**
     ::
-        Nil mysql_cr()
+        Nil mysql_cr(string)
 
 - **mysql_fa** - get a result row as a lineup by column name.
 
     **Declaration:**
     ::
-        lineup mysql_fa(string)
+        lineup mysql_fa(string, string)
 
 SQLite Functions
 ~~~~~~~~~~~~~~~
