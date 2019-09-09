@@ -382,7 +382,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						//start of single line comment
 						setToken(true, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_SINGLE_COMMENT, lexer.FileName, "") //init token
 						tokenizerState = TOKENIZER_STATE_GET_SINGLE_COMMENT
-					} else if(currentChar == "\\") {
+					} else if(currentChar == "^") {
 						//start of multiline comment
 						setToken(true, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_MULTI_COMMENT, lexer.FileName, "") //init token
 						tokenizerState = TOKENIZER_STATE_GET_MULTI_COMMENT
@@ -408,7 +408,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					}
 				case TOKENIZER_STATE_GET_MULTI_COMMENT:
 					//get multi comment
-					if(currentChar == "\\") {
+					if(currentChar == "^") {
 						tokenizerState = TOKENIZER_STATE_GET_WORD
 						setToken(false, &tokenArray, &isTokenInit, x + 1, x2 + 1, TOKEN_TYPE_CLOSE_MULTI_COMMENT, lexer.FileName, currentChar) //set token
 					} else if([]rune(currentChar)[0] == 13) {
