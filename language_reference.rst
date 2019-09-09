@@ -530,29 +530,29 @@ Cryptographic Functions
 Socket Functions
 ~~~~~~~~~~~~~~~~
 
-- **netc** - initiates TCP/UDP server connection.
+- **netc** - initiates TCP/UDP server connection and returns the connection reference string.
 
     **Declaration:**
     ::
-        Nil netc(string, string)
+        string netc(string, string)
 
 - **netx** - closes socket connection.
 
     **Declaration:**
     ::
-        Nil netx()
+        Nil netx(string)
 
 - **netw** - transmits TCP/UDP message.
 
     **Declaration:**
     ::
-        Nil netw(string)
+        Nil netw(string, string)
 
 - **netr** - receives TCP/UDP message.
 
     **Declaration:**
     ::
-        string netr()
+        string netr(string)
 
 Hello World Code (Web)
 ----------------------
