@@ -43,7 +43,7 @@ Comments
 
 **Multiline Comment**
 
-.. image:: http://ferdinandsilva.com/static/comment2.png
+.. image:: http://ferdinandsilva.com/static/comment3.png
 
 Variables
 ---------
