@@ -311,6 +311,18 @@ String Functions
     ::
         string str_t(string)
 
+- **str_chr** - returns the character that represents the specified code point.
+
+    **Declaration:**
+    ::
+        string str_chr(integer)
+
+- **str_ord** - returns the code point of a specified character.
+
+    **Declaration:**
+    ::
+        integer str_ord(string)
+
 System Functions
 ~~~~~~~~~~~~~~~~
 

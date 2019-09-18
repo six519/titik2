@@ -312,6 +312,12 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//str_t(<string>) - String trim
 	defineFunction(globalFunctionArray, "str_t", Str_t_execute, 1, true)
 
+	//str_chr(<string>) - Integer to character string
+	defineFunction(globalFunctionArray, "str_chr", Str_chr_execute, 1, true)
+
+	//str_ord(<string>) - Character to integer code point
+	defineFunction(globalFunctionArray, "str_ord", Str_ord_execute, 1, true)
+
 	//MATH FUNCTIONALITIES
 	//abs(<float/integer>) - Absolute
 	defineFunction(globalFunctionArray, "abs", Abs_execute, 1, true)
