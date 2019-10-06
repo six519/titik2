@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"os"
 	"strings"
+	"golang.org/x/crypto/ssh/terminal"
 	/*
 	//IF WINDOWS
 	"syscall"
@@ -161,6 +162,22 @@ func R_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 		fmt.Printf("%s", escapeString(arguments[0].StringValue))
 		text, _ := reader.ReadString('\n')
 		ret.StringValue = strings.Trim(text, "\n")
+	}
+
+	return ret
+}
+
+func Rp_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		fmt.Printf("%s", escapeString(arguments[0].StringValue))
+		text, err := terminal.ReadPassword(0)
+		if err == nil {
+			ret.StringValue = strings.Trim(string(text), "\n")
+		}
 	}
 
 	return ret

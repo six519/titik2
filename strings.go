@@ -109,3 +109,30 @@ func Str_ord_execute(arguments []FunctionArgument, errMessage *error, globalVari
 
 	return ret
 }
+
+func Str_sub_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if(arguments[0].Type != ARG_TYPE_INTEGER) {
+		*errMessage = errors.New("Error: Parameter 3 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[1].Type != ARG_TYPE_INTEGER) {
+		*errMessage = errors.New("Error: Parameter 2 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[2].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		if arguments[1].IntegerValue < 0 {
+			*errMessage = errors.New("Error: Parameter 2 must be greater than 0 on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			ctr := 0
+			for x:=arguments[1].IntegerValue; x < len(arguments[2].StringValue); x++ {
+				ret.StringValue += string(arguments[2].StringValue[x])
+				ctr += 1
+				if ctr == arguments[0].IntegerValue {
+					break
+				}
+			}
+		}
+	}
+
+	return ret
+}

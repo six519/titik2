@@ -263,6 +263,12 @@ Console Functions
     ::
         Nil sc(integer 0..8)
 
+- **rp** - prompt the user to input character/text without echoing.
+
+    **Declaration:**
+    ::
+        string rp(string)
+
 Conversion Functions
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -322,6 +328,12 @@ String Functions
     **Declaration:**
     ::
         integer str_ord(string)
+
+- **str_sub** - extracts parts of a string.
+
+    **Declaration:**
+    ::
+        string str_sub(string, integer, integer)
 
 System Functions
 ~~~~~~~~~~~~~~~~
@@ -538,6 +550,24 @@ Cryptographic Functions
     **Declaration:**
     ::
         string s512(string)
+
+- **b64e** - Encode the string using Base64.
+
+    **Declaration:**
+    ::
+        string b64e(string)
+
+- **b64d** - Decode the Base64 string.
+
+    **Declaration:**
+    ::
+        string b64d(string)
+
+- **rsae** - Encrypt the string by RSA public key.
+
+    **Declaration:**
+    ::
+        string rsae(string, string)
 
 Socket Functions
 ~~~~~~~~~~~~~~~~

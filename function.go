@@ -222,6 +222,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//r(<string>)
 	defineFunction(globalFunctionArray, "r", R_execute, 1, true)
 
+	//rp(<string>)
+	defineFunction(globalFunctionArray, "rp", Rp_execute, 1, true)
+
 	//toi(<anyvar>)
 	defineFunction(globalFunctionArray, "toi", Toi_execute, 1, true)
 
@@ -318,6 +321,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//str_ord(<string>) - Character to integer code point
 	defineFunction(globalFunctionArray, "str_ord", Str_ord_execute, 1, true)
 
+	//str_sub(<string>, <integer>, <integer>) - Substring
+	defineFunction(globalFunctionArray, "str_sub", Str_sub_execute, 3, true)
+
 	//MATH FUNCTIONALITIES
 	//abs(<float/integer>) - Absolute
 	defineFunction(globalFunctionArray, "abs", Abs_execute, 1, true)
@@ -362,6 +368,15 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//s512(<string>) - sha512
 	defineFunction(globalFunctionArray, "s512", S512_execute, 1, true)
+
+	//b64e(<string>) - base64 encode
+	defineFunction(globalFunctionArray, "b64e", B64e_execute, 1, true)
+
+	//b64d(<string>) - base64 decode
+	defineFunction(globalFunctionArray, "b64d", B64d_execute, 1, true)
+
+	//rsae(<string>, <string>) - RSA encrypt
+	defineFunction(globalFunctionArray, "rsae", Rsae_execute, 2, true)
 
 	//SOCKET FUNCTIONALITIES
 	//netc(<string>, <string>) - socket connect
