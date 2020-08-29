@@ -26,7 +26,7 @@ func Mysql_set_execute(arguments []FunctionArgument, errMessage *error, globalVa
 		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 
-		db, err := sql.Open("mysql", arguments[3].StringValue + ":" + arguments[2].StringValue + "@" + arguments[1].StringValue + "/" + arguments[0].StringValue)
+		db, err := sql.Open("mysql", arguments[3].StringValue + ":" + arguments[2].StringValue + "@tcp(" + arguments[1].StringValue + ")/" + arguments[0].StringValue)
 
 		if(err != nil) {
 			*errMessage = errors.New("Error: " + err.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
