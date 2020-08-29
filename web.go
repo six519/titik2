@@ -16,11 +16,11 @@ func InternalServerError(writer http.ResponseWriter, msg string) {
 type WebObject struct {
 	IsProcessing bool
 	URLs map[string]string
+	staticURLs map[string]string
 	globalSettings *GlobalSettingsObject
 	scopeName string
 	thisWriter map[string]http.ResponseWriter
 	thisRequest map[string]*http.Request
-	staticURL string
 	startedLine int
 	startedColumn int
 	startedFileName string
@@ -29,15 +29,19 @@ type WebObject struct {
 func (webObject *WebObject) Init(globalSettings *GlobalSettingsObject) {
 	webObject.IsProcessing = false
 	webObject.URLs = make(map[string]string)
+	webObject.staticURLs = make(map[string]string)
 	webObject.globalSettings = globalSettings
 	webObject.thisWriter = make(map[string]http.ResponseWriter)
 	webObject.thisRequest = make(map[string]*http.Request)
-	webObject.staticURL = ""
 }
 
 func (webObject *WebObject) AddURL(key string, value string) {
 	webObject.URLs[key] = value
 	//DumpVariable(*webObject.globalVariableArray)
+}
+
+func (webObject *WebObject) AddStaticURL(key string, value string) {
+	webObject.staticURLs[key] = value
 }
 
 func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -118,8 +122,8 @@ func Http_au_execute(arguments []FunctionArgument, errMessage *error, globalVari
 	} else if(arguments[1].Type != ARG_TYPE_STRING) {
 		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
-
-		if(arguments[1].StringValue == (*globalSettings).webObject.staticURL) {
+		_, existing := (*globalSettings).webObject.staticURLs[arguments[1].StringValue]
+		if(existing) {
 			*errMessage = errors.New("Error: URL " + arguments[1].StringValue + " already exists as static URL on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
 			(*globalSettings).webObject.AddURL(arguments[1].StringValue, arguments[0].StringValue)
@@ -137,17 +141,17 @@ func Http_su_execute(arguments []FunctionArgument, errMessage *error, globalVari
 	} else if(arguments[1].Type != ARG_TYPE_STRING) {
 		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
-		//(*globalSettings).webObject.AddURL(arguments[1].StringValue, arguments[0].StringValue)
-		if(len((*globalSettings).webObject.staticURL) == 0) {
-			_, ok := (*globalSettings).webObject.URLs[arguments[1].StringValue]
+		_, ok := (*globalSettings).webObject.URLs[arguments[1].StringValue]
+		if(ok) {
+			*errMessage = errors.New("Error: URL " + arguments[1].StringValue + " already exists on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			_, ok = (*globalSettings).webObject.staticURLs[arguments[1].StringValue]
 			if(ok) {
 				*errMessage = errors.New("Error: URL " + arguments[1].StringValue + " already exists on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 			} else {
-				(*globalSettings).webObject.staticURL = arguments[1].StringValue
+				(*globalSettings).webObject.AddStaticURL(arguments[1].StringValue, arguments[0].StringValue)
 				http.Handle(arguments[1].StringValue, http.StripPrefix(arguments[1].StringValue, http.FileServer(http.Dir(arguments[0].StringValue))))
 			}
-		} else {
-			*errMessage = errors.New("Error: Static URL already exists on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		}
 	}
 
