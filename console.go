@@ -71,18 +71,18 @@ func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
 	if(arguments[0].Type == ARG_TYPE_FLOAT) {
-		fmt.Printf("%f\n", arguments[0].FloatValue)
+		fmt.Printf("%f", arguments[0].FloatValue)
 		ret.StringValue = strconv.FormatFloat(arguments[0].FloatValue, 'f', -1, 64)
 	} else if(arguments[0].Type == ARG_TYPE_STRING) {
-		fmt.Printf("%s\n", escapeString(arguments[0].StringValue))
+		fmt.Printf("%s", escapeString(arguments[0].StringValue))
 		ret.StringValue = arguments[0].StringValue
 	} else if(arguments[0].Type == ARG_TYPE_INTEGER) {
 		//integer
-		fmt.Printf("%d\n", arguments[0].IntegerValue)
+		fmt.Printf("%d", arguments[0].IntegerValue)
 		ret.StringValue = strconv.Itoa(arguments[0].IntegerValue)
 	} else if(arguments[0].Type == ARG_TYPE_BOOLEAN) {
 		//boolean
-		fmt.Printf("%v\n", arguments[0].BooleanValue)
+		fmt.Printf("%v", arguments[0].BooleanValue)
 		if(arguments[0].BooleanValue) {
 			ret.StringValue = "true"
 		} else {
@@ -117,7 +117,7 @@ func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 			x += 1
 		}
 
-		fmt.Printf("{%s}\n", strVal)
+		fmt.Printf("{%s}", strVal)
 	} else if(arguments[0].Type == ARG_TYPE_ARRAY) {
 		strVal := ""
 
@@ -143,7 +143,7 @@ func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 			}
 		}
 
-		fmt.Printf("[%s]\n", strVal)
+		fmt.Printf("[%s]", strVal)
 	} else {
 		//Nil
 		fmt.Println("Nil")
