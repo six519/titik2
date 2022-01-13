@@ -19,25 +19,34 @@ Hello World Code
 ================
 ::
 
-    \
+    ^
+        Multiline comment
         (Hello World Code)
         Source code at: https://github.com/six519/titik2
-    \
+    ^
 
-    strVariable = "Mabuhay Ka"
+    floatVariable = 25.55
+    strVariable = "Mabuhay " + 'Ka' #concatenation
 
     #function definition
     fd hello_world(var)
         intVariable = 0
-        #loop statement
-        fl (1, 8)
-            intVariable = intVariable + 1
-            sc(intVariable) #change text color
-            p(var + '\n') #It will print "Mabuhay Ka" 5 times
-            zzz(2000) #sleep for 2 seconds
-        lf
-        
-        sc(0) #reset the text color
+        #if statement
+        if(var == 'Mabuhay Ka')
+
+            #loop statement
+            fl (0, 8)
+                intVariable = intVariable + 1
+                sc(intVariable) #change text color
+                p(var + '\n') #It will print "Mabuhay Ka" 5 times
+                zzz(2000) #sleep for 2 seconds
+            lf
+            
+            sc(0) #reset the text color
+        el
+            #else
+            p('Not Mabuhay Ka')
+        fi
     df
 
     hello_world(strVariable) #call function
