@@ -382,6 +382,15 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//netc(<string>, <string>) - socket connect
 	defineFunction(globalFunctionArray, "netc", Netc_execute, 2, true)
 
+	//netl(<string>, <string>) - socket listen
+	defineFunction(globalFunctionArray, "netl", Netl_execute, 2, true)
+
+	//netla(<string>) - listener socket accept connection
+	defineFunction(globalFunctionArray, "netla", Netla_execute, 1, true)
+
+	//netlx(<string>) - listener socket close
+	defineFunction(globalFunctionArray, "netlx", Netlx_execute, 1, true)
+
 	//netx(<string>) - socket close
 	defineFunction(globalFunctionArray, "netx", Netx_execute, 1, true)
 

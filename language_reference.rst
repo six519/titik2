@@ -572,13 +572,31 @@ Cryptographic Functions
 Socket Functions
 ~~~~~~~~~~~~~~~~
 
-- **netc** - initiates TCP/UDP server connection and returns the connection reference string.
+- **netc** - initiates TCP/UDP client connection and returns the connection reference string.
 
     **Declaration:**
     ::
         string netc(string, string)
 
-- **netx** - closes socket connection.
+- **netl** - initiates TCP/UDP server connection and returns the connection reference string.
+
+    **Declaration:**
+    ::
+        string netl(string, string)
+
+- **netla** - accepts client connection and returns the connection reference string.
+
+    **Declaration:**
+    ::
+        string netla(string)
+
+- **netlx** - closes server socket connection.
+
+    **Declaration:**
+    ::
+        Nil netlx(string)
+
+- **netx** - closes client socket connection.
 
     **Declaration:**
     ::
