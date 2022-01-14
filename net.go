@@ -4,7 +4,7 @@ import (
 	"net"
 	"errors"
 	"strconv"
-	"io/ioutil"
+	//"io/ioutil"
 	//"fmt"
 )
 
@@ -143,18 +143,18 @@ func Netw_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 func Netr_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if(arguments[0].Type != ARG_TYPE_STRING) {
+	if(arguments[0].Type != ARG_TYPE_INTEGER) {
+		*errMessage = errors.New("Error: Parameter 2 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else 	if(arguments[1].Type != ARG_TYPE_STRING) {
 		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
-		if ((*globalSettings).netConnection[arguments[0].StringValue] == nil) {
+		if ((*globalSettings).netConnection[arguments[1].StringValue] == nil) {
 			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
-			msg, err := ioutil.ReadAll((*globalSettings).netConnection[arguments[0].StringValue])
-	
-			if(err != nil) {
-				*errMessage = errors.New("Error: " + err.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-			} else {
-				ret.StringValue = string(msg)
+			buf := make([]byte, arguments[0].IntegerValue)
+			_, err := (*globalSettings).netConnection[arguments[1].StringValue].Read(buf[0:])
+			if err == nil {
+				ret.StringValue = string(buf)
 			}
 		}
 	}

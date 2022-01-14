@@ -578,19 +578,19 @@ Socket Functions
     ::
         string netc(string, string)
 
-- **netl** - initiates TCP/UDP server connection and returns the connection reference string.
+- **netl** - initiates TCP server connection and returns the connection reference string.
 
     **Declaration:**
     ::
         string netl(string, string)
 
-- **netla** - accepts client connection and returns the connection reference string.
+- **netla** - accepts TCP client connection and returns the connection reference string.
 
     **Declaration:**
     ::
         string netla(string)
 
-- **netlx** - closes server socket connection.
+- **netlx** - closes server TCP socket connection.
 
     **Declaration:**
     ::
@@ -612,7 +612,7 @@ Socket Functions
 
     **Declaration:**
     ::
-        string netr(string)
+        string netr(string, integer)
 
 Hello World Code (Web)
 ----------------------

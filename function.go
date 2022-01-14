@@ -397,6 +397,6 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//netw(<string>, <string>) - socket write
 	defineFunction(globalFunctionArray, "netw", Netw_execute, 2, true)
 
-	//netr(<string>) - socket read
-	defineFunction(globalFunctionArray, "netr", Netr_execute, 1, true)
+	//netr(<string>, <integer>) - socket read
+	defineFunction(globalFunctionArray, "netr", Netr_execute, 2, true)
 }
