@@ -388,6 +388,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//netla(<string>) - listener socket accept connection
 	defineFunction(globalFunctionArray, "netla", Netla_execute, 1, true)
 
+	//netlaf(<string>, <string>) - accept socket connection then call a function handler
+	defineFunction(globalFunctionArray, "netlaf", Netlaf_execute, 2, true)
+
 	//netlx(<string>) - listener socket close
 	defineFunction(globalFunctionArray, "netlx", Netlx_execute, 1, true)
 

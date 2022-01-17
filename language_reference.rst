@@ -590,6 +590,12 @@ Socket Functions
     ::
         string netla(string)
 
+- **netlaf** - accepts TCP client connection and set a function handler.
+
+    **Declaration:**
+    ::
+        string netlaf(string, string)
+
 - **netlx** - closes server TCP socket connection.
 
     **Declaration:**
