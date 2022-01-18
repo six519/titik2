@@ -584,13 +584,25 @@ Socket Functions
     ::
         string netl(string, string)
 
+- **netul** - initiates UDP server connection and returns the connection reference string.
+
+    **Declaration:**
+    ::
+        string netul(string, string, integer)
+
+- **netulf** - initiates UDP server connection and call a function handler.
+
+    **Declaration:**
+    ::
+        string netulf(string, string, integer, string)
+
 - **netla** - accepts TCP client connection and returns the connection reference string.
 
     **Declaration:**
     ::
         string netla(string)
 
-- **netlaf** - accepts TCP client connection and set a function handler.
+- **netlaf** - accepts TCP client connection and call a function handler.
 
     **Declaration:**
     ::
@@ -619,6 +631,12 @@ Socket Functions
     **Declaration:**
     ::
         string netr(string, integer)
+
+- **netur** - receives UDP message.
+
+    **Declaration:**
+    ::
+        string netur(string, integer)
 
 Hello World Code (Web)
 ----------------------
