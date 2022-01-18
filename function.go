@@ -385,6 +385,12 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//netl(<string>, <string>) - socket listen
 	defineFunction(globalFunctionArray, "netl", Netl_execute, 2, true)
 
+	//netul(<string>, <string>, <integer>) - UDP socket listen
+	defineFunction(globalFunctionArray, "netul", Netul_execute, 3, true)
+
+	//netulf(<string>, <string>, <integer>, <string>) - UDP socket listen then call a function handler
+	defineFunction(globalFunctionArray, "netulf", Netulf_execute, 4, true)
+
 	//netla(<string>) - listener socket accept connection
 	defineFunction(globalFunctionArray, "netla", Netla_execute, 1, true)
 
@@ -402,4 +408,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//netr(<string>, <integer>) - socket read
 	defineFunction(globalFunctionArray, "netr", Netr_execute, 2, true)
+
+	//netur(<string>, <integer>) - UDP socket read when server is created using netul
+	defineFunction(globalFunctionArray, "netur", Netur_execute, 2, true)
 }

@@ -228,3 +228,82 @@ func Netr_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 
 	return ret
 }
+
+func Netul_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if(arguments[0].Type != ARG_TYPE_INTEGER) {
+		*errMessage = errors.New("Error: Parameter 3 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[1].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[2].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		connection, err := net.ListenUDP(arguments[2].StringValue, &net.UDPAddr{
+			Port: arguments[0].IntegerValue,
+			IP:   net.ParseIP(arguments[1].StringValue),
+		})
+
+		if(err != nil) {
+			*errMessage = errors.New("Error: " + err.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			connection_reference := "conul_" + generateRandomNumbers()
+			(*globalSettings).netUDPConnectionListener[connection_reference] = connection
+			ret.StringValue = connection_reference
+		}
+	}
+
+	return ret
+}
+
+func Netulf_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if(arguments[0].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 4 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[1].Type != ARG_TYPE_INTEGER) {
+		*errMessage = errors.New("Error: Parameter 3 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[2].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else if(arguments[3].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		connection, err := net.ListenUDP(arguments[3].StringValue, &net.UDPAddr{
+			Port: arguments[1].IntegerValue,
+			IP:   net.ParseIP(arguments[2].StringValue),
+		})
+
+		if(err != nil) {
+			*errMessage = errors.New("Error: " + err.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			connection_reference := "conul_" + generateRandomNumbers()
+			(*globalSettings).netUDPConnectionListener[connection_reference] = connection
+			ret.StringValue = connection_reference
+			go netHandleRequest(connection_reference, arguments[0].StringValue, globalVariableArray, globalFunctionArray, globalNativeVarList, globalSettings, line_number, column_number, file_name)
+		}
+	}
+
+	return ret
+}
+
+func Netur_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if(arguments[0].Type != ARG_TYPE_INTEGER) {
+		*errMessage = errors.New("Error: Parameter 2 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else 	if(arguments[1].Type != ARG_TYPE_STRING) {
+		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	} else {
+		if ((*globalSettings).netUDPConnectionListener[arguments[1].StringValue] == nil) {
+			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			buf := make([]byte, arguments[0].IntegerValue)
+			_, _, err := (*globalSettings).netUDPConnectionListener[arguments[1].StringValue].ReadFromUDP(buf[0:])
+			if err == nil {
+				ret.StringValue = string(buf)
+			}
+		}
+	}
+
+	return ret
+}

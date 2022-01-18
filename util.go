@@ -27,6 +27,7 @@ type GlobalSettingsObject struct {
 	sQLiteResults map[string]map[string][]string
 	netConnection map[string]net.Conn
 	netConnectionListener map[string]net.Listener
+	netUDPConnectionListener map[string]*net.UDPConn
 	mySQLConnection map[string]*sql.DB
 
 	/*
@@ -50,6 +51,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 
 	globalSettings.netConnection = make(map[string]net.Conn)
 	globalSettings.netConnectionListener = make(map[string]net.Listener)
+	globalSettings.netUDPConnectionListener = make(map[string]*net.UDPConn)
 	globalSettings.mySQLConnection = make(map[string]*sql.DB)
 
 	/*
