@@ -1243,7 +1243,15 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							//check if function got arguments
 							if((*globalFunctionArray)[funcIndex].ArgumentCount > 0) {
 								//function parameter validation below
-								if(len(stack) == 0 || len(stack) < (*globalFunctionArray)[funcIndex].ArgumentCount) {
+
+								arg_count := 0
+								for sx := 0; sx < len(stack); sx++ {
+									if stack[sx].Context == currentToken.Context {
+										arg_count += 1
+									}
+								}
+
+								if((*globalFunctionArray)[funcIndex].ArgumentCount != arg_count) {
 									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly " + strconv.Itoa((*globalFunctionArray)[funcIndex].ArgumentCount) + " argument", currentToken.FileName))
 								}
 
