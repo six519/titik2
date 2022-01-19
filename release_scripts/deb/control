@@ -1,0 +1,7 @@
+Package: titik
+Version: 3.0.0-1
+Section: base
+Priority: optional
+Architecture: amd64
+Maintainer: Ferdinand Silva <ferdinandsilva@ferdinandsilva.com>
+Description: Titik Interpreter
