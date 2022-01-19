@@ -7,17 +7,14 @@ Linux (Ubuntu, Debian)
 
 ::
 
-    wget -qO - 'https://bintray.com/user/downloadSubjectPublicKey?username=six519' | sudo apt-key add -
-    echo "deb https://dl.bintray.com/six519/debian all main" | sudo tee -a /etc/apt/sources.list
-    sudo apt update
-    sudo apt install titik
+    curl -s https://packagecloud.io/install/repositories/six519/titik/script.deb.sh | sudo bash && sudo apt install titik
 
 Linux (Red Hat, CentOS, Fedora)
 -------------------------------
 
 ::
 
-    curl -s https://packagecloud.io/install/repositories/six519/titik/script.rpm.sh | sudo bash && yum install titik -y
+    curl -s https://packagecloud.io/install/repositories/six519/titik/script.rpm.sh | sudo bash && sudo yum install titik -y
 
 Mac OS X
 --------
