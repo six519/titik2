@@ -40,7 +40,7 @@ FreeBSD
 Windows (64 bit only)
 ---------------------
 
-Download the installer from the link below
+Download the installer from the link below then restart the system after installation
 
 ::
 
