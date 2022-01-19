@@ -40,10 +40,8 @@ FreeBSD
 Windows (64 bit only)
 ---------------------
 
-Need to install Chocolatey_ first
-
-.. _Chocolatey: https://chocolatey.org/
+Download the installer from the link below
 
 ::
 
-    choco install titik
+    https://github.com/six519/titik2/blob/master/bin/titik-3.0.0-setup.exe?raw=true
