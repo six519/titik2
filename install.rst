@@ -17,10 +17,7 @@ Linux (Red Hat, CentOS, Fedora)
 
 ::
 
-    wget https://bintray.com/six519/rpm/rpm -O bintray-six519-rpm.repo
-    sudo mv bintray-six519-rpm.repo /etc/yum.repos.d/
-    sudo yum update
-    sudo yum install titik
+    curl -s https://packagecloud.io/install/repositories/six519/titik/script.rpm.sh | sudo bash && yum install titik -y
 
 Mac OS X
 --------
