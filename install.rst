@@ -35,7 +35,7 @@ FreeBSD
     
     sudo pkg install go
     sudo pkg install git
-    sudo pkg add https://dl.bintray.com/six519/Generic/titik-2.0.1.txz
+    sudo pkg add "https://github.com/six519/titik2/blob/master/bin/titik-3.0.0.pkg?raw=true"
 
 Windows (64 bit only)
 ---------------------
