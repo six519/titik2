@@ -411,4 +411,7 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//netur(<string>, <integer>) - UDP socket read when server is created using netul
 	defineFunction(globalFunctionArray, "netur", Netur_execute, 2, true)
+
+	//netus(<string>, <string>, <string>, <integer>) - send message via UDP
+	defineFunction(globalFunctionArray, "netus", Netus_execute, 4, true)
 }
