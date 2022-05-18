@@ -1244,16 +1244,16 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							if((*globalFunctionArray)[funcIndex].ArgumentCount > 0) {
 								//function parameter validation below
 
-								stack_count := len(stack)
+								arg_count := 0
 
-								//remove main_context from the argument count
+								//add to counter if column is greater than current column
 								for sx := 0; sx < len(stack); sx++ {
-									if stack[sx].Context == "main_context" {
-										stack_count -= 1
+									if stack[sx].Column > currentToken.Column{
+										arg_count += 1
 									}
 								}
 
-								if((*globalFunctionArray)[funcIndex].ArgumentCount != stack_count) {
+								if((*globalFunctionArray)[funcIndex].ArgumentCount != arg_count) {
 									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly " + strconv.Itoa((*globalFunctionArray)[funcIndex].ArgumentCount) + " argument", currentToken.FileName))
 								}
 
@@ -1358,16 +1358,16 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							} else {
 								// no argument
 
-								stack_count := len(stack)
+								arg_count := 0
 
-								//remove main_context from the argument count
+								//add to counter if column is greater than current column
 								for sx := 0; sx < len(stack); sx++ {
-									if stack[sx].Context == "main_context" {
-										stack_count -= 1
+									if stack[sx].Column > currentToken.Column{
+										arg_count += 1
 									}
 								}
 
-								if(stack_count > 0) {
+								if(arg_count > 0) {
 									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly 0 argument", currentToken.FileName))
 								}
 							}
