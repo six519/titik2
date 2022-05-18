@@ -1244,7 +1244,16 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							if((*globalFunctionArray)[funcIndex].ArgumentCount > 0) {
 								//function parameter validation below
 
-								if((*globalFunctionArray)[funcIndex].ArgumentCount != len(stack)) {
+								stack_count := len(stack)
+
+								//remove main_context from the argument count
+								for sx := 0; sx < len(stack); sx++ {
+									if stack[sx].Context == "main_context" {
+										stack_count -= 1
+									}
+								}
+
+								if((*globalFunctionArray)[funcIndex].ArgumentCount != stack_count) {
 									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly " + strconv.Itoa((*globalFunctionArray)[funcIndex].ArgumentCount) + " argument", currentToken.FileName))
 								}
 
@@ -1348,7 +1357,17 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							} else {
 								// no argument
-								if(len(stack) > 0) {
+
+								stack_count := len(stack)
+
+								//remove main_context from the argument count
+								for sx := 0; sx < len(stack); sx++ {
+									if stack[sx].Context == "main_context" {
+										stack_count -= 1
+									}
+								}
+
+								if(stack_count > 0) {
 									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value + " takes exactly 0 argument", currentToken.FileName))
 								}
 							}

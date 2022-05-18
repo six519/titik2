@@ -8,7 +8,7 @@ import (
 )
 
 const TITIK_APP_NAME string = "Titik"
-const TITIK_STRING_VERSION string = "3.0.1"
+const TITIK_STRING_VERSION string = "3.0.2"
 const TITIK_AUTHOR string = "Ferdinand E. Silva"
 
 func Help(exeName string) {
