@@ -1,4 +1,4 @@
-module github.com/six519/titik2/v3.0.0
+module github.com/six519/titik2
 
 go 1.17
 
