@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"errors"
-	"strconv"
+	"fmt"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -32,33 +32,33 @@ const (
 )
 
 type FunctionReturn struct {
-	Type int
-	StringValue string
-	IntegerValue int
-	FloatValue float64
-	BooleanValue bool
-	ArrayValue []FunctionReturn
+	Type                  int
+	StringValue           string
+	IntegerValue          int
+	FloatValue            float64
+	BooleanValue          bool
+	ArrayValue            []FunctionReturn
 	AssociativeArrayValue map[string]FunctionReturn
 }
 
 type FunctionArgument struct {
-	Type int
-	StringValue string
-	IntegerValue int
-	FloatValue float64
-	BooleanValue bool
-	ArrayValue []FunctionArgument
+	Type                  int
+	StringValue           string
+	IntegerValue          int
+	FloatValue            float64
+	BooleanValue          bool
+	ArrayValue            []FunctionArgument
 	AssociativeArrayValue map[string]FunctionArgument
 }
 
 type Execute func([]FunctionArgument, *error, *[]Variable, *[]Function, string, *[]string, *GlobalSettingsObject, int, int, string) FunctionReturn
 
 type Function struct {
-	Name string
-	IsNative bool
-	Tokens []Token
-	Run Execute
-	Arguments []Token
+	Name          string
+	IsNative      bool
+	Tokens        []Token
+	Run           Execute
+	Arguments     []Token
 	ArgumentCount int
 }
 
@@ -69,7 +69,7 @@ func DumpFunction(functions []Function) {
 		fmt.Printf("Function Name: %s\n", functions[x].Name)
 		fmt.Printf("Argument Count: %d\n", functions[x].ArgumentCount)
 
-		if(functions[x].IsNative) {
+		if functions[x].IsNative {
 			fmt.Println("Is Native: Yes")
 		} else {
 			fmt.Println("Is Native: No")
@@ -82,7 +82,7 @@ func DumpFunction(functions []Function) {
 func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
 
 	for x := 0; x < len(globalFunctionArray); x++ {
-		if(globalFunctionArray[x].Name == token.Value) {
+		if globalFunctionArray[x].Name == token.Value {
 			return true, x
 		}
 	}
@@ -93,7 +93,7 @@ func isFunctionExists(token Token, globalFunctionArray []Function) (bool, int) {
 func isParamExists(token Token, functionParams []Token) bool {
 
 	for x := 0; x < len(functionParams); x++ {
-		if(functionParams[x].Value == token.Value) {
+		if functionParams[x].Value == token.Value {
 			return true
 		}
 	}
@@ -111,7 +111,7 @@ func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec E
 func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
 
-	if(arguments[0].Type != ARG_TYPE_BOOLEAN) {
+	if arguments[0].Type != ARG_TYPE_BOOLEAN {
 		*errMessage = errors.New("Error: Parameter must be a boolean type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
 		ret.BooleanValue = !arguments[0].BooleanValue
@@ -123,12 +123,12 @@ func ReverseBoolean_execute(arguments []FunctionArgument, errMessage *error, glo
 func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
 
-	if(arguments[0].Type != ARG_TYPE_ARRAY && arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY && arguments[0].Type != ARG_TYPE_STRING) {
+	if arguments[0].Type != ARG_TYPE_ARRAY && arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY && arguments[0].Type != ARG_TYPE_STRING {
 		*errMessage = errors.New("Error: Parameter must be a lineup or glossary or string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
-		if(arguments[0].Type == ARG_TYPE_ARRAY) {
+		if arguments[0].Type == ARG_TYPE_ARRAY {
 			ret.IntegerValue = len(arguments[0].ArrayValue)
-		} else if(arguments[0].Type == ARG_TYPE_STRING) {
+		} else if arguments[0].Type == ARG_TYPE_STRING {
 			ret.IntegerValue = len(arguments[0].StringValue)
 		} else {
 			ret.IntegerValue = len(arguments[0].AssociativeArrayValue)
@@ -141,16 +141,16 @@ func Len_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 func I_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if(arguments[0].Type != ARG_TYPE_STRING) {
+	if arguments[0].Type != ARG_TYPE_STRING {
 		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	} else {
-		if(scopeName != "main") {
+		if scopeName != "main" {
 			*errMessage = errors.New("Error: You cannot include file inside a function on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
 			suffix := ""
 			fileToLoad := arguments[0].StringValue
 
-			if(runtime.GOOS == "windows") {
+			if runtime.GOOS == "windows" {
 				suffix = "\\"
 				fileToLoad = strings.Replace(fileToLoad, "/", "\\", -1)
 			} else {
@@ -160,25 +160,27 @@ func I_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 			dir, _ := filepath.Abs(filepath.Dir(file_name))
 
 			//open titik file to include
-			lxr := Lexer{FileName: dir + suffix + fileToLoad + ".ttk" }
+			lxr := Lexer{FileName: dir + suffix + fileToLoad + ".ttk"}
 			fileErr := lxr.ReadSourceFile()
-			if (fileErr != nil) {
+			if fileErr != nil {
 				*errMessage = errors.New(fileErr.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 			} else {
 				//generate token below
 				tokenArray, tokenErr := lxr.GenerateToken()
-				if (tokenErr != nil) {
+				if tokenErr != nil {
 					*errMessage = tokenErr
 				} else {
 					var gotReturn bool = false
 					var returnToken Token
 					var needBreak bool = false
 					var stackReference []Token
+					var getLastStackBool bool = false
+					var lastStackBool bool = false
 
 					//parser object
 					prsr := Parser{}
-					parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main", globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, globalSettings)
-					if(parserErr != nil) {
+					parserErr := prsr.Parse(tokenArray, globalVariableArray, globalFunctionArray, "main", globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, globalSettings, getLastStackBool, &lastStackBool)
+					if parserErr != nil {
 						*errMessage = parserErr
 					}
 				}
@@ -192,7 +194,7 @@ func I_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 func In_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
 
-	if(arguments[0].Type == ARG_TYPE_NONE) {
+	if arguments[0].Type == ARG_TYPE_NONE {
 		ret.BooleanValue = true
 	}
 
@@ -200,7 +202,7 @@ func In_execute(arguments []FunctionArgument, errMessage *error, globalVariableA
 }
 
 func initNativeFunctions(globalFunctionArray *[]Function) {
-	
+
 	//p(<anyvar>)
 	defineFunction(globalFunctionArray, "p", P_execute, 1, true)
 
