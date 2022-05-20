@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 	"unicode"
 	//fmt
@@ -2372,7 +2373,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 			tokensToEvaluate = append(tokensToEvaluate, tokenArray[x])
 		} else {
 
-			if isWhileLoopStatement {
+			if isWhileLoopStatement && strings.Index(tokenArray[x].Context, "wl_") == 0 {
 				//collect all the parameters from while loop
 				//to be able to parse later on the body of while loop
 				if _, ok := whileLoopIsDone[tokenArray[x].Context]; ok {
