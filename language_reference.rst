@@ -214,6 +214,20 @@ Execute a block of code a specified number of times where start counter is lower
 
 .. image:: http://ferdinandsilva.com/static/infinite.png
 
+**While Loop**
+
+Execute a statement or code block repeatedly as long as an expression is true.
+
+**Syntax**
+::
+    wl (condition)
+        code to be executed
+    lw
+
+**Example**
+
+.. image:: http://ferdinandsilva.com/static/while.png
+
 **Break Statement**
 
 When a break statement is encountered inside a loop, the loop is immediately terminated and the program control resumes at the next statement following the loop.
