@@ -248,15 +248,6 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//gcp()
 	defineFunction(globalFunctionArray, "gcp", Gcp_execute, 0, true)
 
-	//flrm(string)
-	defineFunction(globalFunctionArray, "flrm", Flrm_execute, 1, true)
-
-	//flmv(string, string)
-	defineFunction(globalFunctionArray, "flmv", Flmv_execute, 2, true)
-
-	//flcp(string, string)
-	defineFunction(globalFunctionArray, "flcp", Flcp_execute, 2, true)
-
 	//in(<anyvar>)
 	defineFunction(globalFunctionArray, "in", In_execute, 1, true)
 
@@ -416,4 +407,26 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//netus(<string>, <string>, <string>, <integer>) - send message via UDP
 	defineFunction(globalFunctionArray, "netus", Netus_execute, 4, true)
+
+	//FILE FUNCTIONALITIES
+	//flrm(string)
+	defineFunction(globalFunctionArray, "flrm", Flrm_execute, 1, true)
+
+	//flmv(string, string)
+	defineFunction(globalFunctionArray, "flmv", Flmv_execute, 2, true)
+
+	//flcp(string, string)
+	defineFunction(globalFunctionArray, "flcp", Flcp_execute, 2, true)
+
+	//fo(string, string)
+	defineFunction(globalFunctionArray, "fo", Fo_execute, 2, true)
+
+	//fc(string)
+	defineFunction(globalFunctionArray, "fc", Fc_execute, 1, true)
+
+	//fw(string)
+	defineFunction(globalFunctionArray, "fw", Fw_execute, 2, true)
+
+	//fr(string)
+	defineFunction(globalFunctionArray, "fr", Fr_execute, 2, true)
 }

@@ -1,39 +1,39 @@
 package main
 
 import (
-	"strings"
+	"database/sql"
 	"io"
 	"io/ioutil"
+	"net"
 	"os"
 	"path/filepath"
-	"net"
-	"database/sql"
+	"strings"
 	/*
-	//IF WINDOWS
-	"runtime"
-	"syscall"
-	"unsafe"
-	//END IF WINDOWS
-	*/
-)
+		//IF WINDOWS
+		"runtime"
+		"syscall"
+		"unsafe"
+		//END IF WINDOWS
+	*/)
 
 type GlobalSettingsObject struct {
-	webObject WebObject
-	globalVariableArray *[]Variable
-	globalFunctionArray *[]Function
-	globalNativeVarList *[]string
-	mySQLResults map[string]map[string][]string //NOTE: TEMPORARY ONLY
-	sQLiteSettings map[string]map[string]string
-	sQLiteResults map[string]map[string][]string
-	netConnection map[string]net.Conn
-	netConnectionListener map[string]net.Listener
+	webObject                WebObject
+	globalVariableArray      *[]Variable
+	globalFunctionArray      *[]Function
+	globalNativeVarList      *[]string
+	mySQLResults             map[string]map[string][]string //NOTE: TEMPORARY ONLY
+	sQLiteSettings           map[string]map[string]string
+	sQLiteResults            map[string]map[string][]string
+	netConnection            map[string]net.Conn
+	netConnectionListener    map[string]net.Listener
 	netUDPConnectionListener map[string]*net.UDPConn
-	mySQLConnection map[string]*sql.DB
+	mySQLConnection          map[string]*sql.DB
+	fileHandler              map[string]*os.File
 
 	/*
-	//IF WINDOWS
-	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
-	//END IF WINDOWS
+		//IF WINDOWS
+		consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
+		//END IF WINDOWS
 	*/
 }
 
@@ -45,7 +45,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.webObject.Init(globalSettings)
 
 	globalSettings.mySQLResults = make(map[string]map[string][]string) //TODO: NEED WAY TO CLEAN THIS UP //MAYBE END OF FUNCTION CALLS?
-	
+
 	globalSettings.sQLiteSettings = make(map[string]map[string]string)
 	globalSettings.sQLiteResults = make(map[string]map[string][]string)
 
@@ -53,18 +53,19 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.netConnectionListener = make(map[string]net.Listener)
 	globalSettings.netUDPConnectionListener = make(map[string]*net.UDPConn)
 	globalSettings.mySQLConnection = make(map[string]*sql.DB)
+	globalSettings.fileHandler = make(map[string]*os.File)
 
 	/*
-	//IF WINDOWS
-	if runtime.GOOS == "windows" {
-		//get console handle
-		//for windows
-		kernel32 := syscall.NewLazyDLL("kernel32.dll")
-		getConsoleScreenBufferInfoProc := kernel32.NewProc("GetConsoleScreenBufferInfo")
-		handle, _ := syscall.GetStdHandle(syscall.STD_OUTPUT_HANDLE)
-		_, _, _ = getConsoleScreenBufferInfoProc.Call(uintptr(handle), uintptr(unsafe.Pointer(&globalSettings.consoleInfo)), 0)
-	}
-	//END IF WINDOWS
+		//IF WINDOWS
+		if runtime.GOOS == "windows" {
+			//get console handle
+			//for windows
+			kernel32 := syscall.NewLazyDLL("kernel32.dll")
+			getConsoleScreenBufferInfoProc := kernel32.NewProc("GetConsoleScreenBufferInfo")
+			handle, _ := syscall.GetStdHandle(syscall.STD_OUTPUT_HANDLE)
+			_, _, _ = getConsoleScreenBufferInfoProc.Call(uintptr(handle), uintptr(unsafe.Pointer(&globalSettings.consoleInfo)), 0)
+		}
+		//END IF WINDOWS
 	*/
 }
 
@@ -188,4 +189,5 @@ func lcopy(src, dest string, info os.FileInfo) error {
 	}
 	return os.Symlink(src, dest)
 }
+
 //end of Copy code
