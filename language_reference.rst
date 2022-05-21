@@ -388,6 +388,33 @@ System Functions
     ::
         string gcp()
 
+File Processing Functions
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- **fo** - open file for reading/writing/appending.
+
+    **Declaration:**
+    ::
+        string fo(string, string)
+
+- **fc** - close file.
+
+    **Declaration:**
+    ::
+        Nil fc(string)
+
+- **fw** - write string file.
+
+    **Declaration:**
+    ::
+        Nil fw(string, string)
+
+- **fr** - read the file using specific bytes count.
+
+    **Declaration:**
+    ::
+        string fr(string, integer)
+
 - **flrm** - removes path and any children it contains.
 
     **Declaration:**
