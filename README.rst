@@ -11,6 +11,7 @@ This is for experimental and educational purpose only. ;)
 Compile From Source
 ===================
 ::
+    
     go build .
 
 Binary Release (Installation Instructions)
