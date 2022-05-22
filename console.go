@@ -1,22 +1,22 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
-	"strconv"
-	"bufio"
 	"os"
+	"strconv"
 	"strings"
+
 	"golang.org/x/crypto/ssh/terminal"
 	/*
-	//IF WINDOWS
-	"syscall"
-	//END IF WINDOWS
-	*/
-)
+		//IF WINDOWS
+		"syscall"
+		//END IF WINDOWS
+	*/)
 
-var ANSI_COLORS = []string {
-	"\x1b[0m", //Normal
+var ANSI_COLORS = []string{
+	"\x1b[0m",    //Normal
 	"\x1b[30;1m", //Black
 	"\x1b[31;1m", //Red
 	"\x1b[32;1m", //Green
@@ -70,38 +70,38 @@ type (
 func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if(arguments[0].Type == ARG_TYPE_FLOAT) {
+	if arguments[0].Type == ARG_TYPE_FLOAT {
 		fmt.Printf("%f", arguments[0].FloatValue)
 		ret.StringValue = strconv.FormatFloat(arguments[0].FloatValue, 'f', -1, 64)
-	} else if(arguments[0].Type == ARG_TYPE_STRING) {
+	} else if arguments[0].Type == ARG_TYPE_STRING {
 		fmt.Printf("%s", escapeString(arguments[0].StringValue))
 		ret.StringValue = arguments[0].StringValue
-	} else if(arguments[0].Type == ARG_TYPE_INTEGER) {
+	} else if arguments[0].Type == ARG_TYPE_INTEGER {
 		//integer
 		fmt.Printf("%d", arguments[0].IntegerValue)
 		ret.StringValue = strconv.Itoa(arguments[0].IntegerValue)
-	} else if(arguments[0].Type == ARG_TYPE_BOOLEAN) {
+	} else if arguments[0].Type == ARG_TYPE_BOOLEAN {
 		//boolean
 		fmt.Printf("%v", arguments[0].BooleanValue)
-		if(arguments[0].BooleanValue) {
+		if arguments[0].BooleanValue {
 			ret.StringValue = "true"
 		} else {
 			ret.StringValue = "false"
 		}
-	} else if(arguments[0].Type == ARG_TYPE_ASSOCIATIVE_ARRAY) {
+	} else if arguments[0].Type == ARG_TYPE_ASSOCIATIVE_ARRAY {
 		strVal := ""
 		x := 0
 
-		for k,v := range arguments[0].AssociativeArrayValue {
+		for k, v := range arguments[0].AssociativeArrayValue {
 
-			if(v.Type == ARG_TYPE_FLOAT) {
+			if v.Type == ARG_TYPE_FLOAT {
 				strVal = strVal + k + ":" + strconv.FormatFloat(v.FloatValue, 'f', -1, 64)
-			} else if(v.Type == ARG_TYPE_STRING) {
+			} else if v.Type == ARG_TYPE_STRING {
 				strVal = strVal + k + ":" + v.StringValue
-			} else if(v.Type == ARG_TYPE_INTEGER) {
+			} else if v.Type == ARG_TYPE_INTEGER {
 				strVal = strVal + k + ":" + strconv.Itoa(v.IntegerValue)
-			} else if(v.Type == ARG_TYPE_BOOLEAN) {
-				if(v.BooleanValue) {
+			} else if v.Type == ARG_TYPE_BOOLEAN {
+				if v.BooleanValue {
 					strVal = strVal + k + ":" + "true"
 				} else {
 					strVal = strVal + k + ":" + "false"
@@ -110,7 +110,7 @@ func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 				strVal = strVal + k + ":" + "Nil"
 			}
 
-			if((x + 1) != len(arguments[0].AssociativeArrayValue)) {
+			if (x + 1) != len(arguments[0].AssociativeArrayValue) {
 				strVal = strVal + ", "
 			}
 
@@ -118,18 +118,18 @@ func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 		}
 
 		fmt.Printf("{%s}", strVal)
-	} else if(arguments[0].Type == ARG_TYPE_ARRAY) {
+	} else if arguments[0].Type == ARG_TYPE_ARRAY {
 		strVal := ""
 
 		for x := 0; x < len(arguments[0].ArrayValue); x++ {
-			if(arguments[0].ArrayValue[x].Type == ARG_TYPE_FLOAT) {
+			if arguments[0].ArrayValue[x].Type == ARG_TYPE_FLOAT {
 				strVal = strVal + strconv.FormatFloat(arguments[0].ArrayValue[x].FloatValue, 'f', -1, 64)
-			} else if(arguments[0].ArrayValue[x].Type == ARG_TYPE_STRING) {
+			} else if arguments[0].ArrayValue[x].Type == ARG_TYPE_STRING {
 				strVal = strVal + arguments[0].ArrayValue[x].StringValue
-			} else if(arguments[0].ArrayValue[x].Type == ARG_TYPE_INTEGER) {
+			} else if arguments[0].ArrayValue[x].Type == ARG_TYPE_INTEGER {
 				strVal = strVal + strconv.Itoa(arguments[0].ArrayValue[x].IntegerValue)
-			} else if(arguments[0].ArrayValue[x].Type == ARG_TYPE_BOOLEAN) {
-				if(arguments[0].ArrayValue[x].BooleanValue) {
+			} else if arguments[0].ArrayValue[x].Type == ARG_TYPE_BOOLEAN {
+				if arguments[0].ArrayValue[x].BooleanValue {
 					strVal = strVal + "true"
 				} else {
 					strVal = strVal + "false"
@@ -138,7 +138,7 @@ func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 				strVal = strVal + "Nil"
 			}
 
-			if((x + 1) != len(arguments[0].ArrayValue)) {
+			if (x + 1) != len(arguments[0].ArrayValue) {
 				strVal = strVal + ", "
 			}
 		}
@@ -155,9 +155,7 @@ func P_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 func R_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if(arguments[0].Type != ARG_TYPE_STRING) {
-		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Printf("%s", escapeString(arguments[0].StringValue))
 		text, _ := reader.ReadString('\n')
@@ -170,9 +168,7 @@ func R_execute(arguments []FunctionArgument, errMessage *error, globalVariableAr
 func Rp_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if(arguments[0].Type != ARG_TYPE_STRING) {
-		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		fmt.Printf("%s", escapeString(arguments[0].StringValue))
 		text, err := terminal.ReadPassword(0)
 		if err == nil {
@@ -186,10 +182,8 @@ func Rp_execute(arguments []FunctionArgument, errMessage *error, globalVariableA
 func Sc_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if(arguments[0].Type != ARG_TYPE_INTEGER) {
-		*errMessage = errors.New("Error: Parameter must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
-		if(arguments[0].IntegerValue > (len(ANSI_COLORS) - 1) || arguments[0].IntegerValue < 0) {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+		if arguments[0].IntegerValue > (len(ANSI_COLORS)-1) || arguments[0].IntegerValue < 0 {
 			*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
 			fmt.Printf("%s", ANSI_COLORS[arguments[0].IntegerValue])
@@ -204,9 +198,7 @@ func Sc_execute(arguments []FunctionArgument, errMessage *error, globalVariableA
 func Sc_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if(arguments[0].Type != ARG_TYPE_INTEGER) {
-		*errMessage = errors.New("Error: Parameter must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
 		if(arguments[0].IntegerValue > (len(ANSI_COLORS) - 1) || arguments[0].IntegerValue < 0) {
 			*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
