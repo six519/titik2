@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 )
 
 //function return type
@@ -94,6 +96,36 @@ func isParamExists(token Token, functionParams []Token) bool {
 	}
 
 	return false
+}
+
+func validateParameters(arguments []FunctionArgument, errMessage *error, line_number int, column_number int, file_name string, param_index int, param_expected int) bool {
+	var ret bool = true
+	var err_msg string = "a Nil"
+
+	if arguments[param_index].Type != param_expected {
+		ret = false
+	}
+
+	if !ret {
+		switch param_expected {
+		case ARG_TYPE_STRING:
+			err_msg = "a string"
+		case ARG_TYPE_INTEGER:
+			err_msg = "an integer"
+		case ARG_TYPE_FLOAT:
+			err_msg = "a float"
+		case ARG_TYPE_ARRAY:
+			err_msg = "a lineup"
+		case ARG_TYPE_ASSOCIATIVE_ARRAY:
+			err_msg = "a glossary"
+		case ARG_TYPE_BOOLEAN:
+			err_msg = "a boolean"
+		default:
+		}
+		*errMessage = errors.New("Error: Parameter must be " + err_msg + " type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+	}
+
+	return ret
 }
 
 func defineFunction(globalFunctionArray *[]Function, funcName string, funcExec Execute, argumentCount int, isNative bool) {
