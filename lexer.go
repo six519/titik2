@@ -240,7 +240,6 @@ func (lexer *Lexer) ReadString(inputString string) {
 
 func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var tokenArray []Token
-	var cleanTokenArray []Token
 	var finalTokenArray []Token
 	tokenizerState := TOKENIZER_STATE_GET_WORD
 	isTokenInit := false
@@ -277,12 +276,11 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				} else if currentChar == "\n" {
 					//new line
 					setToken(false, &tokenArray, &isTokenInit, x+1, x2+1, TOKEN_TYPE_NEWLINE, lexer.FileName, currentChar) //set token
-				} else if currentChar == "\t" {
-					//tab
-					setToken(false, &tokenArray, &isTokenInit, x+1, x2+1, TOKEN_TYPE_TAB, lexer.FileName, currentChar) //set token
-				} else if currentChar == " " {
-					//space
-					setToken(false, &tokenArray, &isTokenInit, x+1, x2+1, TOKEN_TYPE_SPACE, lexer.FileName, currentChar) //set token
+				} else if currentChar == "\t" || currentChar == " " {
+					//tab & space
+					if tokenArray[len(tokenArray)-1].Value == "fd" {
+						isTokenInit = false
+					}
 				} else if currentChar == "=" {
 					//equals
 					setToken(false, &tokenArray, &isTokenInit, x+1, x2+1, TOKEN_TYPE_EQUALS, lexer.FileName, currentChar) //set token
@@ -386,11 +384,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					tokenizerState = TOKENIZER_STATE_GET_STRING
 				} else if currentChar == "#" {
 					//start of single line comment
-					setToken(true, &tokenArray, &isTokenInit, x+1, x2+1, TOKEN_TYPE_SINGLE_COMMENT, lexer.FileName, "") //init token
 					tokenizerState = TOKENIZER_STATE_GET_SINGLE_COMMENT
 				} else if currentChar == "^" {
 					//start of multiline comment
-					setToken(true, &tokenArray, &isTokenInit, x+1, x2+1, TOKEN_TYPE_MULTI_COMMENT, lexer.FileName, "") //init token
 					tokenizerState = TOKENIZER_STATE_GET_MULTI_COMMENT
 				} else if unicode.IsDigit([]rune(currentChar)[0]) {
 					//integer
@@ -408,26 +404,22 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				//get single comment
 				if currentChar == "\n" || []rune(currentChar)[0] == 13 { //add char 13 for windows
 					tokenizerState = TOKENIZER_STATE_GET_WORD
-					setToken(false, &tokenArray, &isTokenInit, x+1, x2+1, TOKEN_TYPE_NEWLINE, lexer.FileName, "\n") //set token
-				} else {
-					tokenArray[len(tokenArray)-1].Value += currentChar
+					setToken(false, &tokenArray, &isTokenInit, -1, -1, TOKEN_TYPE_NEWLINE, lexer.FileName, "END_OF_COMMENT") // make sure that current line is executed
 				}
 			case TOKENIZER_STATE_GET_MULTI_COMMENT:
 				//get multi comment
 				if currentChar == "^" {
 					tokenizerState = TOKENIZER_STATE_GET_WORD
-					setToken(false, &tokenArray, &isTokenInit, x+1, x2+1, TOKEN_TYPE_CLOSE_MULTI_COMMENT, lexer.FileName, currentChar) //set token
-				} else if []rune(currentChar)[0] == 13 {
-					//for windows
-					tokenArray[len(tokenArray)-1].Value += "\n"
+					setToken(false, &tokenArray, &isTokenInit, -1, -1, TOKEN_TYPE_NEWLINE, lexer.FileName, "END_OF_COMMENT") // make sure that current line is executed
 				} else {
-					tokenArray[len(tokenArray)-1].Value += currentChar
+					if x+1 == len(lexer.fileContents) && x2+1 == len(lexer.fileContents[x]) {
+						return finalTokenArray, errors.New(SyntaxErrorMessage(x+1, x+2, "Expected closing of multi line comment", lexer.FileName))
+					}
 				}
 			case TOKENIZER_STATE_GET_STRING:
 				//get string
 				if currentChar == stringOpener {
 					tokenizerState = TOKENIZER_STATE_GET_WORD
-					setToken(false, &tokenArray, &isTokenInit, x+1, x2+1, TOKEN_TYPE_CLOSE_STRING, lexer.FileName, currentChar) //set token
 				} else if []rune(currentChar)[0] == 13 {
 					//for windows
 					tokenArray[len(tokenArray)-1].Value += "\n"
@@ -458,17 +450,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 		}
 	}
 
-	//1st token cleanup
-	//TODO: Try to eliminate this part
-	for x := 0; x < len(tokenArray); x++ {
-		if tokenArray[x].Type == TOKEN_TYPE_SPACE || tokenArray[x].Type == TOKEN_TYPE_SINGLE_COMMENT || tokenArray[x].Type == TOKEN_TYPE_MULTI_COMMENT || tokenArray[x].Type == TOKEN_TYPE_CLOSE_MULTI_COMMENT || tokenArray[x].Type == TOKEN_TYPE_CLOSE_STRING || tokenArray[x].Type == TOKEN_TYPE_TAB {
-			//ignore space, tab, comments etc...
-			continue
-		}
-		cleanTokenArray = append(cleanTokenArray, tokenArray[x])
-	}
+	setToken(false, &tokenArray, &isTokenInit, -1, -1, TOKEN_TYPE_NEWLINE, lexer.FileName, "END_OF_CODE") //add newline to the end to make sure that code will be executed
 
-	//2nd token cleanup
+	//1st token cleanup
 	var ignoreOpen bool = false
 	var isOpenP bool = false
 	var isOpenB bool = false
@@ -486,29 +470,29 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 
 	var contextName = []string{"main_context"}
 
-	for x := 0; x < len(cleanTokenArray); x++ {
+	for x := 0; x < len(tokenArray); x++ {
 		if ignoreOpen {
 			//ignore open parenthesis if the last token is a function
 			//or ignore open braces if the last token is a variable that accessing its index
 			ignoreOpen = false
 			continue
 		}
-		if cleanTokenArray[x].Type == TOKEN_TYPE_OPEN_PARENTHESIS {
+		if tokenArray[x].Type == TOKEN_TYPE_OPEN_PARENTHESIS {
 			op_count[contextName[len(contextName)-1]] += 1
 		}
-		if cleanTokenArray[x].Type == TOKEN_TYPE_OPEN_BRACES {
+		if tokenArray[x].Type == TOKEN_TYPE_OPEN_BRACES {
 			ob_count[contextName[len(contextName)-1]] += 1
 		}
-		if cleanTokenArray[x].Type == TOKEN_TYPE_CLOSE_BRACES {
+		if tokenArray[x].Type == TOKEN_TYPE_CLOSE_BRACES {
 			if ob_count[contextName[len(contextName)-1]] > 0 {
 				ob_count[contextName[len(contextName)-1]] -= 1
 			} else {
-				cleanTokenArray[x].Type = TOKEN_TYPE_GET_ARRAY_END
-				cleanTokenArray[x].Context = contextName[len(contextName)-1]
+				tokenArray[x].Type = TOKEN_TYPE_GET_ARRAY_END
+				tokenArray[x].Context = contextName[len(contextName)-1]
 				contextName = contextName[:len(contextName)-1]
 			}
 		}
-		if cleanTokenArray[x].Type == TOKEN_TYPE_CLOSE_PARENTHESIS {
+		if tokenArray[x].Type == TOKEN_TYPE_CLOSE_PARENTHESIS {
 			if op_count[contextName[len(contextName)-1]] > 0 {
 				op_count[contextName[len(contextName)-1]] -= 1
 			} else {
@@ -517,215 +501,211 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 
 					if isFunctionDef {
 						isFunctionDef = false
-						cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_PARAM_END
+						tokenArray[x].Type = TOKEN_TYPE_FUNCTION_PARAM_END
 					} else {
-						cleanTokenArray[x].Type = TOKEN_TYPE_INVOKE_FUNCTION
-						cleanTokenArray[x].Context = contextName[len(contextName)-1]
+						tokenArray[x].Type = TOKEN_TYPE_INVOKE_FUNCTION
+						tokenArray[x].Context = contextName[len(contextName)-1]
 						contextName = contextName[:len(contextName)-1]
 					}
 				} else {
 					if isForLoop {
 						isForLoop = false
-						cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_PARAM_END
-						cleanTokenArray[x].Context = contextName[len(contextName)-1]
+						tokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_PARAM_END
+						tokenArray[x].Context = contextName[len(contextName)-1]
 						contextName = contextName[:len(contextName)-1]
 					}
 					if isWhileLoop {
 						isWhileLoop = false
-						cleanTokenArray[x].Type = TOKEN_TYPE_WHILE_LOOP_PARAM_END
-						cleanTokenArray[x].Context = contextName[len(contextName)-1]
+						tokenArray[x].Type = TOKEN_TYPE_WHILE_LOOP_PARAM_END
+						tokenArray[x].Context = contextName[len(contextName)-1]
 						contextName = contextName[:len(contextName)-1]
 					}
 					if isForIf {
 						isForIf = false
-						cleanTokenArray[x].Type = TOKEN_TYPE_IF_PARAM_END
-						cleanTokenArray[x].Context = contextName[len(contextName)-1]
+						tokenArray[x].Type = TOKEN_TYPE_IF_PARAM_END
+						tokenArray[x].Context = contextName[len(contextName)-1]
 						contextName = contextName[:len(contextName)-1]
 					}
 					if isForEf {
 						isForEf = false
-						cleanTokenArray[x].Type = TOKEN_TYPE_ELIF_PARAM_END
-						cleanTokenArray[x].Context = contextName[len(contextName)-1]
+						tokenArray[x].Type = TOKEN_TYPE_ELIF_PARAM_END
+						tokenArray[x].Context = contextName[len(contextName)-1]
 						contextName = contextName[:len(contextName)-1]
 					}
 				}
 			}
 		}
-		if cleanTokenArray[x].Type == TOKEN_TYPE_IDENTIFIER {
-			if IsReservedWord(cleanTokenArray[x].Value) {
+		if tokenArray[x].Type == TOKEN_TYPE_IDENTIFIER {
+			if IsReservedWord(tokenArray[x].Value) {
 				//Convert identifier to keyword if existing in reserved words
-				cleanTokenArray[x].Type = TOKEN_TYPE_KEYWORD
-				if cleanTokenArray[x].Value == "fd" {
+				tokenArray[x].Type = TOKEN_TYPE_KEYWORD
+				if tokenArray[x].Value == "fd" {
 					//function definition
 					openFunctionCount += 1
 					continue
 				}
-				if cleanTokenArray[x].Value == "df" {
+				if tokenArray[x].Value == "df" {
 					//end of function definition
-					cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_DEF_END
+					tokenArray[x].Type = TOKEN_TYPE_FUNCTION_DEF_END
 					openFunctionCount -= 1
 				}
-				if cleanTokenArray[x].Value == "rtn" {
+				if tokenArray[x].Value == "rtn" {
 					//function return
-					cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_RETURN
+					tokenArray[x].Type = TOKEN_TYPE_FUNCTION_RETURN
 				}
-				if cleanTokenArray[x].Value == "brk" {
+				if tokenArray[x].Value == "brk" {
 					//loop break
-					cleanTokenArray[x].Type = TOKEN_TYPE_LOOP_BREAK
+					tokenArray[x].Type = TOKEN_TYPE_LOOP_BREAK
 				}
-				if cleanTokenArray[x].Value == "fl" {
+				if tokenArray[x].Value == "fl" {
 					//for loop
 					isForLoop = true
-					cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_START
+					tokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_START
 					ignoreOpen = true
 
-					thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
+					thisSuffix := strconv.Itoa(tokenArray[x].Column)
 					contextName = append(contextName, "fl_"+thisSuffix)
 
-					if (x + 1) <= len(cleanTokenArray)-1 {
-						if cleanTokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
-							return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x+1].Line, cleanTokenArray[x+1].Column, "Unexpected token '"+cleanTokenArray[x+1].Value+"'", cleanTokenArray[x+1].FileName))
+					if (x + 1) <= len(tokenArray)-1 {
+						if tokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
+							return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x+1].Line, tokenArray[x+1].Column, "Unexpected token '"+tokenArray[x+1].Value+"'", tokenArray[x+1].FileName))
 						}
 					} else {
-						return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "Unfinished statement", cleanTokenArray[x].FileName))
+						return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Unfinished statement", tokenArray[x].FileName))
 					}
 					//continue
 				}
-				if cleanTokenArray[x].Value == "lf" {
-					cleanTokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_END
+				if tokenArray[x].Value == "lf" {
+					tokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_END
 				}
 
-				if cleanTokenArray[x].Value == "wl" {
+				if tokenArray[x].Value == "wl" {
 					//while loop
 					isWhileLoop = true
-					cleanTokenArray[x].Type = TOKEN_TYPE_WHILE_LOOP_START
+					tokenArray[x].Type = TOKEN_TYPE_WHILE_LOOP_START
 					ignoreOpen = true
 
-					thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
+					thisSuffix := strconv.Itoa(tokenArray[x].Column)
 					contextName = append(contextName, "wl_"+thisSuffix)
 
-					if (x + 1) <= len(cleanTokenArray)-1 {
-						if cleanTokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
-							return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x+1].Line, cleanTokenArray[x+1].Column, "Unexpected token '"+cleanTokenArray[x+1].Value+"'", cleanTokenArray[x+1].FileName))
+					if (x + 1) <= len(tokenArray)-1 {
+						if tokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
+							return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x+1].Line, tokenArray[x+1].Column, "Unexpected token '"+tokenArray[x+1].Value+"'", tokenArray[x+1].FileName))
 						}
 					} else {
-						return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "Unfinished statement", cleanTokenArray[x].FileName))
+						return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Unfinished statement", tokenArray[x].FileName))
 					}
 				}
-				if cleanTokenArray[x].Value == "lw" {
-					cleanTokenArray[x].Type = TOKEN_TYPE_WHILE_LOOP_END
+				if tokenArray[x].Value == "lw" {
+					tokenArray[x].Type = TOKEN_TYPE_WHILE_LOOP_END
 				}
 
-				if cleanTokenArray[x].Value == "if" || cleanTokenArray[x].Value == "ef" {
+				if tokenArray[x].Value == "if" || tokenArray[x].Value == "ef" {
 					//if or ef statement
-					thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
+					thisSuffix := strconv.Itoa(tokenArray[x].Column)
 
-					if cleanTokenArray[x].Value == "if" {
+					if tokenArray[x].Value == "if" {
 						//if statement
 						isForIf = true
-						cleanTokenArray[x].Type = TOKEN_TYPE_IF_START
+						tokenArray[x].Type = TOKEN_TYPE_IF_START
 						contextName = append(contextName, "if_"+thisSuffix)
 					} else {
 						//ef statement
 						isForEf = true
-						cleanTokenArray[x].Type = TOKEN_TYPE_ELIF_START
+						tokenArray[x].Type = TOKEN_TYPE_ELIF_START
 						contextName = append(contextName, "ef_"+thisSuffix)
 					}
 
 					ignoreOpen = true
-					if (x + 1) <= len(cleanTokenArray)-1 {
-						if cleanTokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
-							return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x+1].Line, cleanTokenArray[x+1].Column, "Unexpected token '"+cleanTokenArray[x+1].Value+"'", cleanTokenArray[x+1].FileName))
+					if (x + 1) <= len(tokenArray)-1 {
+						if tokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
+							return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x+1].Line, tokenArray[x+1].Column, "Unexpected token '"+tokenArray[x+1].Value+"'", tokenArray[x+1].FileName))
 						}
 					} else {
-						return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "Unfinished statement", cleanTokenArray[x].FileName))
+						return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Unfinished statement", tokenArray[x].FileName))
 					}
 					//continue
 				}
-				if cleanTokenArray[x].Value == "fi" {
-					cleanTokenArray[x].Type = TOKEN_TYPE_IF_END
+				if tokenArray[x].Value == "fi" {
+					tokenArray[x].Type = TOKEN_TYPE_IF_END
 				}
-				if cleanTokenArray[x].Value == "el" {
-					cleanTokenArray[x].Type = TOKEN_TYPE_ELSE
+				if tokenArray[x].Value == "el" {
+					tokenArray[x].Type = TOKEN_TYPE_ELSE
 				}
 			} else {
-				if (x + 1) <= len(cleanTokenArray)-1 {
+				if (x + 1) <= len(tokenArray)-1 {
 					isOpenP = false
 					//Check if the next token is '(', if yes then it's a function call
-					if cleanTokenArray[x+1].Type == TOKEN_TYPE_OPEN_PARENTHESIS {
+					if tokenArray[x+1].Type == TOKEN_TYPE_OPEN_PARENTHESIS {
 						isOpenP = true
 					}
 					if isOpenP {
 						//set to function call
-						cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION
+						tokenArray[x].Type = TOKEN_TYPE_FUNCTION
 						ignoreOpen = true
 						f_count += 1
 						if (x - 1) >= 0 {
-							if cleanTokenArray[x-1].Value == "fd" {
+							if tokenArray[x-1].Value == "fd" {
 								//set to function definition
-								cleanTokenArray[x].Type = TOKEN_TYPE_FUNCTION_DEF_START
+								tokenArray[x].Type = TOKEN_TYPE_FUNCTION_DEF_START
 								isFunctionDef = true
 								if openFunctionCount > 1 {
 									//if it's already true then
 									//you define a function inside a function
 									//but it's prohibited so raise an error
-									return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "You cannot define a function inside a function", lexer.FileName))
+									return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "You cannot define a function inside a function", lexer.FileName))
 								}
 							}
 						}
-						if cleanTokenArray[x].Type == TOKEN_TYPE_FUNCTION {
-							thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
-							contextName = append(contextName, cleanTokenArray[x].Value+"_"+thisSuffix)
+						if tokenArray[x].Type == TOKEN_TYPE_FUNCTION {
+							thisSuffix := strconv.Itoa(tokenArray[x].Column)
+							contextName = append(contextName, tokenArray[x].Value+"_"+thisSuffix)
 						}
 					}
 					isOpenB = false
 					//Check if the next token is '[', if yes then it's an array getter
-					if cleanTokenArray[x+1].Type == TOKEN_TYPE_OPEN_BRACES {
+					if tokenArray[x+1].Type == TOKEN_TYPE_OPEN_BRACES {
 						isOpenB = true
 					}
 					if isOpenB {
-						cleanTokenArray[x].Type = TOKEN_TYPE_GET_ARRAY_START
+						tokenArray[x].Type = TOKEN_TYPE_GET_ARRAY_START
 						ignoreOpen = true
-						thisSuffix := strconv.Itoa(cleanTokenArray[x].Column)
+						thisSuffix := strconv.Itoa(tokenArray[x].Column)
 						contextName = append(contextName, "array_get"+thisSuffix)
 					}
 				}
 			}
-		} else if cleanTokenArray[x].Type == TOKEN_TYPE_STRING {
-			if !((x + 1) < len(cleanTokenArray)) {
-				return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "Expected closing of string", lexer.FileName))
-			}
-		} else if cleanTokenArray[x].Type == TOKEN_TYPE_MULTI_COMMENT {
-			if !((x + 1) < len(cleanTokenArray)) {
-				return finalTokenArray, errors.New(SyntaxErrorMessage(cleanTokenArray[x].Line, cleanTokenArray[x].Column, "Expected closing of multi line comment", lexer.FileName))
+		} else if tokenArray[x].Type == TOKEN_TYPE_STRING {
+			if !((x + 1) < len(tokenArray)) {
+				return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Expected closing of string", lexer.FileName))
 			}
 		}
 
 		//set context
-		if cleanTokenArray[x].Context == "" {
-			cleanTokenArray[x].Context = contextName[len(contextName)-1]
+		if tokenArray[x].Context == "" {
+			tokenArray[x].Context = contextName[len(contextName)-1]
 		}
 
-		if x != 0 && (cleanTokenArray[x].Type == TOKEN_TYPE_FLOAT || cleanTokenArray[x].Type == TOKEN_TYPE_INTEGER) {
-			if cleanTokenArray[x-1].Type == TOKEN_TYPE_MINUS {
+		if x != 0 && (tokenArray[x].Type == TOKEN_TYPE_FLOAT || tokenArray[x].Type == TOKEN_TYPE_INTEGER) {
+			if tokenArray[x-1].Type == TOKEN_TYPE_MINUS {
 
 				if (x - 2) >= 0 {
-					if cleanTokenArray[x-2].Type != TOKEN_TYPE_FLOAT && cleanTokenArray[x-2].Type != TOKEN_TYPE_INTEGER && cleanTokenArray[x-2].Type != TOKEN_TYPE_IDENTIFIER && cleanTokenArray[x-2].Type != TOKEN_TYPE_CLOSE_PARENTHESIS && cleanTokenArray[x-2].Type != TOKEN_TYPE_INVOKE_FUNCTION { //added && cleanTokenArray[x-2].Type != TOKEN_TYPE_CLOSE_PARENTHESIS
+					if tokenArray[x-2].Type != TOKEN_TYPE_FLOAT && tokenArray[x-2].Type != TOKEN_TYPE_INTEGER && tokenArray[x-2].Type != TOKEN_TYPE_IDENTIFIER && tokenArray[x-2].Type != TOKEN_TYPE_CLOSE_PARENTHESIS && tokenArray[x-2].Type != TOKEN_TYPE_INVOKE_FUNCTION { //added && tokenArray[x-2].Type != TOKEN_TYPE_CLOSE_PARENTHESIS
 						//set to negative number
-						finalTokenArray[len(finalTokenArray)-1].Value += cleanTokenArray[x].Value
-						finalTokenArray[len(finalTokenArray)-1].Type = cleanTokenArray[x].Type
+						finalTokenArray[len(finalTokenArray)-1].Value += tokenArray[x].Value
+						finalTokenArray[len(finalTokenArray)-1].Type = tokenArray[x].Type
 					} else {
-						finalTokenArray = append(finalTokenArray, cleanTokenArray[x])
+						finalTokenArray = append(finalTokenArray, tokenArray[x])
 					}
 				} else {
-					finalTokenArray = append(finalTokenArray, cleanTokenArray[x])
+					finalTokenArray = append(finalTokenArray, tokenArray[x])
 				}
 
 			} else {
-				finalTokenArray = append(finalTokenArray, cleanTokenArray[x])
+				finalTokenArray = append(finalTokenArray, tokenArray[x])
 			}
 		} else {
-			finalTokenArray = append(finalTokenArray, cleanTokenArray[x])
+			finalTokenArray = append(finalTokenArray, tokenArray[x])
 		}
 	}
 
