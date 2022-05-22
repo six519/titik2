@@ -248,6 +248,27 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	stringOpener := "\""
 	var ignoreNext bool = false
 
+	// vars for cleanup
+	var ignoreOpen bool = false
+	var isOpenP bool = false
+	var isOpenB bool = false
+	var isFunctionDef bool = false
+	var isForLoop bool = false
+	var isWhileLoop bool = false
+	var isForIf bool = false
+	var isForEf bool = false
+	var openFunctionCount int = 0
+	var f_count int = 0
+	var op_count map[string]int
+	var ob_count map[string]int
+	op_count = make(map[string]int)
+	ob_count = make(map[string]int)
+	var contextName = []string{"main_context"}
+	var contextNameBrace = []string{"main_context"}
+	var contextToReplaceBrace string = ""
+	var contextNameBracket = []string{"main_context"}
+	var contextToReplaceBracket string = ""
+
 	//read the file contents line by line
 	for x := 0; x < len(lexer.fileContents); x++ {
 		//read character by character
@@ -450,24 +471,8 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 		}
 	}
 
-	//1st token cleanup
-	var ignoreOpen bool = false
-	var isOpenP bool = false
-	var isOpenB bool = false
-	var isFunctionDef bool = false
-	var isForLoop bool = false
-	var isWhileLoop bool = false
-	var isForIf bool = false
-	var isForEf bool = false
-	var openFunctionCount int = 0
-	var f_count int = 0
-	var op_count map[string]int
-	var ob_count map[string]int
-	op_count = make(map[string]int)
-	ob_count = make(map[string]int)
-
-	var contextName = []string{"main_context"}
-
+	//token cleaup
+	lastTokenCount := 0
 	for x := 0; x < len(tokenArray); x++ {
 		if ignoreOpen {
 			//ignore open parenthesis if the last token is a function
@@ -705,47 +710,44 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 		} else {
 			finalTokenArray = append(finalTokenArray, tokenArray[x])
 		}
-	}
 
-	//3rd token cleanup (for open and close braces)
-	var contextNameBrace = []string{"main_context"}
-	var contextToReplaceBrace string = ""
-	var contextNameBracket = []string{"main_context"}
-	var contextToReplaceBracket string = ""
-	for x := 0; x < len(finalTokenArray); x++ {
+		//cleanup for open and close braces/bracket?
+		if lastTokenCount != len(finalTokenArray) {
 
-		//braces
-		if finalTokenArray[x].Type == TOKEN_TYPE_OPEN_BRACES {
-			thisSuffix := strconv.Itoa(finalTokenArray[x].Column)
-			contextNameBrace = append(contextNameBrace, "ob_"+thisSuffix)
-			contextToReplaceBrace = finalTokenArray[x].Context
+			//braces
+			if finalTokenArray[lastTokenCount].Type == TOKEN_TYPE_OPEN_BRACES {
+				thisSuffix := strconv.Itoa(finalTokenArray[lastTokenCount].Column)
+				contextNameBrace = append(contextNameBrace, "ob_"+thisSuffix)
+				contextToReplaceBrace = finalTokenArray[lastTokenCount].Context
+			}
+
+			if finalTokenArray[lastTokenCount].Type == TOKEN_TYPE_CLOSE_BRACES {
+				finalTokenArray[lastTokenCount].Context = contextNameBrace[len(contextNameBrace)-1]
+				contextNameBrace = contextNameBrace[:len(contextNameBrace)-1]
+			}
+
+			if finalTokenArray[lastTokenCount].Context == contextToReplaceBrace {
+				finalTokenArray[lastTokenCount].Context = contextNameBrace[len(contextNameBrace)-1]
+			}
+
+			//bracket
+			if finalTokenArray[lastTokenCount].Type == TOKEN_TYPE_OPEN_BRACKET {
+				thisSuffix := strconv.Itoa(finalTokenArray[lastTokenCount].Column)
+				contextNameBracket = append(contextNameBracket, "obr_"+thisSuffix)
+				contextToReplaceBracket = finalTokenArray[lastTokenCount].Context
+			}
+
+			if finalTokenArray[lastTokenCount].Type == TOKEN_TYPE_CLOSE_BRACKET {
+				finalTokenArray[lastTokenCount].Context = contextNameBracket[len(contextNameBracket)-1]
+				contextNameBracket = contextNameBracket[:len(contextNameBracket)-1]
+			}
+
+			if finalTokenArray[lastTokenCount].Context == contextToReplaceBracket {
+				finalTokenArray[lastTokenCount].Context = contextNameBracket[len(contextNameBracket)-1]
+			}
+
+			lastTokenCount += 1
 		}
-
-		if finalTokenArray[x].Type == TOKEN_TYPE_CLOSE_BRACES {
-			finalTokenArray[x].Context = contextNameBrace[len(contextNameBrace)-1]
-			contextNameBrace = contextNameBrace[:len(contextNameBrace)-1]
-		}
-
-		if finalTokenArray[x].Context == contextToReplaceBrace {
-			finalTokenArray[x].Context = contextNameBrace[len(contextNameBrace)-1]
-		}
-
-		//bracket
-		if finalTokenArray[x].Type == TOKEN_TYPE_OPEN_BRACKET {
-			thisSuffix := strconv.Itoa(finalTokenArray[x].Column)
-			contextNameBracket = append(contextNameBracket, "obr_"+thisSuffix)
-			contextToReplaceBracket = finalTokenArray[x].Context
-		}
-
-		if finalTokenArray[x].Type == TOKEN_TYPE_CLOSE_BRACKET {
-			finalTokenArray[x].Context = contextNameBracket[len(contextNameBracket)-1]
-			contextNameBracket = contextNameBracket[:len(contextNameBracket)-1]
-		}
-
-		if finalTokenArray[x].Context == contextToReplaceBracket {
-			finalTokenArray[x].Context = contextNameBracket[len(contextNameBracket)-1]
-		}
-
 	}
 
 	return finalTokenArray, nil
