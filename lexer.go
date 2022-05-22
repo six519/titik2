@@ -450,8 +450,6 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 		}
 	}
 
-	setToken(false, &tokenArray, &isTokenInit, -1, -1, TOKEN_TYPE_NEWLINE, lexer.FileName, "END_OF_CODE") //add newline to the end to make sure that code will be executed
-
 	//1st token cleanup
 	var ignoreOpen bool = false
 	var isOpenP bool = false
