@@ -9,6 +9,15 @@ import (
 	"unicode"
 )
 
+const CONTEXT_NAME_MAIN string = "main_context"
+const CONTEXT_NAME_PREFIX_BRACE string = "ob_"
+const CONTEXT_NAME_PREFIX_BRACKET string = "obr_"
+const CONTEXT_NAME_PREFIX_FOR_LOOP string = "fl_"
+const CONTEXT_NAME_PREFIX_ARRAY string = "array_get"
+const CONTEXT_NAME_PREFIX_WHILE_LOOP string = "wl_"
+const CONTEXT_NAME_PREFIX_IF string = "if_"
+const CONTEXT_NAME_PREFIX_ELSEIF string = "ef_"
+
 //Tokenizer States
 const (
 	TOKENIZER_STATE_GET_WORD = iota
@@ -263,10 +272,10 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var ob_count map[string]int
 	op_count = make(map[string]int)
 	ob_count = make(map[string]int)
-	var contextName = []string{"main_context"}
-	var contextNameBrace = []string{"main_context"}
+	var contextName = []string{CONTEXT_NAME_MAIN}
+	var contextNameBrace = []string{CONTEXT_NAME_MAIN}
 	var contextToReplaceBrace string = ""
-	var contextNameBracket = []string{"main_context"}
+	var contextNameBracket = []string{CONTEXT_NAME_MAIN}
 	var contextToReplaceBracket string = ""
 
 	//read the file contents line by line
@@ -567,7 +576,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					ignoreOpen = true
 
 					thisSuffix := strconv.Itoa(tokenArray[x].Column)
-					contextName = append(contextName, "fl_"+thisSuffix)
+					contextName = append(contextName, CONTEXT_NAME_PREFIX_FOR_LOOP+thisSuffix)
 
 					if (x + 1) <= len(tokenArray)-1 {
 						if tokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
@@ -589,7 +598,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					ignoreOpen = true
 
 					thisSuffix := strconv.Itoa(tokenArray[x].Column)
-					contextName = append(contextName, "wl_"+thisSuffix)
+					contextName = append(contextName, CONTEXT_NAME_PREFIX_WHILE_LOOP+thisSuffix)
 
 					if (x + 1) <= len(tokenArray)-1 {
 						if tokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
@@ -611,12 +620,12 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						//if statement
 						isForIf = true
 						tokenArray[x].Type = TOKEN_TYPE_IF_START
-						contextName = append(contextName, "if_"+thisSuffix)
+						contextName = append(contextName, CONTEXT_NAME_PREFIX_IF+thisSuffix)
 					} else {
 						//ef statement
 						isForEf = true
 						tokenArray[x].Type = TOKEN_TYPE_ELIF_START
-						contextName = append(contextName, "ef_"+thisSuffix)
+						contextName = append(contextName, CONTEXT_NAME_PREFIX_ELSEIF+thisSuffix)
 					}
 
 					ignoreOpen = true
@@ -674,7 +683,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						tokenArray[x].Type = TOKEN_TYPE_GET_ARRAY_START
 						ignoreOpen = true
 						thisSuffix := strconv.Itoa(tokenArray[x].Column)
-						contextName = append(contextName, "array_get"+thisSuffix)
+						contextName = append(contextName, CONTEXT_NAME_PREFIX_ARRAY+thisSuffix)
 					}
 				}
 			}
@@ -717,7 +726,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			//braces
 			if finalTokenArray[lastTokenCount].Type == TOKEN_TYPE_OPEN_BRACES {
 				thisSuffix := strconv.Itoa(finalTokenArray[lastTokenCount].Column)
-				contextNameBrace = append(contextNameBrace, "ob_"+thisSuffix)
+				contextNameBrace = append(contextNameBrace, CONTEXT_NAME_PREFIX_BRACE+thisSuffix)
 				contextToReplaceBrace = finalTokenArray[lastTokenCount].Context
 			}
 
@@ -733,7 +742,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			//bracket
 			if finalTokenArray[lastTokenCount].Type == TOKEN_TYPE_OPEN_BRACKET {
 				thisSuffix := strconv.Itoa(finalTokenArray[lastTokenCount].Column)
-				contextNameBracket = append(contextNameBracket, "obr_"+thisSuffix)
+				contextNameBracket = append(contextNameBracket, CONTEXT_NAME_PREFIX_BRACKET+thisSuffix)
 				contextToReplaceBracket = finalTokenArray[lastTokenCount].Context
 			}
 

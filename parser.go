@@ -39,7 +39,7 @@ type Parser struct {
 func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, gotReturn *bool, returnToken *Token, isLoop bool, needBreak *bool, stackReference *[]Token, globalSettings *GlobalSettingsObject, getLastStackBool bool, lastStackBool *bool) error {
 	var tokensToEvaluate []Token
 	operatorPrecedences := map[string]int{"function_return": 0, ":": 1, "=": 1, "+": 2, "-": 2, "&": 2, "|": 2, "==": 2, "<>": 2, ">": 2, "<": 2, ">=": 2, "<=": 2, "/": 3, "*": 3} //operator order of precedences
-	currentContext := "main_context"
+	currentContext := CONTEXT_NAME_MAIN
 	var operatorStack map[string][]Token
 	operatorStack = make(map[string][]Token)
 	var arrayArgCount map[string]int
@@ -367,12 +367,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					}
 				}
 
-				for len(operatorStack["main_context"]) > 0 {
-					if operatorStack["main_context"][len(operatorStack["main_context"])-1].Type == TOKEN_TYPE_OPEN_PARENTHESIS {
-						return errors.New(SyntaxErrorMessage(operatorStack["main_context"][len(operatorStack["main_context"])-1].Line, operatorStack["main_context"][len(operatorStack["main_context"])-1].Column, "Unexpected token '"+operatorStack["main_context"][len(operatorStack["main_context"])-1].Value+"'", operatorStack["main_context"][len(operatorStack["main_context"])-1].FileName))
+				for len(operatorStack[CONTEXT_NAME_MAIN]) > 0 {
+					if operatorStack[CONTEXT_NAME_MAIN][len(operatorStack[CONTEXT_NAME_MAIN])-1].Type == TOKEN_TYPE_OPEN_PARENTHESIS {
+						return errors.New(SyntaxErrorMessage(operatorStack[CONTEXT_NAME_MAIN][len(operatorStack[CONTEXT_NAME_MAIN])-1].Line, operatorStack[CONTEXT_NAME_MAIN][len(operatorStack[CONTEXT_NAME_MAIN])-1].Column, "Unexpected token '"+operatorStack[CONTEXT_NAME_MAIN][len(operatorStack[CONTEXT_NAME_MAIN])-1].Value+"'", operatorStack[CONTEXT_NAME_MAIN][len(operatorStack[CONTEXT_NAME_MAIN])-1].FileName))
 					}
-					outputQueue = append(outputQueue, operatorStack["main_context"][len(operatorStack["main_context"])-1])
-					operatorStack["main_context"] = operatorStack["main_context"][:len(operatorStack["main_context"])-1]
+					outputQueue = append(outputQueue, operatorStack[CONTEXT_NAME_MAIN][len(operatorStack[CONTEXT_NAME_MAIN])-1])
+					operatorStack[CONTEXT_NAME_MAIN] = operatorStack[CONTEXT_NAME_MAIN][:len(operatorStack[CONTEXT_NAME_MAIN])-1]
 				}
 				//end of shunting-yard
 
@@ -2044,7 +2044,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 													break
 												} else {
 													if currentToken2.Context == will_change_to_main {
-														currentToken2.Context = "main_context"
+														currentToken2.Context = CONTEXT_NAME_MAIN
 													}
 													paramTokens = append(paramTokens, currentToken2)
 												}
@@ -2061,7 +2061,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											var thisLastStackBool bool = false
 
 											//add newline to paramTokens so parser can execute it
-											paramTokens = append(paramTokens, Token{Value: "\n", FileName: currentToken2.FileName, Type: TOKEN_TYPE_NEWLINE, Line: currentToken2.Line, Column: currentToken2.Column, Context: "main_context"})
+											paramTokens = append(paramTokens, Token{Value: "\n", FileName: currentToken2.FileName, Type: TOKEN_TYPE_NEWLINE, Line: currentToken2.Line, Column: currentToken2.Column, Context: CONTEXT_NAME_MAIN})
 
 											prsr := Parser{}
 											parserErr := prsr.Parse(paramTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &efGotReturn, &efReturnToken, isLoop, &efNeedBreak, &efStackReference, globalSettings, getLastStackBool, &thisLastStackBool)
@@ -2373,7 +2373,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 			tokensToEvaluate = append(tokensToEvaluate, tokenArray[x])
 		} else {
 
-			if isWhileLoopStatement && strings.Index(tokenArray[x].Context, "wl_") == 0 {
+			if isWhileLoopStatement && strings.Index(tokenArray[x].Context, CONTEXT_NAME_PREFIX_WHILE_LOOP) == 0 {
 				//collect all the parameters from while loop
 				//to be able to parse later on the body of while loop
 				if _, ok := whileLoopIsDone[tokenArray[x].Context]; ok {
