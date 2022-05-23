@@ -122,7 +122,7 @@ func validateParameters(arguments []FunctionArgument, errMessage *error, line_nu
 			err_msg = "a boolean"
 		default:
 		}
-		*errMessage = errors.New("Error: Parameter must be " + err_msg + " type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		*errMessage = errors.New("Error: Parameter " + strconv.Itoa(len(arguments)-param_index) + " must be " + err_msg + " type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 	}
 
 	return ret
