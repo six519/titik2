@@ -13,11 +13,8 @@ import (
 func Netc_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		connection, err := net.Dial(arguments[1].StringValue, arguments[0].StringValue)
 
 		if err != nil {
@@ -35,11 +32,8 @@ func Netc_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 func Netl_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		connection, err := net.Listen(arguments[1].StringValue, arguments[0].StringValue)
 
 		if err != nil {
@@ -57,9 +51,7 @@ func Netl_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 func Netla_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		if (*globalSettings).netConnectionListener[arguments[0].StringValue] == nil {
 			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
@@ -123,11 +115,8 @@ func netHandleRequest(connection_reference string, function_name string, globalV
 func Netlaf_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		if (*globalSettings).netConnectionListener[arguments[1].StringValue] == nil {
 			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
@@ -148,9 +137,7 @@ func Netlaf_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 func Netlx_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		if (*globalSettings).netConnectionListener[arguments[0].StringValue] == nil {
 			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
@@ -170,9 +157,7 @@ func Netlx_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 func Netx_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		if (*globalSettings).netConnection[arguments[0].StringValue] == nil {
 			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
@@ -192,11 +177,8 @@ func Netx_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 func Netw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		if (*globalSettings).netConnection[arguments[1].StringValue] == nil {
 			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
@@ -214,11 +196,8 @@ func Netw_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 func Netr_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if arguments[0].Type != ARG_TYPE_INTEGER {
-		*errMessage = errors.New("Error: Parameter 2 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
 		if (*globalSettings).netConnection[arguments[1].StringValue] == nil {
 			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
@@ -236,13 +215,9 @@ func Netr_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 func Netul_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if arguments[0].Type != ARG_TYPE_INTEGER {
-		*errMessage = errors.New("Error: Parameter 3 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[2].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
 		connection, err := net.ListenUDP(arguments[2].StringValue, &net.UDPAddr{
 			Port: arguments[0].IntegerValue,
 			IP:   net.ParseIP(arguments[1].StringValue),
@@ -263,15 +238,10 @@ func Netul_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 func Netulf_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 4 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_INTEGER {
-		*errMessage = errors.New("Error: Parameter 3 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[2].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[3].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		connection, err := net.ListenUDP(arguments[3].StringValue, &net.UDPAddr{
 			Port: arguments[1].IntegerValue,
 			IP:   net.ParseIP(arguments[2].StringValue),
@@ -293,11 +263,8 @@ func Netulf_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 func Netur_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if arguments[0].Type != ARG_TYPE_INTEGER {
-		*errMessage = errors.New("Error: Parameter 2 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
 		if (*globalSettings).netUDPConnectionListener[arguments[1].StringValue] == nil {
 			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
@@ -315,15 +282,10 @@ func Netur_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 func Netus_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_INTEGER {
-		*errMessage = errors.New("Error: Parameter 4 must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 3 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[2].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[3].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
 		if (*globalSettings).netUDPConnectionListener[arguments[3].StringValue] == nil {
 			*errMessage = errors.New("Error: Uninitialized connection on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
