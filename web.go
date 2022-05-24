@@ -119,11 +119,8 @@ func (webObject *WebObject) handleHTTP(writer http.ResponseWriter, request *http
 func Http_au_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		_, existing := (*globalSettings).webObject.staticURLs[arguments[1].StringValue]
 		if existing {
 			*errMessage = errors.New("Error: URL " + arguments[1].StringValue + " already exists as static URL on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
@@ -138,11 +135,8 @@ func Http_au_execute(arguments []FunctionArgument, errMessage *error, globalVari
 func Http_su_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 2 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		_, ok := (*globalSettings).webObject.URLs[arguments[1].StringValue]
 		if ok {
 			*errMessage = errors.New("Error: URL " + arguments[1].StringValue + " already exists on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
@@ -163,10 +157,7 @@ func Http_su_execute(arguments []FunctionArgument, errMessage *error, globalVari
 func Http_run_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
-
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		_, ok := (*globalSettings).webObject.URLs["/"]
 
 		if !ok {
@@ -194,10 +185,7 @@ func Http_run_execute(arguments []FunctionArgument, errMessage *error, globalVar
 func Http_p_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
-
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		if !(*globalSettings).webObject.IsProcessing {
 			*errMessage = errors.New("Error: Web server should be running on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 			return ret
@@ -225,9 +213,7 @@ func Http_gm_execute(arguments []FunctionArgument, errMessage *error, globalVari
 func Http_gq_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		if !(*globalSettings).webObject.IsProcessing {
 			*errMessage = errors.New("Error: Web server should be running on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 			return ret
@@ -252,9 +238,7 @@ func Http_gq_execute(arguments []FunctionArgument, errMessage *error, globalVari
 func Http_gfp_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		if !(*globalSettings).webObject.IsProcessing {
 			*errMessage = errors.New("Error: Web server should be running on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 			return ret
@@ -275,11 +259,8 @@ func Http_gfp_execute(arguments []FunctionArgument, errMessage *error, globalVar
 func Http_lt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY {
-		*errMessage = errors.New("Error: Parameter 2 must be a glossary type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else if arguments[1].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter 1 must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_ASSOCIATIVE_ARRAY) {
 		//get all associative arrays
 		//and convert all to string
 		//and add to map
