@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -14,9 +13,7 @@ import (
 func Ex_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_INTEGER {
-		*errMessage = errors.New("Error: Parameter must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
 		os.Exit(arguments[0].IntegerValue)
 	}
 
@@ -26,9 +23,7 @@ func Ex_execute(arguments []FunctionArgument, errMessage *error, globalVariableA
 func Abt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		*errMessage = errors.New(arguments[0].StringValue)
 	}
 
@@ -42,9 +37,7 @@ func Exe_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 	isSuccess := false
 	outString := ""
 
-	if arguments[0].Type != ARG_TYPE_STRING {
-		*errMessage = errors.New("Error: Parameter must be a string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		cmds := strings.Split(arguments[0].StringValue, " ")
 
 		cmd := exec.Command(cmds[0], cmds[1:]...)
@@ -71,9 +64,7 @@ func Exe_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 func Zzz_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
-	if arguments[0].Type != ARG_TYPE_INTEGER {
-		*errMessage = errors.New("Error: Parameter must be an integer type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
-	} else {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
 		time.Sleep(time.Duration(arguments[0].IntegerValue) * time.Millisecond)
 	}
 
