@@ -2,8 +2,8 @@ Installation Instructions
 =========================
 
 
-Linux (Ubuntu, Debian)
-----------------------
+Linux (Ubuntu 22.04, Debian 13, Linux Mint 20.3, Raspbian 11, Elementary OS 5.1)
+--------------------------------------------------------------------------------
 
 ::
 
