@@ -9,8 +9,8 @@ Linux (Ubuntu, Debian)
 
     curl -s https://packagecloud.io/install/repositories/six519/titik/script.deb.sh | sudo bash && sudo apt install titik
 
-Linux (Red Hat, CentOS, Fedora)
--------------------------------
+Linux (Red Hat 7/8, CentOS 7/8, Fedora 36, openSUSE 42.3, Scientific Linux 7, Oracle Linux 8)
+---------------------------------------------------------------------------------------------
 
 ::
 
