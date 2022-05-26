@@ -28,8 +28,8 @@ Need to install Homebrew_ first
     brew tap six519/tap
     brew install titik
 
-FreeBSD
--------
+FreeBSD 13.1
+------------
 
 ::
     
