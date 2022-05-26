@@ -17,6 +17,7 @@ files: {
   /usr/local/share/titik-3.3.0/console.go: 'sha256sum';
   /usr/local/share/titik-3.3.0/conversion.go: 'sha256sum';
   /usr/local/share/titik-3.3.0/cryptographic.go: 'sha256sum';
+  /usr/local/share/titik-3.3.0/file.go: 'sha256sum';
   /usr/local/share/titik-3.3.0/function.go: 'sha256sum';
   /usr/local/share/titik-3.3.0/go.mod: 'sha256sum';
   /usr/local/share/titik-3.3.0/go.sum: 'sha256sum';
