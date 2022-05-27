@@ -1039,6 +1039,28 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							//assignment operation
 							value := stack[len(stack)-1]
 							stack = stack[:len(stack)-1]
+
+							if value.From_function_call {
+								if len(value.Array) != 1 {
+									return errors.New(SyntaxErrorMessage(value.Line, value.Column, "Unexpected token '"+value.Value+"'", value.FileName))
+								}
+								if value.Array[0].Type != TOKEN_TYPE_INTEGER {
+									return errors.New(SyntaxErrorMessage(value.Line, value.Column, "Unexpected token '"+value.Value+"'", value.FileName))
+								}
+
+								// get the real value from array
+								this_index, _ := strconv.Atoi(value.Array[0].Value)
+								old_value := value
+								value = stack[len(stack)-1]
+								stack = stack[:len(stack)-1]
+
+								if (this_index + 1) > len(value.Array) {
+									return errors.New(SyntaxErrorMessage(old_value.Line, old_value.Column, "Index out of range", old_value.FileName))
+								}
+
+								value = value.Array[this_index]
+							}
+
 							var errConvert error
 
 							//if value is an identifier

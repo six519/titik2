@@ -175,6 +175,7 @@ type Token struct {
 	Array_ref_var_name  string
 	Array_ref_index     int
 	Array_ref_index_str string
+	From_function_call  bool
 }
 
 type TokenArray struct {
@@ -493,6 +494,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			op_count[contextName[len(contextName)-1]] += 1
 		}
 		if tokenArray[x].Type == TOKEN_TYPE_OPEN_BRACES {
+			if tokenArray[x-1].Type == TOKEN_TYPE_INVOKE_FUNCTION {
+				tokenArray[x].From_function_call = true
+			}
 			ob_count[contextName[len(contextName)-1]] += 1
 		}
 		if tokenArray[x].Type == TOKEN_TYPE_CLOSE_BRACES {
