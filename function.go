@@ -250,6 +250,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//str_sub(<string>, <integer>, <integer>) - Substring
 	defineFunction(globalFunctionArray, "str_sub", Str_sub_execute, 3, true)
 
+	//str_ind(<string>, <string>) - Get index of specified substring
+	defineFunction(globalFunctionArray, "str_ind", Str_ind_execute, 2, true)
+
 	//MATH FUNCTIONALITIES
 	//abs(<float/integer>) - Absolute
 	defineFunction(globalFunctionArray, "abs", Abs_execute, 1, true)

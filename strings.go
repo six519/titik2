@@ -116,3 +116,14 @@ func Str_sub_execute(arguments []FunctionArgument, errMessage *error, globalVari
 
 	return ret
 }
+
+func Str_ind_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: -1}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		ret.IntegerValue = strings.Index(arguments[1].StringValue, arguments[0].StringValue)
+	}
+
+	return ret
+}

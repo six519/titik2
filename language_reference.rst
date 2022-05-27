@@ -349,6 +349,12 @@ String Functions
     ::
         string str_sub(string, integer, integer)
 
+- **str_ind** - get index of specified substring.
+
+    **Declaration:**
+    ::
+        integer str_ind(string, string)
+
 System Functions
 ~~~~~~~~~~~~~~~~
 
