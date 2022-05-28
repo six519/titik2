@@ -1608,7 +1608,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								if (this_index + 1) > len(value.Array) {
 									return errors.New(SyntaxErrorMessage(old_value.Line, old_value.Column, "Index out of range", old_value.FileName))
 								}
-								stack = append(stack, value.Array[this_index])
+								this_value := value.Array[this_index]
+								this_value.Column = value.Column
+								stack = append(stack, this_value)
 							} else {
 								//array declaration
 								processedArg := 0
