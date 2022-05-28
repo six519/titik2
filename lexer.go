@@ -309,7 +309,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					setToken(false, &tokenArray, &isTokenInit, x+1, x2+1, TOKEN_TYPE_NEWLINE, lexer.FileName, currentChar) //set token
 				} else if currentChar == "\t" || currentChar == " " {
 					//tab & space
-					if tokenArray[len(tokenArray)-1].Value == "fd" {
+					if tokenArray[len(tokenArray)-1].Value == "fd" || tokenArray[len(tokenArray)-1].Value == "rtn" {
 						isTokenInit = false
 					}
 				} else if currentChar == "=" {
