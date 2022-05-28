@@ -33,6 +33,12 @@ func expectedTokenTypes(token Token, tokenTypes ...int) error {
 	return nil
 }
 
+func PopStack(stack *[]Token) Token {
+	ret := (*stack)[len((*stack))-1]
+	*stack = (*stack)[:len((*stack))-1]
+	return ret
+}
+
 type Parser struct {
 }
 
@@ -395,14 +401,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						if currentToken.Type == TOKEN_TYPE_PLUS || currentToken.Type == TOKEN_TYPE_MINUS || currentToken.Type == TOKEN_TYPE_DIVIDE || currentToken.Type == TOKEN_TYPE_MULTIPLY {
 							//arithmetic operation
 							//NOTE: ASSUME THAT RIGHT OPERAND AND LEFT OPERAND ARE INTEGER AND FLOAT ONLY (NO IDENTIFIER, STRING ETC... (TEMPORARY ONLY)
-							rightOperand := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							rightOperand := PopStack(&stack)
 							var tempRightInt int
 							var tempRightFloat float64
 							var tempRightString string
 
-							leftOperand := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							leftOperand := PopStack(&stack)
 							var tempLeftInt int
 							var tempLeftFloat float64
 							var tempLeftString string
@@ -522,11 +526,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 						} else if currentToken.Type == TOKEN_TYPE_AMPERSAND || currentToken.Type == TOKEN_TYPE_OR || currentToken.Type == TOKEN_TYPE_EQUALITY || currentToken.Type == TOKEN_TYPE_INEQUALITY || currentToken.Type == TOKEN_TYPE_GREATER_THAN || currentToken.Type == TOKEN_TYPE_LESS_THAN || currentToken.Type == TOKEN_TYPE_GREATER_THAN_OR_EQUALS || currentToken.Type == TOKEN_TYPE_LESS_THAN_OR_EQUALS {
 							//logical or comparison operation
-							rightOperand := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							rightOperand := PopStack(&stack)
 
-							leftOperand := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							leftOperand := PopStack(&stack)
 
 							var errConvert error
 
@@ -1037,8 +1039,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							lastToken = result //used in while loop to track the parameter
 						} else if currentToken.Type == TOKEN_TYPE_EQUALS {
 							//assignment operation
-							value := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							value := PopStack(&stack)
 							var errConvert error
 
 							//if value is an identifier
@@ -1050,8 +1051,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							}
 
-							variable := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							variable := PopStack(&stack)
 
 							//validate value
 							errVal := expectedTokenTypes(value, TOKEN_TYPE_INTEGER, TOKEN_TYPE_FLOAT, TOKEN_TYPE_STRING, TOKEN_TYPE_NONE, TOKEN_TYPE_BOOLEAN, TOKEN_TYPE_ARRAY, TOKEN_TYPE_ASSOCIATIVE_ARRAY)
@@ -1287,8 +1287,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								for true {
 									var param Token
 									//add to functionargument one by one
-									param = stack[len(stack)-1]
-									stack = stack[:len(stack)-1]
+									param = PopStack(&stack)
 
 									var errConvert error
 									if param.Type == TOKEN_TYPE_IDENTIFIER {
@@ -1594,8 +1593,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						} else if currentToken.Type == TOKEN_TYPE_OPEN_BRACES || currentToken.Type == TOKEN_TYPE_OPEN_BRACKET {
 
 							if currentToken.From_function_call {
-								value := stack[len(stack)-1]
-								stack = stack[:len(stack)-1]
+								value := PopStack(&stack)
 
 								if value.Type != TOKEN_TYPE_INTEGER {
 									return errors.New(SyntaxErrorMessage(value.Line, value.Column, "Unexpected token '"+value.Value+"'", value.FileName))
@@ -1605,8 +1603,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								this_index, _ := strconv.Atoi(value.Value)
 								old_value := value
 
-								value = stack[len(stack)-1]
-								stack = stack[:len(stack)-1]
+								value = PopStack(&stack)
 
 								if (this_index + 1) > len(value.Array) {
 									return errors.New(SyntaxErrorMessage(old_value.Line, old_value.Column, "Index out of range", old_value.FileName))
@@ -1642,8 +1639,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unexpected token '"+currentToken.Value+"'", currentToken.FileName))
 										}
 
-										param = stack[len(stack)-1]
-										stack = stack[:len(stack)-1]
+										param = PopStack(&stack)
 
 										if currentToken.Type == TOKEN_TYPE_OPEN_BRACES {
 											var errConvert error
@@ -1710,8 +1706,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								var param Token
 
 								if len(stack) > 0 {
-									param = stack[len(stack)-1]
-									stack = stack[:len(stack)-1]
+									param = PopStack(&stack)
 
 									//validate param type
 									errParam := expectedTokenTypes(param, TOKEN_TYPE_IDENTIFIER)
@@ -1765,8 +1760,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "'rtn' outside function", currentToken.FileName))
 							}
 
-							returnValue := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							returnValue := PopStack(&stack)
 							var errConvert error
 
 							if returnValue.Type == TOKEN_TYPE_IDENTIFIER {
@@ -1792,8 +1786,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 							var errConvert error
 
-							param2 := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							param2 := PopStack(&stack)
 
 							//if param2 is an identifier
 							//then it's a variable
@@ -1804,8 +1797,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							}
 
-							param1 := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							param1 := PopStack(&stack)
 
 							//if param1 is an identifier
 							//then it's a variable
@@ -1927,8 +1919,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 							var errConvert error
 
-							param1 := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							param1 := PopStack(&stack)
 
 							//if param1 is an identifier
 							//then it's a variable
@@ -2031,8 +2022,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 							//param := stack[len(stack)-1]
 
-							params = append(params, stack[len(stack)-1])
-							stack = stack[:len(stack)-1]
+							params = append(params, PopStack(&stack))
 
 							var tempTokens []TokenArray
 							openIfCount = 0
@@ -2180,8 +2170,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							var errConvert error
 							var thisArrayToken Token
 
-							param := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							param := PopStack(&stack)
 
 							if param.Type == TOKEN_TYPE_IDENTIFIER {
 								param, errConvert = convertVariableToToken(param, *globalVariableArray, scopeName)
@@ -2251,8 +2240,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 						} else if currentToken.Type == TOKEN_TYPE_COLON {
 							//key-value pair
-							value := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							value := PopStack(&stack)
 							var errConvert error
 
 							if value.Type == TOKEN_TYPE_IDENTIFIER {
@@ -2267,8 +2255,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								return errVal
 							}
 
-							key := stack[len(stack)-1]
-							stack = stack[:len(stack)-1]
+							key := PopStack(&stack)
 
 							if key.Type == TOKEN_TYPE_IDENTIFIER {
 								key, errConvert = convertVariableToToken(key, *globalVariableArray, scopeName)
