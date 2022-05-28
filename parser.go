@@ -1039,28 +1039,6 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							//assignment operation
 							value := stack[len(stack)-1]
 							stack = stack[:len(stack)-1]
-
-							if value.From_function_call {
-								if len(value.Array) != 1 {
-									return errors.New(SyntaxErrorMessage(value.Line, value.Column, "Unexpected token '"+value.Value+"'", value.FileName))
-								}
-								if value.Array[0].Type != TOKEN_TYPE_INTEGER {
-									return errors.New(SyntaxErrorMessage(value.Line, value.Column, "Unexpected token '"+value.Value+"'", value.FileName))
-								}
-
-								// get the real value from array
-								this_index, _ := strconv.Atoi(value.Array[0].Value)
-								old_value := value
-								value = stack[len(stack)-1]
-								stack = stack[:len(stack)-1]
-
-								if (this_index + 1) > len(value.Array) {
-									return errors.New(SyntaxErrorMessage(old_value.Line, old_value.Column, "Index out of range", old_value.FileName))
-								}
-
-								value = value.Array[this_index]
-							}
-
 							var errConvert error
 
 							//if value is an identifier
@@ -1614,87 +1592,110 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							stack = append(stack, newToken)
 
 						} else if currentToken.Type == TOKEN_TYPE_OPEN_BRACES || currentToken.Type == TOKEN_TYPE_OPEN_BRACKET {
-							//array declaration
-							processedArg := 0
-							newToken := currentToken
-							var tempArray []Token //for TOKEN-TYPE_ARRAY
 
-							if currentToken.Type == TOKEN_TYPE_OPEN_BRACES {
-								newToken.Type = TOKEN_TYPE_ARRAY
-							} else {
-								//TOKEN_TYPE_OPEN_BRACKET , associative array
-								newToken.Type = TOKEN_TYPE_ASSOCIATIVE_ARRAY
-								newToken.AssociativeArray = make(map[string]Token)
-							}
+							if currentToken.From_function_call {
+								value := stack[len(stack)-1]
+								stack = stack[:len(stack)-1]
 
-							if currentToken.OtherInt > 0 {
-								if len(stack) == 0 {
-									if len(outputQueue) > 0 {
-										return errors.New(SyntaxErrorMessage(outputQueue[0].Line, outputQueue[0].Column, "Unexpected token '"+outputQueue[0].Value+"'", outputQueue[0].FileName))
-									} else {
-										return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unexpected token '"+currentToken.Value+"'", currentToken.FileName))
-									}
+								if value.Type != TOKEN_TYPE_INTEGER {
+									return errors.New(SyntaxErrorMessage(value.Line, value.Column, "Unexpected token '"+value.Value+"'", value.FileName))
 								}
 
-								for true {
-									var param Token
+								// get the real value from array
+								this_index, _ := strconv.Atoi(value.Value)
+								old_value := value
 
+								value = stack[len(stack)-1]
+								stack = stack[:len(stack)-1]
+
+								if (this_index + 1) > len(value.Array) {
+									return errors.New(SyntaxErrorMessage(old_value.Line, old_value.Column, "Index out of range", old_value.FileName))
+								}
+								stack = append(stack, value.Array[this_index])
+							} else {
+								//array declaration
+								processedArg := 0
+								newToken := currentToken
+								var tempArray []Token //for TOKEN-TYPE_ARRAY
+
+								if currentToken.Type == TOKEN_TYPE_OPEN_BRACES {
+									newToken.Type = TOKEN_TYPE_ARRAY
+								} else {
+									//TOKEN_TYPE_OPEN_BRACKET , associative array
+									newToken.Type = TOKEN_TYPE_ASSOCIATIVE_ARRAY
+									newToken.AssociativeArray = make(map[string]Token)
+								}
+
+								if currentToken.OtherInt > 0 {
 									if len(stack) == 0 {
-										return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unexpected token '"+currentToken.Value+"'", currentToken.FileName))
+										if len(outputQueue) > 0 {
+											return errors.New(SyntaxErrorMessage(outputQueue[0].Line, outputQueue[0].Column, "Unexpected token '"+outputQueue[0].Value+"'", outputQueue[0].FileName))
+										} else {
+											return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unexpected token '"+currentToken.Value+"'", currentToken.FileName))
+										}
 									}
 
-									param = stack[len(stack)-1]
-									stack = stack[:len(stack)-1]
+									for true {
+										var param Token
 
-									if currentToken.Type == TOKEN_TYPE_OPEN_BRACES {
-										var errConvert error
-										if param.Type == TOKEN_TYPE_IDENTIFIER {
-											param, errConvert = convertVariableToToken(param, *globalVariableArray, scopeName)
-											if errConvert != nil {
-												return errConvert
+										if len(stack) == 0 {
+											return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unexpected token '"+currentToken.Value+"'", currentToken.FileName))
+										}
+
+										param = stack[len(stack)-1]
+										stack = stack[:len(stack)-1]
+
+										if currentToken.Type == TOKEN_TYPE_OPEN_BRACES {
+											var errConvert error
+											if param.Type == TOKEN_TYPE_IDENTIFIER {
+												param, errConvert = convertVariableToToken(param, *globalVariableArray, scopeName)
+												if errConvert != nil {
+													return errConvert
+												}
+											}
+
+											if param.Type == TOKEN_TYPE_ARRAY {
+												return errors.New(SyntaxErrorMessage(param.Line, param.Column, "Unexpected token '"+param.Value+"'", param.FileName))
+											}
+
+											tempArray = append(tempArray, param)
+										} else {
+											//associative array
+											//param should be key-value pair
+											errParam := expectedTokenTypes(param, TOKEN_TYPE_KEY_VALUE_PAIR)
+											if errParam != nil {
+												return errParam
+											}
+
+											for k, v := range param.AssociativeArray {
+												newToken.AssociativeArray[k] = v
 											}
 										}
 
-										if param.Type == TOKEN_TYPE_ARRAY {
-											return errors.New(SyntaxErrorMessage(param.Line, param.Column, "Unexpected token '"+param.Value+"'", param.FileName))
+										processedArg += 1
+										if processedArg == currentToken.OtherInt {
+											break
 										}
+									}
 
-										tempArray = append(tempArray, param)
+									if currentToken.Type == TOKEN_TYPE_OPEN_BRACES {
+										if len(tempArray) > 0 {
+											//reverse the array (so it's in proper position)
+											arrayLength := len(tempArray)
+											for thisArrayIndex := 0; thisArrayIndex < arrayLength; thisArrayIndex++ {
+												thisToken := tempArray[len(tempArray)-1]
+												tempArray = tempArray[:len(tempArray)-1]
+												newToken.Array = append(newToken.Array, thisToken)
+											}
+										}
 									} else {
-										//associative array
-										//param should be key-value pair
-										errParam := expectedTokenTypes(param, TOKEN_TYPE_KEY_VALUE_PAIR)
-										if errParam != nil {
-											return errParam
-										}
-
-										for k, v := range param.AssociativeArray {
-											newToken.AssociativeArray[k] = v
-										}
-									}
-
-									processedArg += 1
-									if processedArg == currentToken.OtherInt {
-										break
+										newToken.OtherInt = len(newToken.AssociativeArray)
 									}
 								}
-
-								if currentToken.Type == TOKEN_TYPE_OPEN_BRACES {
-									if len(tempArray) > 0 {
-										//reverse the array (so it's in proper position)
-										arrayLength := len(tempArray)
-										for thisArrayIndex := 0; thisArrayIndex < arrayLength; thisArrayIndex++ {
-											thisToken := tempArray[len(tempArray)-1]
-											tempArray = tempArray[:len(tempArray)-1]
-											newToken.Array = append(newToken.Array, thisToken)
-										}
-									}
-								} else {
-									newToken.OtherInt = len(newToken.AssociativeArray)
-								}
+								stack = append(stack, newToken)
+								//DumpToken(stack)
 							}
-							stack = append(stack, newToken)
-							//DumpToken(stack)
+
 						} else if currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START {
 							//check if function already exists
 							//if yes then raise an error
