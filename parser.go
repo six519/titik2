@@ -185,7 +185,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						if currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACKET || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END {
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
-							for true {
+							for {
 								if len(operatorStack[currentContext]) > 0 {
 									if operatorStack[currentContext][len(operatorStack[currentContext])-1].Type == TOKEN_TYPE_EQUALS {
 										break
@@ -313,7 +313,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 						}
 
-						for true {
+						for {
 							if len(operatorStack[currentContext]) > 0 {
 
 								if currentToken.Type == TOKEN_TYPE_FUNCTION_RETURN {
@@ -350,7 +350,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						isValidToken = true
 						//close parenthesis
 						if len(operatorStack[currentContext]) > 0 {
-							for true {
+							for {
 								if operatorStack[currentContext][len(operatorStack[currentContext])-1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
 									outputQueue = append(outputQueue, operatorStack[currentContext][len(operatorStack[currentContext])-1])
 									operatorStack[currentContext] = operatorStack[currentContext][:len(operatorStack[currentContext])-1]
@@ -1284,7 +1284,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 								//add arguments from stack below
 								processedArg := 0
-								for true {
+								for {
 									var param Token
 									//add to functionargument one by one
 									param = PopStack(&stack)
@@ -1611,6 +1611,34 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								this_value := value.Array[this_index]
 								this_value.Column = value.Column
 								stack = append(stack, this_value)
+
+								if len(outputQueue) > 0 {
+									//pop all operators from stack if there's any then prepend to output queue instead of append
+
+									//get the context to stack
+									//if no stack then get from output queue
+									this_context := currentContext
+									if len(stack) > 0 {
+										this_context = stack[0].Context
+									} else {
+										this_context = outputQueue[0].Context
+									}
+
+									for {
+										if len(operatorStack[this_context]) > 0 {
+											if operatorStack[this_context][len(operatorStack[this_context])-1].Type == TOKEN_TYPE_EQUALS {
+												break
+											} else {
+												this_token := operatorStack[this_context][len(operatorStack[this_context])-1]
+												outputQueue = append([]Token{this_token}, outputQueue...)
+												operatorStack[this_context] = operatorStack[this_context][:len(operatorStack[this_context])-1]
+											}
+										} else {
+											break
+										}
+									}
+								}
+
 							} else {
 								//array declaration
 								processedArg := 0
@@ -1634,7 +1662,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										}
 									}
 
-									for true {
+									for {
 										var param Token
 
 										if len(stack) == 0 {
@@ -1704,7 +1732,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 							//get function arguments
 							var functionParams []Token
-							for true {
+							for {
 								var param Token
 
 								if len(stack) > 0 {
@@ -1738,7 +1766,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							newFunction := Function{Name: currentToken.Value, IsNative: false, ArgumentCount: len(functionParams), Arguments: functionParams}
 
 							//append all tokens to function (body of function)
-							for true {
+							for {
 								currentToken := outputQueue[0]
 								outputQueue = append(outputQueue[:0], outputQueue[1:]...)
 
@@ -1824,7 +1852,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							var tempTokens []Token
 							openLoopCount = 0
 							//append all tokens to temporary token
-							for true {
+							for {
 								currentToken := outputQueue[0]
 								outputQueue = append(outputQueue[:0], outputQueue[1:]...)
 
@@ -1941,7 +1969,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							var tempTokens []Token
 							openWhileLoopCount = 0
 							//append all tokens to temporary token
-							for true {
+							for {
 								currentToken := outputQueue[0]
 								outputQueue = append(outputQueue[:0], outputQueue[1:]...)
 
@@ -2031,7 +2059,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							//append all tokens to temporary token
 
 							tempTokens = append(tempTokens, TokenArray{})
-							for true {
+							for {
 								currentToken := outputQueue[0]
 								outputQueue = append(outputQueue[:0], outputQueue[1:]...)
 
@@ -2051,7 +2079,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 											var paramTokens []Token
 											var currentToken2 Token
 											var will_change_to_main string = currentToken.Context
-											for true {
+											for {
 												currentToken2 = outputQueue[0]
 												outputQueue = append(outputQueue[:0], outputQueue[1:]...)
 
