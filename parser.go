@@ -1624,34 +1624,6 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 								this_value.Column = value.Column
 								stack = append(stack, this_value)
-
-								if len(outputQueue) > 0 {
-									//pop all operators from stack if there's any then prepend to output queue instead of append
-
-									//get the context to stack
-									//if no stack then get from output queue
-									this_context := currentContext
-									if len(stack) > 0 {
-										this_context = stack[0].Context
-									} else {
-										this_context = outputQueue[0].Context
-									}
-
-									for {
-										if len(operatorStack[this_context]) > 0 {
-											if operatorStack[this_context][len(operatorStack[this_context])-1].Type == TOKEN_TYPE_EQUALS {
-												break
-											} else {
-												this_token := operatorStack[this_context][len(operatorStack[this_context])-1]
-												outputQueue = append([]Token{this_token}, outputQueue...)
-												operatorStack[this_context] = operatorStack[this_context][:len(operatorStack[this_context])-1]
-											}
-										} else {
-											break
-										}
-									}
-								}
-
 							} else {
 								//array declaration
 								processedArg := 0

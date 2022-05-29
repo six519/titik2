@@ -740,7 +740,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			}
 
 			if finalTokenArray[lastTokenCount].Context == contextToReplaceBrace {
-				finalTokenArray[lastTokenCount].Context = contextNameBrace[len(contextNameBrace)-1]
+				if contextNameBrace[len(contextNameBrace)-1] != CONTEXT_NAME_MAIN {
+					finalTokenArray[lastTokenCount].Context = contextNameBrace[len(contextNameBrace)-1]
+				}
 			}
 
 			//bracket
@@ -756,7 +758,9 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 			}
 
 			if finalTokenArray[lastTokenCount].Context == contextToReplaceBracket {
-				finalTokenArray[lastTokenCount].Context = contextNameBracket[len(contextNameBracket)-1]
+				if contextNameBracket[len(contextNameBracket)-1] != CONTEXT_NAME_MAIN {
+					finalTokenArray[lastTokenCount].Context = contextNameBracket[len(contextNameBracket)-1]
+				}
 			}
 
 			lastTokenCount += 1
