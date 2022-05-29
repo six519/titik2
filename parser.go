@@ -1593,22 +1593,35 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						} else if currentToken.Type == TOKEN_TYPE_OPEN_BRACES || currentToken.Type == TOKEN_TYPE_OPEN_BRACKET {
 
 							if currentToken.From_function_call {
+								index := PopStack(&stack)
 								value := PopStack(&stack)
+								this_value := value
 
-								if value.Type != TOKEN_TYPE_INTEGER {
-									return errors.New(SyntaxErrorMessage(value.Line, value.Column, "Unexpected token '"+value.Value+"'", value.FileName))
+								if value.Type == TOKEN_TYPE_ARRAY {
+									//lineup
+									if index.Type != TOKEN_TYPE_INTEGER {
+										return errors.New(SyntaxErrorMessage(value.Line, value.Column, "Unexpected token '"+value.Value+"'", value.FileName))
+									}
+									this_index, _ := strconv.Atoi(index.Value)
+
+									if (this_index + 1) > len(value.Array) {
+										return errors.New(SyntaxErrorMessage(index.Line, index.Column, "Index out of range", index.FileName))
+									}
+
+									this_value = value.Array[this_index]
+
+								} else {
+									//glossary
+									if index.Type != TOKEN_TYPE_STRING {
+										return errors.New(SyntaxErrorMessage(value.Line, value.Column, "Unexpected token '"+value.Value+"'", value.FileName))
+									}
+									ok := false
+									this_value, ok = value.AssociativeArray[index.Value]
+									if !ok {
+										return errors.New(SyntaxErrorMessage(index.Line, index.Column, "Index out of range", index.FileName))
+									}
 								}
 
-								// get the real value from array
-								this_index, _ := strconv.Atoi(value.Value)
-								old_value := value
-
-								value = PopStack(&stack)
-
-								if (this_index + 1) > len(value.Array) {
-									return errors.New(SyntaxErrorMessage(old_value.Line, old_value.Column, "Index out of range", old_value.FileName))
-								}
-								this_value := value.Array[this_index]
 								this_value.Column = value.Column
 								stack = append(stack, this_value)
 
