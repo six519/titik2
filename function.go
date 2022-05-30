@@ -187,6 +187,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//la(<lineup>, <anyvar>)
 	defineFunction(globalFunctionArray, "la", La_execute, 2, true)
 
+	//lp(<lineup>, <integer>)
+	defineFunction(globalFunctionArray, "lp", Lp_execute, 2, true)
+
 	//WEB FUNCTIONALITIES
 	//http_au(<string>, <string>) - Add URL
 	defineFunction(globalFunctionArray, "http_au", Http_au_execute, 2, true)

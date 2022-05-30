@@ -121,3 +121,26 @@ func La_execute(arguments []FunctionArgument, errMessage *error, globalVariableA
 	}
 	return ret
 }
+
+func Lp_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_ARRAY) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+		if (arguments[0].IntegerValue+1) > len(arguments[1].ArrayValue) || len(arguments[1].ArrayValue) == 0 || arguments[0].IntegerValue < 0 {
+			*errMessage = errors.New("Error: Index out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			for x := 0; x < len(arguments[1].ArrayValue); x++ {
+				if x != arguments[0].IntegerValue {
+					ret.ArrayValue = append(ret.ArrayValue, FunctionReturn{
+						Type:         arguments[1].ArrayValue[x].Type,
+						StringValue:  arguments[1].ArrayValue[x].StringValue,
+						IntegerValue: arguments[1].ArrayValue[x].IntegerValue,
+						FloatValue:   arguments[1].ArrayValue[x].FloatValue,
+						BooleanValue: arguments[1].ArrayValue[x].BooleanValue,
+					})
+				}
+			}
+		}
+	}
+	return ret
+}
