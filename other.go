@@ -94,3 +94,30 @@ func In_execute(arguments []FunctionArgument, errMessage *error, globalVariableA
 
 	return ret
 }
+
+func La_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ARRAY}
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_ARRAY) {
+		if arguments[0].Type != ARG_TYPE_STRING && arguments[0].Type != ARG_TYPE_INTEGER && arguments[0].Type != ARG_TYPE_FLOAT && arguments[0].Type != ARG_TYPE_BOOLEAN && arguments[0].Type != ARG_TYPE_NONE {
+			*errMessage = errors.New("Error: Parameter must be a string/integer/float/boolean/Nil type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			for x := 0; x < len(arguments[1].ArrayValue); x++ {
+				ret.ArrayValue = append(ret.ArrayValue, FunctionReturn{
+					Type:         arguments[1].ArrayValue[x].Type,
+					StringValue:  arguments[1].ArrayValue[x].StringValue,
+					IntegerValue: arguments[1].ArrayValue[x].IntegerValue,
+					FloatValue:   arguments[1].ArrayValue[x].FloatValue,
+					BooleanValue: arguments[1].ArrayValue[x].BooleanValue,
+				})
+			}
+			ret.ArrayValue = append(ret.ArrayValue, FunctionReturn{
+				Type:         arguments[0].Type,
+				StringValue:  arguments[0].StringValue,
+				IntegerValue: arguments[0].IntegerValue,
+				FloatValue:   arguments[0].FloatValue,
+				BooleanValue: arguments[0].BooleanValue,
+			})
+		}
+	}
+	return ret
+}
