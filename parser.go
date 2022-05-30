@@ -1604,7 +1604,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									}
 									this_index, _ := strconv.Atoi(index.Value)
 
-									if (this_index + 1) > len(value.Array) {
+									if (this_index+1) > len(value.Array) || len(value.Array) == 0 || this_index < 0 {
 										return errors.New(SyntaxErrorMessage(index.Line, index.Column, "Index out of range", index.FileName))
 									}
 
