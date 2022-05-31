@@ -200,6 +200,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//http_p(<string>) - Print
 	defineFunction(globalFunctionArray, "http_p", Http_p_execute, 1, true)
 
+	//http_h(<string>, <string>) - Set header
+	defineFunction(globalFunctionArray, "http_h", Http_h_execute, 2, true)
+
 	//http_gm() - Get method
 	defineFunction(globalFunctionArray, "http_gm", Http_gm_execute, 0, true)
 
