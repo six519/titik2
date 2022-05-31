@@ -4,7 +4,6 @@ import (
 	"errors"
 	"math/rand"
 	"strconv"
-	"strings"
 	"time"
 	"unicode"
 	//fmt
@@ -66,6 +65,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 	whileLoopTokens = make(map[string][]Token)
 	whileLoopIsDone = make(map[string]bool)
 	var lastToken Token
+	var whileLoopContexts []string
 
 	for x := 0; x < len(tokenArray); x++ {
 		if tokenArray[x].Type == TOKEN_TYPE_NEWLINE {
@@ -2368,6 +2368,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						openWhileLoopCount += 1
 						ignoreNewline = true
 						isWhileLoopStatement = true
+						whileLoopContexts = append(whileLoopContexts, tokenArray[x].Context)
 					} else if tokenArray[x].Type == TOKEN_TYPE_WHILE_LOOP_END {
 						openWhileLoopCount = openWhileLoopCount - 1
 
@@ -2398,20 +2399,24 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 			tokensToEvaluate = append(tokensToEvaluate, tokenArray[x])
 		} else {
 
-			if isWhileLoopStatement && strings.Index(tokenArray[x].Context, CONTEXT_NAME_PREFIX_WHILE_LOOP) == 0 {
-				//collect all the parameters from while loop
-				//to be able to parse later on the body of while loop
-				if _, ok := whileLoopIsDone[tokenArray[x].Context]; ok {
-				} else {
-					whileLoopIsDone[tokenArray[x].Context] = false
-				}
+			if isWhileLoopStatement {
+				if len(whileLoopContexts) > 0 {
+					this_context := whileLoopContexts[len(whileLoopContexts)-1]
+					//collect all the parameters from while loop
+					//to be able to parse later on the body of while loop
+					if _, ok := whileLoopIsDone[this_context]; ok {
+					} else {
+						whileLoopIsDone[this_context] = false
+					}
 
-				if tokenArray[x].Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END {
-					whileLoopIsDone[tokenArray[x].Context] = true
-				}
+					if tokenArray[x].Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END {
+						whileLoopIsDone[this_context] = true
+						whileLoopContexts = whileLoopContexts[:len(whileLoopContexts)-1]
+					}
 
-				if !whileLoopIsDone[tokenArray[x].Context] {
-					whileLoopTokens[tokenArray[x].Context] = append(whileLoopTokens[tokenArray[x].Context], tokenArray[x])
+					if !whileLoopIsDone[this_context] {
+						whileLoopTokens[this_context] = append(whileLoopTokens[this_context], tokenArray[x])
+					}
 				}
 			}
 
