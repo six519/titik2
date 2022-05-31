@@ -189,6 +189,15 @@ func setToken(initToken bool, tokenArray *[]Token, isTokenInit *bool, lineNumber
 	*isTokenInit = initToken
 }
 
+func setParamEnd(isBooleanLoop *bool, tokenArray *[]Token, contextName *[]string, index int, token_type int) {
+	if *isBooleanLoop {
+		*isBooleanLoop = false
+		(*tokenArray)[index].Type = token_type
+		(*tokenArray)[index].Context = (*contextName)[len(*contextName)-1]
+		*contextName = (*contextName)[:len(*contextName)-1]
+	}
+}
+
 func DumpToken(tokenArray []Token) {
 	fmt.Printf("====================================\n")
 
@@ -524,30 +533,10 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						contextName = contextName[:len(contextName)-1]
 					}
 				} else {
-					if isForLoop {
-						isForLoop = false
-						tokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_PARAM_END
-						tokenArray[x].Context = contextName[len(contextName)-1]
-						contextName = contextName[:len(contextName)-1]
-					}
-					if isWhileLoop {
-						isWhileLoop = false
-						tokenArray[x].Type = TOKEN_TYPE_WHILE_LOOP_PARAM_END
-						tokenArray[x].Context = contextName[len(contextName)-1]
-						contextName = contextName[:len(contextName)-1]
-					}
-					if isForIf {
-						isForIf = false
-						tokenArray[x].Type = TOKEN_TYPE_IF_PARAM_END
-						tokenArray[x].Context = contextName[len(contextName)-1]
-						contextName = contextName[:len(contextName)-1]
-					}
-					if isForEf {
-						isForEf = false
-						tokenArray[x].Type = TOKEN_TYPE_ELIF_PARAM_END
-						tokenArray[x].Context = contextName[len(contextName)-1]
-						contextName = contextName[:len(contextName)-1]
-					}
+					setParamEnd(&isForLoop, &tokenArray, &contextName, x, TOKEN_TYPE_FOR_LOOP_PARAM_END)
+					setParamEnd(&isWhileLoop, &tokenArray, &contextName, x, TOKEN_TYPE_WHILE_LOOP_PARAM_END)
+					setParamEnd(&isForIf, &tokenArray, &contextName, x, TOKEN_TYPE_IF_PARAM_END)
+					setParamEnd(&isForEf, &tokenArray, &contextName, x, TOKEN_TYPE_ELIF_PARAM_END)
 				}
 			}
 		}
