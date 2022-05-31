@@ -135,6 +135,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								if currentToken.Type == TOKEN_TYPE_WHILE_LOOP_END {
 									if openWhileLoopCount == 0 {
 										justAddTokens = false
+										isWhileLoopStatement = false
 									}
 									if openWhileLoopCount > 0 {
 										openWhileLoopCount = openWhileLoopCount - 1
