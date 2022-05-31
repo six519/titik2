@@ -466,6 +466,18 @@ Other Functions
     ::
         bool in(any)
 
+- **la** - add new item to a lineup.
+
+    **Declaration:**
+    ::
+        lineup la(lineup, any)
+
+- **lp** - pop item from a slice through its index.
+
+    **Declaration:**
+    ::
+        lineup lp(lineup, integer)
+
 MySQL Functions
 ~~~~~~~~~~~~~~~
 
@@ -570,6 +582,12 @@ HTTP Functions
     **Declaration:**
     ::
         string http_gp()
+
+- **http_h** - set HTTP header.
+
+    **Declaration:**
+    ::
+        Nil http_h(string, string)
 
 Cryptographic Functions
 ~~~~~~~~~~~~~~~~~~~~~~~
