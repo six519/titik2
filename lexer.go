@@ -324,6 +324,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 	var isFunctionDef bool = false
 	var isForLoop bool = false
 	var isWhileLoop bool = false
+	var isForEach bool = false
 	var isForIf bool = false
 	var isForEf bool = false
 	var openFunctionCount int = 0
@@ -587,6 +588,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					setParamEnd(&isWhileLoop, &tokenArray, &contextName, x, TOKEN_TYPE_WHILE_LOOP_PARAM_END)
 					setParamEnd(&isForIf, &tokenArray, &contextName, x, TOKEN_TYPE_IF_PARAM_END)
 					setParamEnd(&isForEf, &tokenArray, &contextName, x, TOKEN_TYPE_ELIF_PARAM_END)
+					setParamEnd(&isForEach, &tokenArray, &contextName, x, TOKEN_TYPE_FOR_EACH_PARAM_END)
 				}
 			}
 		}
@@ -616,6 +618,11 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					return finalTokenArray, err
 				}
 				cleanupReservedWord(&tokenArray, x, "lw", TOKEN_TYPE_WHILE_LOOP_END)
+				err = cleanupReservedWordLoop(&tokenArray, x, "fea", TOKEN_TYPE_FOR_EACH_START, &isForEach, &ignoreOpen, &contextName, CONTEXT_NAME_PREFIX_FOR_EACH)
+				if err != nil {
+					return finalTokenArray, err
+				}
+				cleanupReservedWord(&tokenArray, x, "aef", TOKEN_TYPE_FOR_EACH_END)
 
 				if tokenArray[x].Value == "if" || tokenArray[x].Value == "ef" {
 					//if or ef statement
