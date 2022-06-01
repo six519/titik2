@@ -17,6 +17,7 @@ const CONTEXT_NAME_PREFIX_ARRAY string = "array_get"
 const CONTEXT_NAME_PREFIX_WHILE_LOOP string = "wl_"
 const CONTEXT_NAME_PREFIX_IF string = "if_"
 const CONTEXT_NAME_PREFIX_ELSEIF string = "ef_"
+const CONTEXT_NAME_PREFIX_FOR_EACH string = "fea_"
 
 //Tokenizer States
 const (
@@ -91,6 +92,9 @@ const (
 	TOKEN_TYPE_WHILE_LOOP_START
 	TOKEN_TYPE_WHILE_LOOP_PARAM_END
 	TOKEN_TYPE_WHILE_LOOP_END
+	TOKEN_TYPE_FOR_EACH_START
+	TOKEN_TYPE_FOR_EACH_PARAM_END
+	TOKEN_TYPE_FOR_EACH_END
 )
 
 //for debugging purpose only
@@ -157,6 +161,9 @@ var TOKEN_TYPES_STRING = []string{
 	"TOKEN_TYPE_WHILE_LOOP_START",
 	"TOKEN_TYPE_WHILE_LOOP_PARAM_END",
 	"TOKEN_TYPE_WHILE_LOOP_END",
+	"TOKEN_TYPE_FOR_EACH_START",
+	"TOKEN_TYPE_FOR_EACH_PARAM_END",
+	"TOKEN_TYPE_FOR_EACH_END",
 }
 
 //token object
@@ -195,6 +202,23 @@ func setParamEnd(isBooleanLoop *bool, tokenArray *[]Token, contextName *[]string
 		(*tokenArray)[index].Type = token_type
 		(*tokenArray)[index].Context = (*contextName)[len(*contextName)-1]
 		*contextName = (*contextName)[:len(*contextName)-1]
+	}
+}
+
+func cleanupBraceBracket(finalTokenArray *[]Token, lastTokenCount int, openTokenType int, closeTokenType int, contextName *[]string, contextToReplace *string, prefix string) {
+	if (*finalTokenArray)[lastTokenCount].Type == openTokenType {
+		thisSuffix := strconv.Itoa((*finalTokenArray)[lastTokenCount].Column)
+		*contextName = append(*contextName, prefix+thisSuffix)
+		*contextToReplace = (*finalTokenArray)[lastTokenCount].Context
+	}
+	if (*finalTokenArray)[lastTokenCount].Type == closeTokenType {
+		(*finalTokenArray)[lastTokenCount].Context = (*contextName)[len(*contextName)-1]
+		*contextName = (*contextName)[:len(*contextName)-1]
+	}
+	if (*finalTokenArray)[lastTokenCount].Context == *contextToReplace {
+		if (*contextName)[len(*contextName)-1] != CONTEXT_NAME_MAIN {
+			(*finalTokenArray)[lastTokenCount].Context = (*contextName)[len(*contextName)-1]
+		}
 	}
 }
 
@@ -715,42 +739,11 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 
 		//cleanup for open and close braces/bracket?
 		if lastTokenCount != len(finalTokenArray) {
-
 			//braces
-			if finalTokenArray[lastTokenCount].Type == TOKEN_TYPE_OPEN_BRACES {
-				thisSuffix := strconv.Itoa(finalTokenArray[lastTokenCount].Column)
-				contextNameBrace = append(contextNameBrace, CONTEXT_NAME_PREFIX_BRACE+thisSuffix)
-				contextToReplaceBrace = finalTokenArray[lastTokenCount].Context
-			}
-
-			if finalTokenArray[lastTokenCount].Type == TOKEN_TYPE_CLOSE_BRACES {
-				finalTokenArray[lastTokenCount].Context = contextNameBrace[len(contextNameBrace)-1]
-				contextNameBrace = contextNameBrace[:len(contextNameBrace)-1]
-			}
-
-			if finalTokenArray[lastTokenCount].Context == contextToReplaceBrace {
-				if contextNameBrace[len(contextNameBrace)-1] != CONTEXT_NAME_MAIN {
-					finalTokenArray[lastTokenCount].Context = contextNameBrace[len(contextNameBrace)-1]
-				}
-			}
+			cleanupBraceBracket(&finalTokenArray, lastTokenCount, TOKEN_TYPE_OPEN_BRACES, TOKEN_TYPE_CLOSE_BRACES, &contextNameBrace, &contextToReplaceBrace, CONTEXT_NAME_PREFIX_BRACE)
 
 			//bracket
-			if finalTokenArray[lastTokenCount].Type == TOKEN_TYPE_OPEN_BRACKET {
-				thisSuffix := strconv.Itoa(finalTokenArray[lastTokenCount].Column)
-				contextNameBracket = append(contextNameBracket, CONTEXT_NAME_PREFIX_BRACKET+thisSuffix)
-				contextToReplaceBracket = finalTokenArray[lastTokenCount].Context
-			}
-
-			if finalTokenArray[lastTokenCount].Type == TOKEN_TYPE_CLOSE_BRACKET {
-				finalTokenArray[lastTokenCount].Context = contextNameBracket[len(contextNameBracket)-1]
-				contextNameBracket = contextNameBracket[:len(contextNameBracket)-1]
-			}
-
-			if finalTokenArray[lastTokenCount].Context == contextToReplaceBracket {
-				if contextNameBracket[len(contextNameBracket)-1] != CONTEXT_NAME_MAIN {
-					finalTokenArray[lastTokenCount].Context = contextNameBracket[len(contextNameBracket)-1]
-				}
-			}
+			cleanupBraceBracket(&finalTokenArray, lastTokenCount, TOKEN_TYPE_OPEN_BRACKET, TOKEN_TYPE_CLOSE_BRACKET, &contextNameBracket, &contextToReplaceBracket, CONTEXT_NAME_PREFIX_BRACKET)
 
 			lastTokenCount += 1
 		}
