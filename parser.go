@@ -38,6 +38,21 @@ func PopStack(stack *[]Token) Token {
 	return ret
 }
 
+func CheckStartAndEnd(currentToken Token, tokenTypeStart int, tokenTypeEnd int, loopCount *int, justAddTokens *bool, isStatement *bool) {
+	if currentToken.Type == tokenTypeStart {
+		*loopCount += 1
+	}
+	if currentToken.Type == tokenTypeEnd {
+		if *loopCount == 0 {
+			*justAddTokens = false
+			*isStatement = false
+		}
+		if *loopCount > 0 {
+			*loopCount = *loopCount - 1
+		}
+	}
+}
+
 type Parser struct {
 }
 
@@ -118,30 +133,8 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 						}
 						if !isFunctionDefinition {
 							if !isIfStatement {
-								if currentToken.Type == TOKEN_TYPE_FOR_LOOP_START {
-									openLoopCount += 1
-								}
-								if currentToken.Type == TOKEN_TYPE_FOR_LOOP_END {
-									if openLoopCount == 0 {
-										justAddTokens = false
-										isLoopStatement = false
-									}
-									if openLoopCount > 0 {
-										openLoopCount = openLoopCount - 1
-									}
-								}
-								if currentToken.Type == TOKEN_TYPE_WHILE_LOOP_START {
-									openWhileLoopCount += 1
-								}
-								if currentToken.Type == TOKEN_TYPE_WHILE_LOOP_END {
-									if openWhileLoopCount == 0 {
-										justAddTokens = false
-										isWhileLoopStatement = false
-									}
-									if openWhileLoopCount > 0 {
-										openWhileLoopCount = openWhileLoopCount - 1
-									}
-								}
+								CheckStartAndEnd(currentToken, TOKEN_TYPE_FOR_LOOP_START, TOKEN_TYPE_FOR_LOOP_END, &openLoopCount, &justAddTokens, &isLoopStatement)
+								CheckStartAndEnd(currentToken, TOKEN_TYPE_WHILE_LOOP_START, TOKEN_TYPE_WHILE_LOOP_END, &openWhileLoopCount, &justAddTokens, &isWhileLoopStatement)
 							}
 							if !isLoopStatement && !isWhileLoopStatement {
 								if currentToken.Type == TOKEN_TYPE_IF_START {
