@@ -222,6 +222,12 @@ func cleanupBraceBracket(finalTokenArray *[]Token, lastTokenCount int, openToken
 	}
 }
 
+func cleanupReservedWord(tokenArray *[]Token, index int, checkValue string, tokenType int) {
+	if (*tokenArray)[index].Value == checkValue {
+		(*tokenArray)[index].Type = tokenType
+	}
+}
+
 func DumpToken(tokenArray []Token) {
 	fmt.Printf("====================================\n")
 
@@ -578,14 +584,8 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					tokenArray[x].Type = TOKEN_TYPE_FUNCTION_DEF_END
 					openFunctionCount -= 1
 				}
-				if tokenArray[x].Value == "rtn" {
-					//function return
-					tokenArray[x].Type = TOKEN_TYPE_FUNCTION_RETURN
-				}
-				if tokenArray[x].Value == "brk" {
-					//loop break
-					tokenArray[x].Type = TOKEN_TYPE_LOOP_BREAK
-				}
+				cleanupReservedWord(&tokenArray, x, "rtn", TOKEN_TYPE_FUNCTION_RETURN) //function return
+				cleanupReservedWord(&tokenArray, x, "brk", TOKEN_TYPE_LOOP_BREAK)      //loop break
 				if tokenArray[x].Value == "fl" {
 					//for loop
 					isForLoop = true
@@ -604,9 +604,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					}
 					//continue
 				}
-				if tokenArray[x].Value == "lf" {
-					tokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_END
-				}
+				cleanupReservedWord(&tokenArray, x, "lf", TOKEN_TYPE_FOR_LOOP_END)
 
 				if tokenArray[x].Value == "wl" {
 					//while loop
@@ -625,9 +623,7 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 						return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Unfinished statement", tokenArray[x].FileName))
 					}
 				}
-				if tokenArray[x].Value == "lw" {
-					tokenArray[x].Type = TOKEN_TYPE_WHILE_LOOP_END
-				}
+				cleanupReservedWord(&tokenArray, x, "lw", TOKEN_TYPE_WHILE_LOOP_END)
 
 				if tokenArray[x].Value == "if" || tokenArray[x].Value == "ef" {
 					//if or ef statement
@@ -655,12 +651,8 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 					}
 					//continue
 				}
-				if tokenArray[x].Value == "fi" {
-					tokenArray[x].Type = TOKEN_TYPE_IF_END
-				}
-				if tokenArray[x].Value == "el" {
-					tokenArray[x].Type = TOKEN_TYPE_ELSE
-				}
+				cleanupReservedWord(&tokenArray, x, "fi", TOKEN_TYPE_IF_END)
+				cleanupReservedWord(&tokenArray, x, "el", TOKEN_TYPE_ELSE)
 			} else {
 				if (x + 1) <= len(tokenArray)-1 {
 					isOpenP = false
