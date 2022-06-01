@@ -53,6 +53,12 @@ func CheckStartAndEnd(currentToken Token, tokenTypeStart int, tokenTypeEnd int, 
 	}
 }
 
+func SetBoolVar(currentToken Token, tokenType int, boolVar *bool) {
+	if currentToken.Type == tokenType {
+		*boolVar = true
+	}
+}
+
 type Parser struct {
 }
 
@@ -201,17 +207,11 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 							if !isFunctionDefinition {
 								if !isIfStatement {
-									if currentToken.Type == TOKEN_TYPE_FOR_LOOP_START {
-										isLoopStatement = true
-									}
-									if currentToken.Type == TOKEN_TYPE_WHILE_LOOP_START {
-										isWhileLoopStatement = true
-									}
+									SetBoolVar(currentToken, TOKEN_TYPE_FOR_LOOP_START, &isLoopStatement)
+									SetBoolVar(currentToken, TOKEN_TYPE_WHILE_LOOP_START, &isWhileLoopStatement)
 								}
 								if !isLoopStatement && !isWhileLoopStatement {
-									if currentToken.Type == TOKEN_TYPE_IF_START {
-										isIfStatement = true
-									}
+									SetBoolVar(currentToken, TOKEN_TYPE_IF_START, &isIfStatement)
 								}
 							}
 							if currentToken.Type == TOKEN_TYPE_OPEN_BRACES || currentToken.Type == TOKEN_TYPE_OPEN_BRACKET {
