@@ -228,6 +228,26 @@ func cleanupReservedWord(tokenArray *[]Token, index int, checkValue string, toke
 	}
 }
 
+func cleanupReservedWordLoop(tokenArray *[]Token, index int, checkValue string, tokenType int, isBoolean *bool, ignoreOpen *bool, contextName *[]string, contextNamePrefix string) error {
+	if (*tokenArray)[index].Value == checkValue {
+		*isBoolean = true
+		(*tokenArray)[index].Type = tokenType
+		*ignoreOpen = true
+
+		thisSuffix := strconv.Itoa((*tokenArray)[index].Column)
+		*contextName = append(*contextName, contextNamePrefix+thisSuffix)
+
+		if (index + 1) <= len(*tokenArray)-1 {
+			if (*tokenArray)[index+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
+				return errors.New(SyntaxErrorMessage((*tokenArray)[index+1].Line, (*tokenArray)[index+1].Column, "Unexpected token '"+(*tokenArray)[index+1].Value+"'", (*tokenArray)[index+1].FileName))
+			}
+		} else {
+			return errors.New(SyntaxErrorMessage((*tokenArray)[index].Line, (*tokenArray)[index].Column, "Unfinished statement", (*tokenArray)[index].FileName))
+		}
+	}
+	return nil
+}
+
 func DumpToken(tokenArray []Token) {
 	fmt.Printf("====================================\n")
 
@@ -586,42 +606,14 @@ func (lexer Lexer) GenerateToken() ([]Token, error) {
 				}
 				cleanupReservedWord(&tokenArray, x, "rtn", TOKEN_TYPE_FUNCTION_RETURN) //function return
 				cleanupReservedWord(&tokenArray, x, "brk", TOKEN_TYPE_LOOP_BREAK)      //loop break
-				if tokenArray[x].Value == "fl" {
-					//for loop
-					isForLoop = true
-					tokenArray[x].Type = TOKEN_TYPE_FOR_LOOP_START
-					ignoreOpen = true
-
-					thisSuffix := strconv.Itoa(tokenArray[x].Column)
-					contextName = append(contextName, CONTEXT_NAME_PREFIX_FOR_LOOP+thisSuffix)
-
-					if (x + 1) <= len(tokenArray)-1 {
-						if tokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
-							return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x+1].Line, tokenArray[x+1].Column, "Unexpected token '"+tokenArray[x+1].Value+"'", tokenArray[x+1].FileName))
-						}
-					} else {
-						return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Unfinished statement", tokenArray[x].FileName))
-					}
-					//continue
+				err := cleanupReservedWordLoop(&tokenArray, x, "fl", TOKEN_TYPE_FOR_LOOP_START, &isForLoop, &ignoreOpen, &contextName, CONTEXT_NAME_PREFIX_FOR_LOOP)
+				if err != nil {
+					return finalTokenArray, err
 				}
 				cleanupReservedWord(&tokenArray, x, "lf", TOKEN_TYPE_FOR_LOOP_END)
-
-				if tokenArray[x].Value == "wl" {
-					//while loop
-					isWhileLoop = true
-					tokenArray[x].Type = TOKEN_TYPE_WHILE_LOOP_START
-					ignoreOpen = true
-
-					thisSuffix := strconv.Itoa(tokenArray[x].Column)
-					contextName = append(contextName, CONTEXT_NAME_PREFIX_WHILE_LOOP+thisSuffix)
-
-					if (x + 1) <= len(tokenArray)-1 {
-						if tokenArray[x+1].Type != TOKEN_TYPE_OPEN_PARENTHESIS {
-							return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x+1].Line, tokenArray[x+1].Column, "Unexpected token '"+tokenArray[x+1].Value+"'", tokenArray[x+1].FileName))
-						}
-					} else {
-						return finalTokenArray, errors.New(SyntaxErrorMessage(tokenArray[x].Line, tokenArray[x].Column, "Unfinished statement", tokenArray[x].FileName))
-					}
+				err = cleanupReservedWordLoop(&tokenArray, x, "wl", TOKEN_TYPE_WHILE_LOOP_START, &isWhileLoop, &ignoreOpen, &contextName, CONTEXT_NAME_PREFIX_WHILE_LOOP)
+				if err != nil {
+					return finalTokenArray, err
 				}
 				cleanupReservedWord(&tokenArray, x, "lw", TOKEN_TYPE_WHILE_LOOP_END)
 
