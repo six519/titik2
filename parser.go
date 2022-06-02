@@ -59,6 +59,22 @@ func SetBoolVar(currentToken Token, tokenType int, boolVar *bool) {
 	}
 }
 
+func AppendTokenLoopForEvaluation(tokenArray []Token, tokenTypeStart int, tokenTypeEnd int, openCount *int, ignoreNewline *bool, isStatement *bool, tokensToEvaluate *[]Token, index int) {
+	if tokenArray[index].Type == tokenTypeStart {
+		*openCount += 1
+		*ignoreNewline = true
+		*isStatement = true
+	} else if tokenArray[index].Type == tokenTypeEnd {
+		*openCount = *openCount - 1
+
+		if *openCount == 0 {
+			*ignoreNewline = false
+			*isStatement = false
+			*tokensToEvaluate = append(*tokensToEvaluate, Token{Value: "\n", FileName: tokenArray[index].FileName, Type: TOKEN_TYPE_NEWLINE, Line: tokenArray[index].Line, Column: tokenArray[index].Column})
+		}
+	}
+}
+
 type Parser struct {
 }
 
@@ -2346,32 +2362,10 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 			}
 			if !isFunctionDefinition {
 				if !isIfStatement {
-					if tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_START {
-						openLoopCount += 1
-						ignoreNewline = true
-						isLoopStatement = true
-					} else if tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_END {
-						openLoopCount = openLoopCount - 1
-
-						if openLoopCount == 0 {
-							ignoreNewline = false
-							isLoopStatement = false
-							tokensToEvaluate = append(tokensToEvaluate, Token{Value: "\n", FileName: tokenArray[x].FileName, Type: TOKEN_TYPE_NEWLINE, Line: tokenArray[x].Line, Column: tokenArray[x].Column})
-						}
-					}
+					AppendTokenLoopForEvaluation(tokenArray, TOKEN_TYPE_FOR_LOOP_START, TOKEN_TYPE_FOR_LOOP_END, &openLoopCount, &ignoreNewline, &isLoopStatement, &tokensToEvaluate, x)
+					AppendTokenLoopForEvaluation(tokenArray, TOKEN_TYPE_WHILE_LOOP_START, TOKEN_TYPE_WHILE_LOOP_END, &openWhileLoopCount, &ignoreNewline, &isWhileLoopStatement, &tokensToEvaluate, x)
 					if tokenArray[x].Type == TOKEN_TYPE_WHILE_LOOP_START {
-						openWhileLoopCount += 1
-						ignoreNewline = true
-						isWhileLoopStatement = true
 						whileLoopContexts = append(whileLoopContexts, tokenArray[x].Context)
-					} else if tokenArray[x].Type == TOKEN_TYPE_WHILE_LOOP_END {
-						openWhileLoopCount = openWhileLoopCount - 1
-
-						if openWhileLoopCount == 0 {
-							ignoreNewline = false
-							isWhileLoopStatement = false
-							tokensToEvaluate = append(tokensToEvaluate, Token{Value: "\n", FileName: tokenArray[x].FileName, Type: TOKEN_TYPE_NEWLINE, Line: tokenArray[x].Line, Column: tokenArray[x].Column})
-						}
 					}
 				}
 				if !isLoopStatement && !isWhileLoopStatement {
