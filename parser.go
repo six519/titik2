@@ -75,6 +75,112 @@ func AppendTokenLoopForEvaluation(tokenArray []Token, tokenTypeStart int, tokenT
 	}
 }
 
+func ConvertTokenToVariable(value Token, globalVariableArray *[]Variable, varIndex int) {
+	if value.Type == TOKEN_TYPE_INTEGER {
+		(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_INTEGER
+		(*globalVariableArray)[varIndex].IntegerValue, _ = strconv.Atoi(value.Value)
+	} else if value.Type == TOKEN_TYPE_STRING {
+		(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_STRING
+		(*globalVariableArray)[varIndex].StringValue = value.Value
+	} else if value.Type == TOKEN_TYPE_FLOAT {
+		(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
+		(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 64)
+	} else if value.Type == TOKEN_TYPE_BOOLEAN {
+		(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_BOOLEAN
+		if value.Value == "true" {
+			(*globalVariableArray)[varIndex].BooleanValue = true
+		} else {
+			(*globalVariableArray)[varIndex].BooleanValue = false
+		}
+	} else if value.Type == TOKEN_TYPE_ASSOCIATIVE_ARRAY {
+		(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ASSOCIATIVE_ARRAY
+		(*globalVariableArray)[varIndex].AssociativeArrayValue = make(map[string]*Variable)
+		for k, v := range value.AssociativeArray {
+			thisVar := new(Variable)
+
+			if v.Type == TOKEN_TYPE_INTEGER {
+				thisVar.Type = VARIABLE_TYPE_INTEGER
+				thisVar.IntegerValue, _ = strconv.Atoi(v.Value)
+			} else if v.Type == TOKEN_TYPE_STRING {
+				thisVar.Type = VARIABLE_TYPE_STRING
+				thisVar.StringValue = v.Value
+			} else if v.Type == TOKEN_TYPE_FLOAT {
+				thisVar.Type = VARIABLE_TYPE_FLOAT
+				thisVar.FloatValue, _ = strconv.ParseFloat(v.Value, 64)
+			} else if v.Type == TOKEN_TYPE_BOOLEAN {
+				thisVar.Type = VARIABLE_TYPE_BOOLEAN
+				if v.Value == "true" {
+					thisVar.BooleanValue = true
+				} else {
+					thisVar.BooleanValue = false
+				}
+			} else {
+				thisVar.Type = VARIABLE_TYPE_NONE
+			}
+
+			(*globalVariableArray)[varIndex].AssociativeArrayValue[k] = thisVar
+		}
+	} else if value.Type == TOKEN_TYPE_ARRAY {
+		//reset slice
+		(*globalVariableArray)[varIndex].ArrayValue = nil
+		//set type
+		(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ARRAY
+		for arrayIndex := 0; arrayIndex < len(value.Array); arrayIndex++ {
+			thisVar := Variable{}
+
+			if value.Array[arrayIndex].Type == TOKEN_TYPE_INTEGER {
+				thisVar.Type = VARIABLE_TYPE_INTEGER
+				thisVar.IntegerValue, _ = strconv.Atoi(value.Array[arrayIndex].Value)
+			} else if value.Array[arrayIndex].Type == TOKEN_TYPE_STRING {
+				thisVar.Type = VARIABLE_TYPE_STRING
+				thisVar.StringValue = value.Array[arrayIndex].Value
+			} else if value.Array[arrayIndex].Type == TOKEN_TYPE_FLOAT {
+				thisVar.Type = VARIABLE_TYPE_FLOAT
+				thisVar.FloatValue, _ = strconv.ParseFloat(value.Array[arrayIndex].Value, 64)
+			} else if value.Array[arrayIndex].Type == TOKEN_TYPE_BOOLEAN {
+				thisVar.Type = VARIABLE_TYPE_BOOLEAN
+				if value.Array[arrayIndex].Value == "true" {
+					thisVar.BooleanValue = true
+				} else {
+					thisVar.BooleanValue = false
+				}
+			} else {
+				thisVar.Type = VARIABLE_TYPE_NONE
+			}
+
+			(*globalVariableArray)[varIndex].ArrayValue = append((*globalVariableArray)[varIndex].ArrayValue, thisVar)
+		}
+	} else {
+		//Nil
+		(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
+	}
+}
+
+func AppendTokenToTemporaryTokens(outputQueue *[]Token, tempTokens *[]Token, openCount *int, tokenTypeStart int, tokenTypeEnd int) error {
+	for {
+		currentToken := (*outputQueue)[0]
+		*outputQueue = append((*outputQueue)[:0], (*outputQueue)[1:]...)
+
+		*tempTokens = append(*tempTokens, currentToken)
+
+		if currentToken.Type == tokenTypeStart {
+			*openCount += 1
+		}
+
+		if currentToken.Type == tokenTypeEnd {
+			if *openCount == 0 {
+				break
+			}
+			*openCount = *openCount - 1
+		}
+		if len(*outputQueue) == 0 {
+			return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Invalid statement", currentToken.FileName))
+		}
+	}
+
+	return nil
+}
+
 type Parser struct {
 }
 
@@ -93,9 +199,11 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 	var isFunctionDefinition bool = false
 	var isLoopStatement bool = false
 	var isWhileLoopStatement bool = false
+	var isForEachStatement bool = false
 	var isIfStatement bool = false
 	var openLoopCount int = 0
 	var openWhileLoopCount int = 0
+	var openForEachCount int = 0
 	var openIfCount int = 0
 	var whileLoopTokens map[string][]Token
 	var whileLoopIsDone map[string]bool
@@ -134,10 +242,12 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 				isFunctionDefinition = false
 				isLoopStatement = false
 				isWhileLoopStatement = false
+				isForEachStatement = false
 				isIfStatement = false
 				openIfCount = 0
 				openLoopCount = 0
 				openWhileLoopCount = 0
+				openForEachCount = 0
 				//shunting-yard
 				for len(tokensToEvaluate) > 0 {
 					currentToken := tokensToEvaluate[0]
@@ -157,8 +267,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							if !isIfStatement {
 								CheckStartAndEnd(currentToken, TOKEN_TYPE_FOR_LOOP_START, TOKEN_TYPE_FOR_LOOP_END, &openLoopCount, &justAddTokens, &isLoopStatement)
 								CheckStartAndEnd(currentToken, TOKEN_TYPE_WHILE_LOOP_START, TOKEN_TYPE_WHILE_LOOP_END, &openWhileLoopCount, &justAddTokens, &isWhileLoopStatement)
+								CheckStartAndEnd(currentToken, TOKEN_TYPE_FOR_EACH_START, TOKEN_TYPE_FOR_EACH_END, &openForEachCount, &justAddTokens, &isForEachStatement)
 							}
-							if !isLoopStatement && !isWhileLoopStatement {
+							if !isLoopStatement && !isWhileLoopStatement && !isForEachStatement {
 								if currentToken.Type == TOKEN_TYPE_IF_START {
 									openIfCount += 1
 								}
@@ -187,7 +298,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					}
 
 					//dontIgnorePopping := true
-					if currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_OPEN_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_START || currentToken.Type == TOKEN_TYPE_GET_ARRAY_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACKET || currentToken.Type == TOKEN_TYPE_OPEN_BRACKET || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_START || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END {
+					if currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_OPEN_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_START || currentToken.Type == TOKEN_TYPE_GET_ARRAY_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACKET || currentToken.Type == TOKEN_TYPE_OPEN_BRACKET || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_START || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_EACH_START || currentToken.Type == TOKEN_TYPE_FOR_EACH_PARAM_END {
 						isValidToken = true
 						/*
 							if(len(tokensToEvaluate) > 0) {
@@ -199,7 +310,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 						*/
 
-						if currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACKET || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END {
+						if currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_COMMA || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACKET || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_EACH_PARAM_END {
 							//pop all operators from operator stack to output queue before the function
 							//NOTE: don't include '=' (NOT SURE)
 							for {
@@ -216,7 +327,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 						}
 
-						if currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_OPEN_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_START || currentToken.Type == TOKEN_TYPE_OPEN_BRACKET || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_START {
+						if currentToken.Type == TOKEN_TYPE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START || currentToken.Type == TOKEN_TYPE_FOR_LOOP_START || currentToken.Type == TOKEN_TYPE_IF_START || currentToken.Type == TOKEN_TYPE_OPEN_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_START || currentToken.Type == TOKEN_TYPE_OPEN_BRACKET || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_START || currentToken.Type == TOKEN_TYPE_FOR_EACH_START {
 							functionStack = append(functionStack, currentToken)
 							if currentToken.Type == TOKEN_TYPE_FUNCTION_DEF_START {
 								isFunctionDefinition = true
@@ -225,8 +336,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								if !isIfStatement {
 									SetBoolVar(currentToken, TOKEN_TYPE_FOR_LOOP_START, &isLoopStatement)
 									SetBoolVar(currentToken, TOKEN_TYPE_WHILE_LOOP_START, &isWhileLoopStatement)
+									SetBoolVar(currentToken, TOKEN_TYPE_FOR_EACH_START, &isForEachStatement)
 								}
-								if !isLoopStatement && !isWhileLoopStatement {
+								if !isLoopStatement && !isWhileLoopStatement && !isForEachStatement {
 									SetBoolVar(currentToken, TOKEN_TYPE_IF_START, &isIfStatement)
 								}
 							}
@@ -265,7 +377,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Unfinished statement", currentToken.FileName))
 								}
 							}
-						} else if currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACKET || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END {
+						} else if currentToken.Type == TOKEN_TYPE_INVOKE_FUNCTION || currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_GET_ARRAY_END || currentToken.Type == TOKEN_TYPE_CLOSE_BRACKET || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_EACH_PARAM_END {
 							tokenToAppend := functionStack[len(functionStack)-1]
 
 							if currentToken.Type == TOKEN_TYPE_CLOSE_BRACES || currentToken.Type == TOKEN_TYPE_CLOSE_BRACKET {
@@ -275,7 +387,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							outputQueue = append(outputQueue, tokenToAppend)
 							functionStack = functionStack[:len(functionStack)-1]
 
-							if currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END {
+							if currentToken.Type == TOKEN_TYPE_FUNCTION_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_IF_PARAM_END || currentToken.Type == TOKEN_TYPE_WHILE_LOOP_PARAM_END || currentToken.Type == TOKEN_TYPE_FOR_EACH_PARAM_END {
 								//next is function body
 								justAddTokens = true
 							}
@@ -1185,84 +1297,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 							} else {
 								//modify the value/type of variable below
-								if value.Type == TOKEN_TYPE_INTEGER {
-									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_INTEGER
-									(*globalVariableArray)[varIndex].IntegerValue, _ = strconv.Atoi(value.Value)
-								} else if value.Type == TOKEN_TYPE_STRING {
-									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_STRING
-									(*globalVariableArray)[varIndex].StringValue = value.Value
-								} else if value.Type == TOKEN_TYPE_FLOAT {
-									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
-									(*globalVariableArray)[varIndex].FloatValue, _ = strconv.ParseFloat(value.Value, 64)
-								} else if value.Type == TOKEN_TYPE_BOOLEAN {
-									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_BOOLEAN
-									if value.Value == "true" {
-										(*globalVariableArray)[varIndex].BooleanValue = true
-									} else {
-										(*globalVariableArray)[varIndex].BooleanValue = false
-									}
-								} else if value.Type == TOKEN_TYPE_ASSOCIATIVE_ARRAY {
-									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ASSOCIATIVE_ARRAY
-									(*globalVariableArray)[varIndex].AssociativeArrayValue = make(map[string]*Variable)
-									for k, v := range value.AssociativeArray {
-										thisVar := new(Variable)
-
-										if v.Type == TOKEN_TYPE_INTEGER {
-											thisVar.Type = VARIABLE_TYPE_INTEGER
-											thisVar.IntegerValue, _ = strconv.Atoi(v.Value)
-										} else if v.Type == TOKEN_TYPE_STRING {
-											thisVar.Type = VARIABLE_TYPE_STRING
-											thisVar.StringValue = v.Value
-										} else if v.Type == TOKEN_TYPE_FLOAT {
-											thisVar.Type = VARIABLE_TYPE_FLOAT
-											thisVar.FloatValue, _ = strconv.ParseFloat(v.Value, 64)
-										} else if v.Type == TOKEN_TYPE_BOOLEAN {
-											thisVar.Type = VARIABLE_TYPE_BOOLEAN
-											if v.Value == "true" {
-												thisVar.BooleanValue = true
-											} else {
-												thisVar.BooleanValue = false
-											}
-										} else {
-											thisVar.Type = VARIABLE_TYPE_NONE
-										}
-
-										(*globalVariableArray)[varIndex].AssociativeArrayValue[k] = thisVar
-									}
-								} else if value.Type == TOKEN_TYPE_ARRAY {
-									//reset slice
-									(*globalVariableArray)[varIndex].ArrayValue = nil
-									//set type
-									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ARRAY
-									for arrayIndex := 0; arrayIndex < len(value.Array); arrayIndex++ {
-										thisVar := Variable{}
-
-										if value.Array[arrayIndex].Type == TOKEN_TYPE_INTEGER {
-											thisVar.Type = VARIABLE_TYPE_INTEGER
-											thisVar.IntegerValue, _ = strconv.Atoi(value.Array[arrayIndex].Value)
-										} else if value.Array[arrayIndex].Type == TOKEN_TYPE_STRING {
-											thisVar.Type = VARIABLE_TYPE_STRING
-											thisVar.StringValue = value.Array[arrayIndex].Value
-										} else if value.Array[arrayIndex].Type == TOKEN_TYPE_FLOAT {
-											thisVar.Type = VARIABLE_TYPE_FLOAT
-											thisVar.FloatValue, _ = strconv.ParseFloat(value.Array[arrayIndex].Value, 64)
-										} else if value.Array[arrayIndex].Type == TOKEN_TYPE_BOOLEAN {
-											thisVar.Type = VARIABLE_TYPE_BOOLEAN
-											if value.Array[arrayIndex].Value == "true" {
-												thisVar.BooleanValue = true
-											} else {
-												thisVar.BooleanValue = false
-											}
-										} else {
-											thisVar.Type = VARIABLE_TYPE_NONE
-										}
-
-										(*globalVariableArray)[varIndex].ArrayValue = append((*globalVariableArray)[varIndex].ArrayValue, thisVar)
-									}
-								} else {
-									//Nil
-									(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
-								}
+								ConvertTokenToVariable(value, globalVariableArray, varIndex)
 							}
 
 							stack = append(stack, value)
@@ -1848,26 +1883,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							var tempTokens []Token
 							openLoopCount = 0
 							//append all tokens to temporary token
-							for {
-								currentToken := outputQueue[0]
-								outputQueue = append(outputQueue[:0], outputQueue[1:]...)
-
-								tempTokens = append(tempTokens, currentToken)
-
-								if currentToken.Type == TOKEN_TYPE_FOR_LOOP_START {
-									openLoopCount += 1
-								}
-
-								if currentToken.Type == TOKEN_TYPE_FOR_LOOP_END {
-									if openLoopCount == 0 {
-										break
-									}
-									openLoopCount = openLoopCount - 1
-								}
-								if len(outputQueue) == 0 {
-									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Invalid statement", currentToken.FileName))
-								}
-							}
+							AppendTokenToTemporaryTokens(&outputQueue, &tempTokens, &openLoopCount, TOKEN_TYPE_FOR_LOOP_START, TOKEN_TYPE_FOR_LOOP_END)
 
 							iParam1, _ := strconv.Atoi(param1.Value)
 							iParam2, _ := strconv.Atoi(param2.Value)
@@ -1965,27 +1981,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							var tempTokens []Token
 							openWhileLoopCount = 0
 							//append all tokens to temporary token
-							for {
-								currentToken := outputQueue[0]
-								outputQueue = append(outputQueue[:0], outputQueue[1:]...)
-
-								tempTokens = append(tempTokens, currentToken)
-
-								if currentToken.Type == TOKEN_TYPE_WHILE_LOOP_START {
-									openWhileLoopCount += 1
-								}
-
-								if currentToken.Type == TOKEN_TYPE_WHILE_LOOP_END {
-									if openWhileLoopCount == 0 {
-										break
-									}
-									openWhileLoopCount = openWhileLoopCount - 1
-								}
-
-								if len(outputQueue) == 0 {
-									return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Invalid statement", currentToken.FileName))
-								}
-							}
+							AppendTokenToTemporaryTokens(&outputQueue, &tempTokens, &openWhileLoopCount, TOKEN_TYPE_WHILE_LOOP_START, TOKEN_TYPE_WHILE_LOOP_END)
 
 							whileCondition := convertTokenToBool(param1)
 
@@ -2036,6 +2032,80 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 							}
 
 							stack = append(stack, currentToken) //append TOKEN_TYPE_WHILE_LOOP_END
+						} else if currentToken.Type == TOKEN_TYPE_FOR_EACH_START {
+							if len(stack) == 0 || len(stack) < 2 {
+								return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, currentToken.Value+" takes exactly 2 argument", currentToken.FileName))
+							}
+
+							var errConvert error
+
+							param2 := PopStack(&stack)
+
+							//param 2 should be an identifier
+							if param2.Type == TOKEN_TYPE_IDENTIFIER {
+								_, errConvert = convertVariableToToken(param2, *globalVariableArray, scopeName)
+								if errConvert != nil {
+									return errConvert
+								}
+							} else {
+								return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "Parameter 2 should be a variable", currentToken.FileName))
+							}
+
+							param1 := PopStack(&stack)
+
+							//if param1 is an identifier
+							//then it's a variable
+							if param1.Type == TOKEN_TYPE_IDENTIFIER {
+								param1, errConvert = convertVariableToToken(param1, *globalVariableArray, scopeName)
+								if errConvert != nil {
+									return errConvert
+								}
+							}
+
+							//validate param1
+							errParam1 := expectedTokenTypes(param1, TOKEN_TYPE_ARRAY)
+							if errParam1 != nil {
+								return errParam1
+							}
+
+							var tempTokens []Token
+							openForEachCount = 0
+							//append all tokens to temporary token
+							AppendTokenToTemporaryTokens(&outputQueue, &tempTokens, &openForEachCount, TOKEN_TYPE_FOR_EACH_START, TOKEN_TYPE_FOR_EACH_END)
+
+							for _, el := range param1.Array {
+								_, varIndex := isVariableExists(param2, *globalVariableArray, scopeName)
+
+								if (*globalVariableArray)[varIndex].IsConstant {
+									return errors.New(SyntaxErrorMessage(param2.Line, param2.Column, "Cannot override constant '"+param2.Value+"'", param2.FileName))
+								}
+								//set variable to token below
+								ConvertTokenToVariable(el, globalVariableArray, varIndex)
+
+								var loopGotReturn bool = false
+								var loopReturnToken Token
+								var loopNeedBreak bool = false
+								var loopStackReference []Token
+								var thisLastStackBool bool = false
+
+								prsr := Parser{}
+								parserErr := prsr.Parse(tempTokens, globalVariableArray, globalFunctionArray, scopeName, globalNativeVarList, &loopGotReturn, &loopReturnToken, true, &loopNeedBreak, &loopStackReference, globalSettings, getLastStackBool, &thisLastStackBool)
+
+								if parserErr != nil {
+									return parserErr
+								}
+								if loopGotReturn {
+									*gotReturn = loopGotReturn
+									*returnToken = loopReturnToken
+									return nil
+								}
+								if loopNeedBreak {
+									break
+								}
+
+							}
+
+							stack = append(stack, currentToken) //append TOKEN_TYPE_FOR_EACH_END
 						} else if currentToken.Type == TOKEN_TYPE_LOOP_BREAK {
 							if !isLoop {
 								return errors.New(SyntaxErrorMessage(currentToken.Line, currentToken.Column, "'brk' outside loop", currentToken.FileName))
@@ -2347,7 +2417,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 
 			}
 
-		} else if tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START || tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_END || tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_START || tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_END || tokenArray[x].Type == TOKEN_TYPE_IF_START || tokenArray[x].Type == TOKEN_TYPE_IF_END || tokenArray[x].Type == TOKEN_TYPE_WHILE_LOOP_START || tokenArray[x].Type == TOKEN_TYPE_WHILE_LOOP_END {
+		} else if tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START || tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_END || tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_START || tokenArray[x].Type == TOKEN_TYPE_FOR_LOOP_END || tokenArray[x].Type == TOKEN_TYPE_IF_START || tokenArray[x].Type == TOKEN_TYPE_IF_END || tokenArray[x].Type == TOKEN_TYPE_WHILE_LOOP_START || tokenArray[x].Type == TOKEN_TYPE_WHILE_LOOP_END || tokenArray[x].Type == TOKEN_TYPE_FOR_EACH_END || tokenArray[x].Type == TOKEN_TYPE_FOR_EACH_START {
 			if tokenArray[x].Type == TOKEN_TYPE_FUNCTION_DEF_START {
 				ignoreNewline = true
 				isFunctionDefinition = true
@@ -2367,8 +2437,9 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 					if tokenArray[x].Type == TOKEN_TYPE_WHILE_LOOP_START {
 						whileLoopContexts = append(whileLoopContexts, tokenArray[x].Context)
 					}
+					AppendTokenLoopForEvaluation(tokenArray, TOKEN_TYPE_FOR_EACH_START, TOKEN_TYPE_FOR_EACH_END, &openForEachCount, &ignoreNewline, &isForEachStatement, &tokensToEvaluate, x)
 				}
-				if !isLoopStatement && !isWhileLoopStatement {
+				if !isLoopStatement && !isWhileLoopStatement && !isForEachStatement {
 					if tokenArray[x].Type == TOKEN_TYPE_IF_START {
 						openIfCount += 1
 						ignoreNewline = true
