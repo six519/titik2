@@ -228,6 +228,20 @@ Execute a statement or code block repeatedly as long as an expression is true.
 
 .. image:: http://ferdinandsilva.com/static/while.png
 
+**For Each Loop**
+
+Used to iterate through elements of lineup.
+
+**Syntax**
+::
+    fea (lineup variable, variable to hold the item)
+        code to be executed
+    aef
+
+**Example**
+
+.. image:: http://ferdinandsilva.com/static/foreach.png
+
 **Break Statement**
 
 When a break statement is encountered inside a loop, the loop is immediately terminated and the program control resumes at the next statement following the loop.
