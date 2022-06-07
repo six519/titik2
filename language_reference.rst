@@ -603,6 +603,12 @@ HTTP Functions
     ::
         Nil http_h(string, string)
 
+- **http_cr** - HTTP client.
+
+    **Declaration:**
+    ::
+        glossary http_cr(string, string, glossary, glossary)
+
 Cryptographic Functions
 ~~~~~~~~~~~~~~~~~~~~~~~
 
