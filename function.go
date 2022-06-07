@@ -221,6 +221,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//http_gp() - Get path
 	defineFunction(globalFunctionArray, "http_gp", Http_gp_execute, 0, true)
 
+	//http_cr() - HTTP client request
+	defineFunction(globalFunctionArray, "http_cr", Http_cr_execute, 4, true)
+
 	//MYSQL FUNCTIONALITIES
 	//mysql_set(<string>, <string>, <string>, <string>) - Set connection
 	defineFunction(globalFunctionArray, "mysql_set", Mysql_set_execute, 4, true)

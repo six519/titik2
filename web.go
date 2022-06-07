@@ -1,10 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"html/template"
+	"io"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -323,6 +327,100 @@ func Http_gp_execute(arguments []FunctionArgument, errMessage *error, globalVari
 	}
 
 	ret.StringValue = (*globalSettings).webObject.thisRequest[scopeName].URL.Path
+
+	return ret
+}
+
+func Http_cr_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ASSOCIATIVE_ARRAY}
+	ret.AssociativeArrayValue = make(map[string]FunctionReturn)
+	ret.AssociativeArrayValue["status"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
+	ret.AssociativeArrayValue["body"] = FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	//http_cr("POST", "http://test.com", {'Content-Type': 'application/json'}, '{"name":"ferdinand"}')
+	//http_cr("POST", "http://test.com", {'Content-Type': 'application/x-www-form-urlencoded'}, {"age": 23})
+	//http_cr("GET", "http://test.com", Nil, Nil)
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_STRING) {
+		if arguments[1].Type != ARG_TYPE_ASSOCIATIVE_ARRAY && arguments[1].Type != ARG_TYPE_NONE {
+			*errMessage = errors.New("Error: Parameter 3 must be a glossary/Nil type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else if arguments[0].Type != ARG_TYPE_ASSOCIATIVE_ARRAY && arguments[0].Type != ARG_TYPE_NONE && arguments[0].Type != ARG_TYPE_STRING {
+			*errMessage = errors.New("Error: Parameter 4 must be a glossary/Nil/string type on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			var b io.Reader
+			if arguments[0].Type == ARG_TYPE_ASSOCIATIVE_ARRAY {
+				data := url.Values{}
+				for k, v := range arguments[0].AssociativeArrayValue {
+					if v.Type == ARG_TYPE_FLOAT {
+						data.Set(k, strconv.FormatFloat(v.FloatValue, 'f', -1, 64))
+					} else if v.Type == ARG_TYPE_STRING {
+						data.Set(k, v.StringValue)
+					} else if v.Type == ARG_TYPE_INTEGER {
+						data.Set(k, strconv.Itoa(v.IntegerValue))
+					} else if v.Type == ARG_TYPE_BOOLEAN {
+						if v.BooleanValue {
+							data.Set(k, "true")
+						} else {
+							data.Set(k, "false")
+						}
+					} else {
+						data.Set(k, "Nil")
+					}
+				}
+
+				b = bytes.NewBufferString(data.Encode())
+
+			} else if arguments[0].Type == ARG_TYPE_STRING {
+				var jsonReq = []byte(arguments[0].StringValue)
+				b = bytes.NewBuffer(jsonReq)
+			}
+
+			req, err2 := http.NewRequest(arguments[3].StringValue, arguments[2].StringValue, b)
+
+			//set http header
+			if arguments[1].Type == ARG_TYPE_ASSOCIATIVE_ARRAY {
+				for k, v := range arguments[0].AssociativeArrayValue {
+					if v.Type == ARG_TYPE_FLOAT {
+						req.Header.Set(k, strconv.FormatFloat(v.FloatValue, 'f', -1, 64))
+					} else if v.Type == ARG_TYPE_STRING {
+						req.Header.Set(k, v.StringValue)
+					} else if v.Type == ARG_TYPE_INTEGER {
+						req.Header.Set(k, strconv.Itoa(v.IntegerValue))
+					} else if v.Type == ARG_TYPE_BOOLEAN {
+						if v.BooleanValue {
+							req.Header.Set(k, "true")
+						} else {
+							req.Header.Set(k, "false")
+						}
+					} else {
+						req.Header.Set(k, "Nil")
+					}
+				}
+			}
+
+			if err2 != nil {
+				*errMessage = errors.New("Error: " + err2.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			}
+
+			c := &http.Client{}
+			resp, err3 := c.Do(req)
+
+			if err3 != nil {
+				*errMessage = errors.New("Error: " + err3.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			}
+
+			defer resp.Body.Close()
+			r, err4 := ioutil.ReadAll(resp.Body)
+			if err4 != nil {
+				*errMessage = errors.New("Error: " + err4.Error() + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			}
+
+			ret.AssociativeArrayValue["status"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: resp.StatusCode}
+			ret.AssociativeArrayValue["body"] = FunctionReturn{Type: RET_TYPE_STRING, StringValue: string(r)}
+
+		}
+	}
 
 	return ret
 }
