@@ -1,5 +1,5 @@
-//go:build !win
-// +build !win
+//go:build win
+// +build win
 
 package main
 
@@ -11,6 +11,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"runtime"
+	"syscall"
+	"unsafe"
 )
 
 type GlobalSettingsObject struct {
@@ -26,6 +30,8 @@ type GlobalSettingsObject struct {
 	netUDPConnectionListener map[string]*net.UDPConn
 	mySQLConnection          map[string]*sql.DB
 	fileHandler              map[string]*os.File
+
+	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
 }
 
 func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -46,6 +52,14 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.mySQLConnection = make(map[string]*sql.DB)
 	globalSettings.fileHandler = make(map[string]*os.File)
 
+	if runtime.GOOS == "windows" {
+		//get console handle
+		//for windows
+		kernel32 := syscall.NewLazyDLL("kernel32.dll")
+		getConsoleScreenBufferInfoProc := kernel32.NewProc("GetConsoleScreenBufferInfo")
+		handle, _ := syscall.GetStdHandle(syscall.STD_OUTPUT_HANDLE)
+		_, _, _ = getConsoleScreenBufferInfoProc.Call(uintptr(handle), uintptr(unsafe.Pointer(&globalSettings.consoleInfo)), 0)
+	}
 }
 
 func escapeString(str string) string {
