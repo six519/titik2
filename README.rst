@@ -8,8 +8,14 @@ Intro
 
 This is for experimental and educational purpose only. ;)
 
-Compile From Source
-===================
+Compile From Source (Windows)
+=============================
+::
+    
+    go build -tags win .
+
+Compile From Source (Other OS)
+==============================
 ::
     
     go build .
