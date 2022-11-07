@@ -44,4 +44,4 @@ Download the installer from the link below then restart the system after install
 
 ::
 
-    https://github.com/six519/titik2/blob/master/bin/titik-3.4.0-setup.exe?raw=true
+    https://github.com/six519/titik2/releases/download/v3.5.0/titik-3.5.0-setup.exe
