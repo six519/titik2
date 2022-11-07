@@ -35,7 +35,7 @@ FreeBSD 13.1
     
     sudo pkg install go
     sudo pkg install git
-    sudo pkg add "https://github.com/six519/titik2/blob/master/bin/titik-3.4.0.pkg?raw=true"
+    sudo pkg add "https://github.com/six519/titik2/releases/download/v3.5.0/titik-3.5.0.pkg"
 
 Windows 10 (64 bit only)
 ------------------------
