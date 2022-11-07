@@ -1,6 +1,6 @@
 Name: titik          
 Version: 3       
-Release: 3
+Release: 5
 Summary: Titik Interpreter        
 
 License: MIT      

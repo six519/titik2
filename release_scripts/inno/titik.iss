@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Titik"
-#define MyAppVersion "3.0.0"
+#define MyAppVersion "3.5.0"
 #define MyAppPublisher "Ferdinand Silva"
 #define MyAppURL "https://github.com/six519/titik2"
 #define MyAppExeName "titik.exe"
@@ -28,7 +28,7 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputBaseFilename=titik-3.0.0-setup
+OutputBaseFilename=titik-3.5.0-setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern

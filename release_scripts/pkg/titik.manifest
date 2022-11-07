@@ -1,5 +1,5 @@
 name: titik
-version: "3.4.0"
+version: "3.5.0"
 origin: lang/titik
 comment: Titik interpreter
 www: https://github.com/six519/titik2
@@ -13,38 +13,40 @@ deps: {
   git: {origin: devel/git, version: 2.35.2};
 }
 files: {
-  /usr/local/share/titik-3.4.0/README.rst: 'sha256sum';
-  /usr/local/share/titik-3.4.0/console.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/conversion.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/cryptographic.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/file.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/function.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/go.mod: 'sha256sum';
-  /usr/local/share/titik-3.4.0/go.sum: 'sha256sum';
-  /usr/local/share/titik-3.4.0/helloworld.ttk: 'sha256sum';
-  /usr/local/share/titik-3.4.0/info.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/interactive.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/lexer.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/main.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/math.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/mysql.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/net.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/other.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/parser.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/reserved.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/sqlite.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/strings.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/system.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/util.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/variable.go: 'sha256sum';
-  /usr/local/share/titik-3.4.0/web.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/README.rst: 'sha256sum';
+  /usr/local/share/titik-3.5.0/console_win.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/console.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/conversion.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/cryptographic.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/file.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/function.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/go.mod: 'sha256sum';
+  /usr/local/share/titik-3.5.0/go.sum: 'sha256sum';
+  /usr/local/share/titik-3.5.0/helloworld.ttk: 'sha256sum';
+  /usr/local/share/titik-3.5.0/info.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/interactive.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/lexer.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/main.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/math.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/mysql.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/net.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/other.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/parser.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/reserved.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/sqlite.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/strings.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/system.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/util_win.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/util.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/variable.go: 'sha256sum';
+  /usr/local/share/titik-3.5.0/web.go: 'sha256sum';
 }
 directories: {
-  /usr/local/share/titik-3.4.0 : 'y';
+  /usr/local/share/titik-3.5.0 : 'y';
 }
 scripts: {
   post-install: <<EOD
-    cd /usr/local/share/titik-3.4.0
+    cd /usr/local/share/titik-3.5.0
     go get github.com/go-sql-driver/mysql
     go get github.com/mattn/go-sqlite3
     go build -o /usr/local/bin/titik
