@@ -50,7 +50,7 @@ Hello World Code
             fl (0, 8)
                 intVariable = intVariable + 1
                 sc(intVariable) #change text color
-                p(var + '\n') #It will print "Mabuhay Ka" 5 times
+                p(var + '\n') #It will print "Mabuhay Ka" 8 times
                 zzz(2000) #sleep for 2 seconds
             lf
             
