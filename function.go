@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-//function return type
+// function return type
 const (
 	RET_TYPE_NONE = iota
 	RET_TYPE_STRING
@@ -17,7 +17,7 @@ const (
 	RET_TYPE_BOOLEAN
 )
 
-//function argument types
+// function argument types
 const (
 	ARG_TYPE_NONE = iota
 	ARG_TYPE_STRING
@@ -377,4 +377,13 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//fr(string)
 	defineFunction(globalFunctionArray, "fr", Fr_execute, 2, true)
+
+	//SDL FUNCTIONALITIES
+	if SDL_ENABLED {
+		//s_i(<integer>) - sdl init
+		defineFunction(globalFunctionArray, "s_i", S_i_execute, 1, true)
+
+		//s_q() - sdl quit
+		defineFunction(globalFunctionArray, "s_q", S_q_execute, 0, true)
+	}
 }
