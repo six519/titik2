@@ -23,6 +23,12 @@ func Version() {
 	fmt.Printf("%s %s\n", TITIK_APP_NAME, TITIK_STRING_VERSION)
 	fmt.Printf("By: %s\n", TITIK_AUTHOR)
 	fmt.Printf("Operating System: %s\n", runtime.GOOS)
+
+	if SDL_ENABLED {
+		fmt.Println("SDL Support: Yes")
+	} else {
+		fmt.Println("SDL Support: No")
+	}
 }
 
 func SyntaxErrorMessage(lineNumber int, columnNumber int, description string, fileName string) string {
