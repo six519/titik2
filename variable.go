@@ -294,7 +294,16 @@ func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *
 	defineConstantBoolean("F", false, globalVariableArray, globalNativeVarList)
 
 	if SDL_ENABLED {
-		defineConstantInteger("S_E", 62001, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_T", 1, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_A", 2, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_V", 3, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_J", 4, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_H", 5, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_G", 6, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E", 7, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_N", 8, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_S", 9, globalVariableArray, globalNativeVarList)
 	}
 
 }
