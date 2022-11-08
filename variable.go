@@ -294,6 +294,7 @@ func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *
 	defineConstantBoolean("F", false, globalVariableArray, globalNativeVarList)
 
 	if SDL_ENABLED {
+		//sdl init
 		defineConstantInteger("S_E", 0, globalVariableArray, globalNativeVarList)
 		defineConstantInteger("S_T", 1, globalVariableArray, globalNativeVarList)
 		defineConstantInteger("S_A", 2, globalVariableArray, globalNativeVarList)
@@ -304,6 +305,23 @@ func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *
 		defineConstantInteger("S_E", 7, globalVariableArray, globalNativeVarList)
 		defineConstantInteger("S_N", 8, globalVariableArray, globalNativeVarList)
 		defineConstantInteger("S_S", 9, globalVariableArray, globalNativeVarList)
+
+		//sdl window positions
+		defineConstantInteger("S_WP_U", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_WP_C", 1, globalVariableArray, globalNativeVarList)
+
+		//sdl window flags
+		defineConstantInteger("S_W_F", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_S", 1, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_H", 2, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_B", 3, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_R", 4, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_MI", 5, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_MA", 6, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_FD", 7, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_A", 8, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_T", 9, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_P", 10, globalVariableArray, globalNativeVarList)
 	}
 
 }
