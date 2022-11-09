@@ -28,6 +28,7 @@ type GlobalSettingsObject struct {
 	mySQLConnection          map[string]*sql.DB
 	fileHandler              map[string]*os.File
 	sdlWindow                map[string]*sdl.Window
+	sdlSurface               map[string]*sdl.Surface
 }
 
 func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -48,6 +49,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.mySQLConnection = make(map[string]*sql.DB)
 	globalSettings.fileHandler = make(map[string]*os.File)
 	globalSettings.sdlWindow = make(map[string]*sdl.Window)
+	globalSettings.sdlSurface = make(map[string]*sdl.Surface)
 
 }
 
