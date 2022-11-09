@@ -112,3 +112,17 @@ func S_dw_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 
 	return ret
 }
+
+func S_usw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if (*globalSettings).sdlWindow[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized window on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			(*globalSettings).sdlWindow[arguments[0].StringValue].UpdateSurface()
+		}
+	}
+
+	return ret
+}

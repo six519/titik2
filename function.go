@@ -391,5 +391,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_dw(<string>) - sdl destroy window
 		defineFunction(globalFunctionArray, "s_dw", S_dw_execute, 1, true)
+
+		//s_usw(<string>) - sdl update surface window
+		defineFunction(globalFunctionArray, "s_usw", S_usw_execute, 1, true)
 	}
 }
