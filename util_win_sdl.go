@@ -1,5 +1,5 @@
-//go:build win && !sdl
-// +build win,!sdl
+//go:build win && sdl
+// +build win,sdl
 
 package main
 
@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/veandco/go-sdl2/sdl"
 	"runtime"
 	"syscall"
 	"unsafe"
@@ -30,6 +31,10 @@ type GlobalSettingsObject struct {
 	netUDPConnectionListener map[string]*net.UDPConn
 	mySQLConnection          map[string]*sql.DB
 	fileHandler              map[string]*os.File
+	sdlWindow                map[string]*sdl.Window
+	sdlSurface               map[string]*sdl.Surface
+	sdlRect                  map[string]sdl.Rect
+	sdlEvent                 map[string]sdl.Event
 
 	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
 }
@@ -51,6 +56,10 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.netUDPConnectionListener = make(map[string]*net.UDPConn)
 	globalSettings.mySQLConnection = make(map[string]*sql.DB)
 	globalSettings.fileHandler = make(map[string]*os.File)
+	globalSettings.sdlWindow = make(map[string]*sdl.Window)
+	globalSettings.sdlSurface = make(map[string]*sdl.Surface)
+	globalSettings.sdlRect = make(map[string]sdl.Rect)
+	globalSettings.sdlEvent = make(map[string]sdl.Event)
 
 	if runtime.GOOS == "windows" {
 		//get console handle

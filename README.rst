@@ -14,11 +14,23 @@ Compile From Source (Windows)
     
     go build -tags win .
 
+Compile From Source (Windows with SDL2 Support)
+===============================================
+::
+    
+    go build -tags win sdl .
+
 Compile From Source (Other OS)
 ==============================
 ::
     
     go build .
+
+Compile From Source (Other OS with SDL2 Support)
+================================================
+::
+    
+    go build -tags sdl .
 
 Binary Release (Installation Instructions)
 ==========================================

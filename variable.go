@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"errors"
-	"strconv"
+	"fmt"
 	"runtime"
+	"strconv"
 )
 
-//variable types (basic)
+// variable types (basic)
 const (
 	VARIABLE_TYPE_NONE = iota
 	VARIABLE_TYPE_INTEGER
@@ -18,7 +18,7 @@ const (
 	VARIABLE_TYPE_BOOLEAN
 )
 
-var VARIABLE_TYPES_STRING = []string {
+var VARIABLE_TYPES_STRING = []string{
 	"VARIABLE_TYPE_NONE",
 	"VARIABLE_TYPE_INTEGER",
 	"VARIABLE_TYPE_STRING",
@@ -29,15 +29,15 @@ var VARIABLE_TYPES_STRING = []string {
 }
 
 type Variable struct {
-	Name string
-	ScopeName string
-	Type int
-	StringValue string
-	IntegerValue int
-	FloatValue float64
-	BooleanValue bool
-	IsConstant bool
-	ArrayValue []Variable
+	Name                  string
+	ScopeName             string
+	Type                  int
+	StringValue           string
+	IntegerValue          int
+	FloatValue            float64
+	BooleanValue          bool
+	IsConstant            bool
+	ArrayValue            []Variable
 	AssociativeArrayValue map[string]*Variable
 }
 
@@ -45,15 +45,15 @@ func cleanupVariables(variables *[]Variable, scopeName string) {
 	varCount := 0
 	//count the variables first
 	for x := 0; x < len(*variables); x++ {
-		if((*variables)[x].ScopeName == scopeName) {
+		if (*variables)[x].ScopeName == scopeName {
 			varCount = varCount + 1
 		}
 	}
-	if(varCount > 0) {
+	if varCount > 0 {
 		for true {
 
 			for x := 0; x < len(*variables); x++ {
-				if((*variables)[x].ScopeName == scopeName) {
+				if (*variables)[x].ScopeName == scopeName {
 					copy((*variables)[x:], (*variables)[x+1:])
 					//(*variables)[len((*variables))-1] = nil
 					(*variables) = (*variables)[:len((*variables))-1]
@@ -62,7 +62,7 @@ func cleanupVariables(variables *[]Variable, scopeName string) {
 				}
 			}
 
-			if(varCount == 0) {
+			if varCount == 0 {
 				break
 			}
 		}
@@ -76,27 +76,27 @@ func DumpVariable(variables []Variable) {
 		fmt.Printf("Variable Name: %s\n", variables[x].Name)
 
 		//NOTE: ASSUME VARIABLE TYPE AS FLOAT AND INTEGER FOR NOW (TEMPORARY)
-		if(variables[x].Type == VARIABLE_TYPE_FLOAT) {
+		if variables[x].Type == VARIABLE_TYPE_FLOAT {
 			fmt.Printf("Variable Value: %f\n", variables[x].FloatValue)
-		} else if(variables[x].Type == VARIABLE_TYPE_STRING) {
+		} else if variables[x].Type == VARIABLE_TYPE_STRING {
 			fmt.Printf("Variable Value: %s\n", variables[x].StringValue)
-		} else if(variables[x].Type == VARIABLE_TYPE_INTEGER) {
+		} else if variables[x].Type == VARIABLE_TYPE_INTEGER {
 			fmt.Printf("Variable Value: %d\n", variables[x].IntegerValue)
-		} else if(variables[x].Type == VARIABLE_TYPE_BOOLEAN) {
+		} else if variables[x].Type == VARIABLE_TYPE_BOOLEAN {
 			fmt.Printf("Variable Value: %v\n", variables[x].BooleanValue)
-		} else if(variables[x].Type == VARIABLE_TYPE_ARRAY) {
+		} else if variables[x].Type == VARIABLE_TYPE_ARRAY {
 			strVal := ""
 
 			for x2 := 0; x2 < len(variables[x].ArrayValue); x2++ {
 				//strVal = strVal + variables[x].Array[x2].Value
-				if(variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_FLOAT) {
+				if variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_FLOAT {
 					strVal = strVal + strconv.FormatFloat(variables[x].ArrayValue[x2].FloatValue, 'f', -1, 64)
-				} else if(variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_STRING) {
+				} else if variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_STRING {
 					strVal = strVal + variables[x].ArrayValue[x2].StringValue
-				} else if(variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_INTEGER) {
+				} else if variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_INTEGER {
 					strVal = strVal + strconv.Itoa(variables[x].ArrayValue[x2].IntegerValue)
-				} else if(variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_BOOLEAN) {
-					if(variables[x].ArrayValue[x2].BooleanValue) {
+				} else if variables[x].ArrayValue[x2].Type == VARIABLE_TYPE_BOOLEAN {
+					if variables[x].ArrayValue[x2].BooleanValue {
 						strVal = strVal + "true"
 					} else {
 						strVal = strVal + "false"
@@ -105,7 +105,7 @@ func DumpVariable(variables []Variable) {
 					strVal = strVal + "Nil"
 				}
 
-				if((x2 + 1) != len(variables[x].ArrayValue)) {
+				if (x2 + 1) != len(variables[x].ArrayValue) {
 					strVal = strVal + " , "
 				}
 			}
@@ -118,8 +118,8 @@ func DumpVariable(variables []Variable) {
 
 		fmt.Printf("Variable Scope: %s\n", variables[x].ScopeName)
 		fmt.Printf("Variable Type: %s\n", VARIABLE_TYPES_STRING[variables[x].Type])
-		
-		if(variables[x].IsConstant) {
+
+		if variables[x].IsConstant {
 			fmt.Println("Variable Constant: Yes")
 		} else {
 			fmt.Println("Variable Constant: No")
@@ -132,7 +132,7 @@ func DumpVariable(variables []Variable) {
 func isVariableExists(token Token, globalVariableArray []Variable, scopeName string) (bool, int) {
 
 	for x := 0; x < len(globalVariableArray); x++ {
-		if(globalVariableArray[x].Name == token.Value && globalVariableArray[x].ScopeName == scopeName) {
+		if globalVariableArray[x].Name == token.Value && globalVariableArray[x].ScopeName == scopeName {
 			return true, x
 		}
 	}
@@ -143,7 +143,7 @@ func isVariableExists(token Token, globalVariableArray []Variable, scopeName str
 func isSystemVariable(name string, globalNativeVarList []string) bool {
 
 	for x := 0; x < len(globalNativeVarList); x++ {
-		if(name == globalNativeVarList[x]) {
+		if name == globalNativeVarList[x] {
 			return true
 		}
 	}
@@ -152,7 +152,7 @@ func isSystemVariable(name string, globalNativeVarList []string) bool {
 }
 
 func convertTokenToBool(token Token) bool {
-	if(token.Value == "true") {
+	if token.Value == "true" {
 		return true
 	}
 	return false
@@ -162,58 +162,58 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 
 	isExists, indx := isVariableExists(token, variables, scopeName)
 
-	if(scopeName == "main"){
+	if scopeName == "main" {
 		//if scope is main and not existing then raise an error right away
-		if(!isExists) {
-			return token, errors.New(SyntaxErrorMessage(token.Line, token.Column, "Variable doesn't exists '" + token.Value + "'", token.FileName))
+		if !isExists {
+			return token, errors.New(SyntaxErrorMessage(token.Line, token.Column, "Variable doesn't exists '"+token.Value+"'", token.FileName))
 		}
 	} else {
-		if(!isExists) {
+		if !isExists {
 			//if doesnt exists in function scope then check in main scope
 			isExists, indx = isVariableExists(token, variables, "main")
-			if(!isExists) {
-				return token, errors.New(SyntaxErrorMessage(token.Line, token.Column, "Variable doesn't exists '" + token.Value + "'", token.FileName))
+			if !isExists {
+				return token, errors.New(SyntaxErrorMessage(token.Line, token.Column, "Variable doesn't exists '"+token.Value+"'", token.FileName))
 			}
 		}
 	}
 
-	if(variables[indx].Type == VARIABLE_TYPE_INTEGER) {
+	if variables[indx].Type == VARIABLE_TYPE_INTEGER {
 		token.Type = TOKEN_TYPE_INTEGER
 		token.Value = strconv.Itoa(variables[indx].IntegerValue)
-	} else if(variables[indx].Type == VARIABLE_TYPE_STRING) {
+	} else if variables[indx].Type == VARIABLE_TYPE_STRING {
 		token.Type = TOKEN_TYPE_STRING
 		token.Value = variables[indx].StringValue
-	} else if(variables[indx].Type == VARIABLE_TYPE_FLOAT) {
+	} else if variables[indx].Type == VARIABLE_TYPE_FLOAT {
 		token.Type = TOKEN_TYPE_FLOAT
 		token.Value = strconv.FormatFloat(variables[indx].FloatValue, 'f', -1, 64)
-	} else if(variables[indx].Type == VARIABLE_TYPE_BOOLEAN) {
+	} else if variables[indx].Type == VARIABLE_TYPE_BOOLEAN {
 		token.Type = TOKEN_TYPE_BOOLEAN
-		if(variables[indx].BooleanValue) {
+		if variables[indx].BooleanValue {
 			//true
 			token.Value = "true"
 		} else {
 			//false
 			token.Value = "false"
 		}
-	} else if(variables[indx].Type == VARIABLE_TYPE_ASSOCIATIVE_ARRAY) {
+	} else if variables[indx].Type == VARIABLE_TYPE_ASSOCIATIVE_ARRAY {
 		token.Type = TOKEN_TYPE_ASSOCIATIVE_ARRAY
 		token.OtherInt = len(variables[indx].AssociativeArrayValue)
 		token.AssociativeArray = make(map[string]Token)
 
-		for k,v := range variables[indx].AssociativeArrayValue {
+		for k, v := range variables[indx].AssociativeArrayValue {
 			newToken := Token{}
-			if(v.Type == VARIABLE_TYPE_INTEGER) {
+			if v.Type == VARIABLE_TYPE_INTEGER {
 				newToken.Type = TOKEN_TYPE_INTEGER
 				newToken.Value = strconv.Itoa(v.IntegerValue)
-			} else if(v.Type == VARIABLE_TYPE_STRING) {
+			} else if v.Type == VARIABLE_TYPE_STRING {
 				newToken.Type = TOKEN_TYPE_STRING
 				newToken.Value = v.StringValue
-			} else if(v.Type == VARIABLE_TYPE_FLOAT) {
+			} else if v.Type == VARIABLE_TYPE_FLOAT {
 				newToken.Type = TOKEN_TYPE_FLOAT
 				newToken.Value = strconv.FormatFloat(v.FloatValue, 'f', -1, 64)
-			} else if(v.Type == VARIABLE_TYPE_BOOLEAN) {
+			} else if v.Type == VARIABLE_TYPE_BOOLEAN {
 				newToken.Type = TOKEN_TYPE_BOOLEAN
-				if(v.BooleanValue) {
+				if v.BooleanValue {
 					newToken.Value = "true"
 				} else {
 					newToken.Value = "false"
@@ -224,24 +224,24 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 
 			token.AssociativeArray[k] = newToken
 		}
-		
-	} else if(variables[indx].Type == VARIABLE_TYPE_ARRAY) {
+
+	} else if variables[indx].Type == VARIABLE_TYPE_ARRAY {
 		token.Type = TOKEN_TYPE_ARRAY
 		token.OtherInt = len(variables[indx].ArrayValue)
 		for x := 0; x < len(variables[indx].ArrayValue); x++ {
 			newToken := Token{}
-			if(variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_INTEGER) {
+			if variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_INTEGER {
 				newToken.Type = TOKEN_TYPE_INTEGER
 				newToken.Value = strconv.Itoa(variables[indx].ArrayValue[x].IntegerValue)
-			} else if(variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_STRING) {
+			} else if variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_STRING {
 				newToken.Type = TOKEN_TYPE_STRING
 				newToken.Value = variables[indx].ArrayValue[x].StringValue
-			} else if(variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_FLOAT) {
+			} else if variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_FLOAT {
 				newToken.Type = TOKEN_TYPE_FLOAT
 				newToken.Value = strconv.FormatFloat(variables[indx].ArrayValue[x].FloatValue, 'f', -1, 64)
-			} else if(variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_BOOLEAN) {
+			} else if variables[indx].ArrayValue[x].Type == VARIABLE_TYPE_BOOLEAN {
 				newToken.Type = TOKEN_TYPE_BOOLEAN
-				if(variables[indx].ArrayValue[x].BooleanValue) {
+				if variables[indx].ArrayValue[x].BooleanValue {
 					newToken.Value = "true"
 				} else {
 					newToken.Value = "false"
@@ -263,20 +263,26 @@ func convertVariableToToken(token Token, variables []Variable, scopeName string)
 func defineConstantString(variableName string, variableValue string, globalVariableArray *[]Variable, globalNativeVarList *[]string) {
 	strVar := Variable{Name: variableName, ScopeName: "main", Type: VARIABLE_TYPE_STRING, IsConstant: true, StringValue: variableValue}
 	*globalVariableArray = append(*globalVariableArray, strVar)
-	*globalNativeVarList= append(*globalNativeVarList, variableName)
+	*globalNativeVarList = append(*globalNativeVarList, variableName)
 }
 
 func defineConstantBoolean(variableName string, variableValue bool, globalVariableArray *[]Variable, globalNativeVarList *[]string) {
 	boolVar := Variable{Name: variableName, ScopeName: "main", Type: VARIABLE_TYPE_BOOLEAN, IsConstant: true, BooleanValue: variableValue}
 	*globalVariableArray = append(*globalVariableArray, boolVar)
-	*globalNativeVarList= append(*globalNativeVarList, variableName)
+	*globalNativeVarList = append(*globalNativeVarList, variableName)
+}
+
+func defineConstantInteger(variableName string, variableValue int, globalVariableArray *[]Variable, globalNativeVarList *[]string) {
+	intVar := Variable{Name: variableName, ScopeName: "main", Type: VARIABLE_TYPE_INTEGER, IsConstant: true, IntegerValue: variableValue}
+	*globalVariableArray = append(*globalVariableArray, intVar)
+	*globalNativeVarList = append(*globalNativeVarList, variableName)
 }
 
 func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *[]string) {
 	//add Nil Variable
 	nilVar := Variable{Name: "Nil", ScopeName: "main", Type: VARIABLE_TYPE_NONE, IsConstant: true}
 	*globalVariableArray = append(*globalVariableArray, nilVar)
-	*globalNativeVarList= append(*globalNativeVarList, "Nil")
+	*globalNativeVarList = append(*globalNativeVarList, "Nil")
 
 	//define string constants
 	defineConstantString("__AUTHOR__", TITIK_AUTHOR, globalVariableArray, globalNativeVarList)
@@ -286,4 +292,43 @@ func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *
 	//define boolean constants
 	defineConstantBoolean("T", true, globalVariableArray, globalNativeVarList)
 	defineConstantBoolean("F", false, globalVariableArray, globalNativeVarList)
+
+	if SDL_ENABLED {
+		//sdl init
+		defineConstantInteger("S_E", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_T", 1, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_A", 2, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_V", 3, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_J", 4, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_H", 5, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_G", 6, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E", 7, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_N", 8, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_S", 9, globalVariableArray, globalNativeVarList)
+
+		//sdl window positions
+		defineConstantInteger("S_WP_U", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_WP_C", 1, globalVariableArray, globalNativeVarList)
+
+		//sdl window flags
+		defineConstantInteger("S_W_F", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_S", 1, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_H", 2, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_B", 3, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_R", 4, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_MI", 5, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_MA", 6, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_FD", 7, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_A", 8, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_T", 9, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_W_P", 10, globalVariableArray, globalNativeVarList)
+
+		//sdl events
+		defineConstantInteger("S_E_F", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E_Q", 1, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E_D", 2, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E_W", 3, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E_S", 4, globalVariableArray, globalNativeVarList)
+	}
+
 }

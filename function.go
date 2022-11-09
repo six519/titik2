@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-//function return type
+// function return type
 const (
 	RET_TYPE_NONE = iota
 	RET_TYPE_STRING
@@ -17,7 +17,7 @@ const (
 	RET_TYPE_BOOLEAN
 )
 
-//function argument types
+// function argument types
 const (
 	ARG_TYPE_NONE = iota
 	ARG_TYPE_STRING
@@ -377,4 +377,40 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 	//fr(string)
 	defineFunction(globalFunctionArray, "fr", Fr_execute, 2, true)
+
+	//SDL FUNCTIONALITIES
+	if SDL_ENABLED {
+		//s_i(<integer>) - sdl init
+		defineFunction(globalFunctionArray, "s_i", S_i_execute, 1, true)
+
+		//s_q() - sdl quit
+		defineFunction(globalFunctionArray, "s_q", S_q_execute, 0, true)
+
+		//s_cw(<string>, <integer>, <integer>, <integer>, <integer>, <integer>) - sdl create window
+		defineFunction(globalFunctionArray, "s_cw", S_cw_execute, 6, true)
+
+		//s_dw(<string>) - sdl destroy window
+		defineFunction(globalFunctionArray, "s_dw", S_dw_execute, 1, true)
+
+		//s_usw(<string>) - sdl update surface window
+		defineFunction(globalFunctionArray, "s_usw", S_usw_execute, 1, true)
+
+		//s_gsw(<string>) - sdl get window surface
+		defineFunction(globalFunctionArray, "s_gsw", S_gsw_execute, 1, true)
+
+		//s_cr(<integer>, <integer>, <integer>, <integer>) - sdl create rectangle
+		defineFunction(globalFunctionArray, "s_cr", S_cr_execute, 4, true)
+
+		//s_frsw(<string>, <string>, <integer>) - sdl fill rect
+		defineFunction(globalFunctionArray, "s_frsw", S_frsw_execute, 3, true)
+
+		//s_pe() - sdl poll event
+		defineFunction(globalFunctionArray, "s_pe", S_pe_execute, 0, true)
+
+		//s_ce() - sdl clear event
+		defineFunction(globalFunctionArray, "s_ce", S_ce_execute, 1, true)
+
+		//s_gte() - sdl get event type
+		defineFunction(globalFunctionArray, "s_gte", S_gte_execute, 1, true)
+	}
 }
