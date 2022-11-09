@@ -400,5 +400,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_cr(<integer>, <integer>, <integer>, <integer>) - sdl create rectangle
 		defineFunction(globalFunctionArray, "s_cr", S_cr_execute, 4, true)
+
+		//s_frsw(<string>, <string>, <integer>) - sdl fill rect
+		defineFunction(globalFunctionArray, "s_frsw", S_frsw_execute, 3, true)
 	}
 }

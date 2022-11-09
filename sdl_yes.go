@@ -165,3 +165,29 @@ func S_cr_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 
 	return ret
 }
+
+func S_frsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if (*globalSettings).sdlSurface[arguments[2].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized surface on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			if arguments[1].StringValue == "" {
+				(*globalSettings).sdlSurface[arguments[2].StringValue].FillRect(nil, uint32(arguments[0].IntegerValue))
+			} else {
+				if val, ok := (*globalSettings).sdlRect[arguments[1].StringValue]; ok {
+					(*globalSettings).sdlSurface[arguments[2].StringValue].FillRect(&val, uint32(arguments[0].IntegerValue))
+				} else {
+					*errMessage = errors.New("Error: Uninitialized rectangle on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+				}
+			}
+		}
+
+	}
+
+	return ret
+}
