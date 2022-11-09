@@ -397,5 +397,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_gsw(<string>) - sdl get window surface
 		defineFunction(globalFunctionArray, "s_gsw", S_gsw_execute, 1, true)
+
+		//s_cr(<integer>, <integer>, <integer>, <integer>) - sdl create rectangle
+		defineFunction(globalFunctionArray, "s_cr", S_cr_execute, 4, true)
 	}
 }

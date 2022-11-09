@@ -147,3 +147,21 @@ func S_gsw_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 
 	return ret
 }
+
+func S_cr_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+		rect := sdl.Rect{int32(arguments[3].IntegerValue), int32(arguments[2].IntegerValue), int32(arguments[1].IntegerValue), int32(arguments[0].IntegerValue)}
+
+		rect_reference := "rect_" + generateRandomNumbers()
+		(*globalSettings).sdlRect[rect_reference] = rect
+		ret.Type = RET_TYPE_STRING
+		ret.StringValue = rect_reference
+	}
+
+	return ret
+}
