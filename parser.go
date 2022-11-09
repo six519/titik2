@@ -275,6 +275,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								}
 								if currentToken.Type == TOKEN_TYPE_IF_END {
 									if openIfCount == 0 {
+										isIfStatement = false
 										justAddTokens = false
 									}
 									if openIfCount > 0 {
@@ -2138,6 +2139,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								if currentToken.Type == TOKEN_TYPE_IF_END || currentToken.Type == TOKEN_TYPE_ELSE || currentToken.Type == TOKEN_TYPE_ELIF_START {
 									if openIfCount == 0 {
 										if currentToken.Type == TOKEN_TYPE_IF_END {
+											isIfStatement = false
 											break
 										} else if currentToken.Type == TOKEN_TYPE_ELIF_START {
 											//else if
