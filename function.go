@@ -406,5 +406,11 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_pe() - sdl poll event
 		defineFunction(globalFunctionArray, "s_pe", S_pe_execute, 0, true)
+
+		//s_ce() - sdl clear event
+		defineFunction(globalFunctionArray, "s_ce", S_ce_execute, 1, true)
+
+		//s_gte() - sdl get event type
+		defineFunction(globalFunctionArray, "s_gte", S_gte_execute, 1, true)
 	}
 }

@@ -43,6 +43,14 @@ var SDL_WFLAGS = []uint32{
 	sdl.WINDOW_POPUP_MENU,
 }
 
+var SDL_EVENT_TYPES = map[uint32]int{
+	sdl.FIRSTEVENT:   0,
+	sdl.QUIT:         1,
+	sdl.DISPLAYEVENT: 2,
+	sdl.WINDOWEVENT:  3,
+	sdl.SYSWMEVENT:   4,
+}
+
 func S_i_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
 
@@ -193,7 +201,43 @@ func S_frsw_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 }
 
 func S_pe_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
-	ret := FunctionReturn{Type: RET_TYPE_NONE} //TEMPORARY RETURN: NEED TO HANDLE EVENTS
-	sdl.PollEvent()
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+	event := sdl.PollEvent()
+
+	evt_reference := "evt_" + generateRandomNumbers()
+	(*globalSettings).sdlEvent[evt_reference] = event
+	ret.StringValue = evt_reference
+
+	return ret
+}
+
+func S_ce_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if _, ok := (*globalSettings).sdlEvent[arguments[0].StringValue]; ok {
+			(*globalSettings).sdlEvent[arguments[0].StringValue] = nil
+			delete((*globalSettings).sdlEvent, arguments[0].StringValue)
+		}
+	}
+
+	return ret
+}
+
+func S_gte_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: -1}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if val, ok := (*globalSettings).sdlEvent[arguments[0].StringValue]; ok {
+			if val != nil {
+				if val2, ok2 := SDL_EVENT_TYPES[val.GetType()]; ok2 {
+					ret.IntegerValue = val2
+				}
+			}
+		}
+
+	}
+
 	return ret
 }

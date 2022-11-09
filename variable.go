@@ -322,6 +322,13 @@ func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *
 		defineConstantInteger("S_W_A", 8, globalVariableArray, globalNativeVarList)
 		defineConstantInteger("S_W_T", 9, globalVariableArray, globalNativeVarList)
 		defineConstantInteger("S_W_P", 10, globalVariableArray, globalNativeVarList)
+
+		//sdl events
+		defineConstantInteger("S_E_F", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E_Q", 1, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E_D", 2, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E_W", 3, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("S_E_S", 4, globalVariableArray, globalNativeVarList)
 	}
 
 }

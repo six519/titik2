@@ -30,6 +30,7 @@ type GlobalSettingsObject struct {
 	sdlWindow                map[string]*sdl.Window
 	sdlSurface               map[string]*sdl.Surface
 	sdlRect                  map[string]sdl.Rect
+	sdlEvent                 map[string]sdl.Event
 }
 
 func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -52,6 +53,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.sdlWindow = make(map[string]*sdl.Window)
 	globalSettings.sdlSurface = make(map[string]*sdl.Surface)
 	globalSettings.sdlRect = make(map[string]sdl.Rect)
+	globalSettings.sdlEvent = make(map[string]sdl.Event)
 
 }
 
