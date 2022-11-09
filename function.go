@@ -386,7 +386,10 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_q() - sdl quit
 		defineFunction(globalFunctionArray, "s_q", S_q_execute, 0, true)
 
-		//s_cw(<string>, <integer>, <integer>, <integer>, <integer>, <integer>)
+		//s_cw(<string>, <integer>, <integer>, <integer>, <integer>, <integer>) - sdl create window
 		defineFunction(globalFunctionArray, "s_cw", S_cw_execute, 6, true)
+
+		//s_dw(<string>) - sdl destroy window
+		defineFunction(globalFunctionArray, "s_dw", S_dw_execute, 1, true)
 	}
 }
