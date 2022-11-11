@@ -57,3 +57,11 @@ func S_gte_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 func S_d_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
+
+func S_it_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_qt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}

@@ -6,6 +6,7 @@ package main
 import (
 	"errors"
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 	"strconv"
 )
 
@@ -247,5 +248,22 @@ func S_d_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 		sdl.Delay(uint32(arguments[0].IntegerValue))
 	}
 
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_it_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
+
+	err := ttf.Init()
+
+	if err != nil {
+		ret.BooleanValue = false
+	}
+
+	return ret
+}
+
+func S_qt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ttf.Quit()
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }

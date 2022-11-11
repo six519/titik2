@@ -415,5 +415,11 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_d() - sdl delay
 		defineFunction(globalFunctionArray, "s_d", S_d_execute, 1, true)
+
+		//s_it() - sdl ttf init
+		defineFunction(globalFunctionArray, "s_it", S_it_execute, 0, true)
+
+		//s_qt() - sdl ttf quit
+		defineFunction(globalFunctionArray, "s_qt", S_qt_execute, 0, true)
 	}
 }
