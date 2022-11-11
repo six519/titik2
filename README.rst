@@ -18,7 +18,7 @@ Compile From Source (Windows with SDL2 Support)
 ===============================================
 ::
     
-    go build -tags win sdl .
+    go build -tags=win -tags=sdl .
 
 Compile From Source (Other OS)
 ==============================
