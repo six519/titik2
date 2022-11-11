@@ -412,5 +412,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_gte() - sdl get event type
 		defineFunction(globalFunctionArray, "s_gte", S_gte_execute, 1, true)
+
+		//s_d() - sdl delay
+		defineFunction(globalFunctionArray, "s_d", S_d_execute, 1, true)
 	}
 }
