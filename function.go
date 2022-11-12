@@ -422,10 +422,13 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_qt() - sdl ttf quit
 		defineFunction(globalFunctionArray, "s_qt", S_qt_execute, 0, true)
 
-		//s_oft() - sdl ttf open font
+		//s_oft(<string>, <integer>) - sdl ttf open font
 		defineFunction(globalFunctionArray, "s_oft", S_oft_execute, 2, true)
 
-		//s_cft() - sdl ttf close font
+		//s_cft(<string>) - sdl ttf close font
 		defineFunction(globalFunctionArray, "s_cft", S_cft_execute, 1, true)
+
+		//s_rft(<string>, <string>, <integer>, <integer>, <integer>, <integer>) - sdl ttf close font
+		defineFunction(globalFunctionArray, "s_rft", S_rft_execute, 6, true)
 	}
 }

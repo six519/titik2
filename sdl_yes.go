@@ -298,3 +298,33 @@ func S_cft_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
+
+func S_rft_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 5, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 4, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if (*globalSettings).sdlFont[arguments[5].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized font on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+
+			surface, err := (*globalSettings).sdlFont[arguments[5].StringValue].RenderUTF8Blended(arguments[4].StringValue, sdl.Color{R: uint8(arguments[3].IntegerValue), G: uint8(arguments[2].IntegerValue), B: uint8(arguments[1].IntegerValue), A: uint8(arguments[0].IntegerValue)})
+
+			if err == nil {
+				surface_reference := "surf_" + generateRandomNumbers()
+				(*globalSettings).sdlSurface[surface_reference] = surface
+				ret.Type = RET_TYPE_STRING
+				ret.StringValue = surface_reference
+			}
+
+		}
+
+	}
+
+	return ret
+}
