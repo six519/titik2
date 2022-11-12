@@ -267,3 +267,21 @@ func S_qt_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 	ttf.Quit()
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
+
+func S_oft_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		font, err := ttf.OpenFont(arguments[1].StringValue, arguments[0].IntegerValue)
+		if err == nil {
+			font_reference := "fnt_" + generateRandomNumbers()
+			(*globalSettings).sdlFont[font_reference] = font
+			ret.Type = RET_TYPE_STRING
+			ret.StringValue = font_reference
+		}
+	}
+
+	return ret
+}
