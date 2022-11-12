@@ -424,5 +424,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_oft() - sdl ttf open font
 		defineFunction(globalFunctionArray, "s_oft", S_oft_execute, 2, true)
+
+		//s_cft() - sdl ttf close font
+		defineFunction(globalFunctionArray, "s_cft", S_cft_execute, 1, true)
 	}
 }

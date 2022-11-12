@@ -285,3 +285,16 @@ func S_oft_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 
 	return ret
 }
+
+func S_cft_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if (*globalSettings).sdlFont[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized font on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			(*globalSettings).sdlFont[arguments[0].StringValue].Close()
+			delete((*globalSettings).sdlFont, arguments[0].StringValue)
+		}
+	}
+
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
