@@ -201,6 +201,21 @@ func S_frsw_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 	return ret
 }
 
+func S_fsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if (*globalSettings).sdlSurface[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized surface on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			(*globalSettings).sdlSurface[arguments[0].StringValue].Free()
+			delete((*globalSettings).sdlSurface, arguments[0].StringValue)
+		}
+
+	}
+
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
 func S_pe_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 	event := sdl.PollEvent()
