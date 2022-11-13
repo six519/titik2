@@ -404,6 +404,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_frsw(<string>, <string>, <integer>) - sdl fill rect
 		defineFunction(globalFunctionArray, "s_frsw", S_frsw_execute, 3, true)
 
+		//s_gdsw(<string>) - sdl get surface dimension
+		defineFunction(globalFunctionArray, "s_gdsw", S_gdsw_execute, 1, true)
+
 		//s_fsw(<string>) - sdl free surface
 		defineFunction(globalFunctionArray, "s_fsw", S_fsw_execute, 1, true)
 

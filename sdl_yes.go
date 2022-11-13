@@ -201,6 +201,24 @@ func S_frsw_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 	return ret
 }
 
+func S_gdsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ASSOCIATIVE_ARRAY}
+	ret.AssociativeArrayValue = make(map[string]FunctionReturn)
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if (*globalSettings).sdlSurface[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized surface on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			ret.AssociativeArrayValue["width"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: int((*globalSettings).sdlSurface[arguments[0].StringValue].W)}
+			ret.AssociativeArrayValue["height"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: int((*globalSettings).sdlSurface[arguments[0].StringValue].H)}
+		}
+
+	}
+
+	return ret
+}
+
 func S_fsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 
