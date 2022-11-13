@@ -201,6 +201,53 @@ func S_frsw_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 	return ret
 }
 
+func S_bsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if (*globalSettings).sdlSurface[arguments[3].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized surface on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+
+			ok_to_execute := true
+			ok := false
+			var val1 sdl.Rect
+			var val2 sdl.Rect
+
+			if arguments[2].StringValue != "" {
+				if val1, ok = (*globalSettings).sdlRect[arguments[2].StringValue]; !ok {
+					ok_to_execute = false
+					*errMessage = errors.New("Error: Uninitialized rectangle on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+				}
+			}
+
+			if (*globalSettings).sdlSurface[arguments[1].StringValue] == nil {
+				ok_to_execute = false
+				*errMessage = errors.New("Error: Uninitialized surface on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			}
+
+			if val2, ok = (*globalSettings).sdlRect[arguments[0].StringValue]; !ok {
+				ok_to_execute = false
+				*errMessage = errors.New("Error: Uninitialized rectangle on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			}
+
+			if ok_to_execute {
+				if arguments[2].StringValue == "" {
+					(*globalSettings).sdlSurface[arguments[3].StringValue].Blit(nil, (*globalSettings).sdlSurface[arguments[1].StringValue], &val2)
+				} else {
+					(*globalSettings).sdlSurface[arguments[3].StringValue].Blit(&val1, (*globalSettings).sdlSurface[arguments[1].StringValue], &val2)
+				}
+			}
+
+		}
+
+	}
+
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
 func S_gdsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_ASSOCIATIVE_ARRAY}
 	ret.AssociativeArrayValue = make(map[string]FunctionReturn)
