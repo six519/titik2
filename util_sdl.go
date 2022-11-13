@@ -6,6 +6,7 @@ package main
 import (
 	"database/sql"
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 	"io"
 	"io/ioutil"
 	"net"
@@ -31,6 +32,7 @@ type GlobalSettingsObject struct {
 	sdlSurface               map[string]*sdl.Surface
 	sdlRect                  map[string]sdl.Rect
 	sdlEvent                 map[string]sdl.Event
+	sdlFont                  map[string]*ttf.Font
 }
 
 func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -54,6 +56,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.sdlSurface = make(map[string]*sdl.Surface)
 	globalSettings.sdlRect = make(map[string]sdl.Rect)
 	globalSettings.sdlEvent = make(map[string]sdl.Event)
+	globalSettings.sdlFont = make(map[string]*ttf.Font)
 
 }
 

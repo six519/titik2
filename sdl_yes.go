@@ -6,6 +6,7 @@ package main
 import (
 	"errors"
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 	"strconv"
 )
 
@@ -200,6 +201,86 @@ func S_frsw_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 	return ret
 }
 
+func S_bsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if (*globalSettings).sdlSurface[arguments[3].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized surface on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+
+			ok_to_execute := true
+			ok := false
+			var val1 sdl.Rect
+			var val2 sdl.Rect
+
+			if arguments[2].StringValue != "" {
+				if val1, ok = (*globalSettings).sdlRect[arguments[2].StringValue]; !ok {
+					ok_to_execute = false
+					*errMessage = errors.New("Error: Uninitialized rectangle on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+				}
+			}
+
+			if (*globalSettings).sdlSurface[arguments[1].StringValue] == nil {
+				ok_to_execute = false
+				*errMessage = errors.New("Error: Uninitialized surface on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			}
+
+			if val2, ok = (*globalSettings).sdlRect[arguments[0].StringValue]; !ok {
+				ok_to_execute = false
+				*errMessage = errors.New("Error: Uninitialized rectangle on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			}
+
+			if ok_to_execute {
+				if arguments[2].StringValue == "" {
+					(*globalSettings).sdlSurface[arguments[3].StringValue].Blit(nil, (*globalSettings).sdlSurface[arguments[1].StringValue], &val2)
+				} else {
+					(*globalSettings).sdlSurface[arguments[3].StringValue].Blit(&val1, (*globalSettings).sdlSurface[arguments[1].StringValue], &val2)
+				}
+			}
+
+		}
+
+	}
+
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_gdsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ASSOCIATIVE_ARRAY}
+	ret.AssociativeArrayValue = make(map[string]FunctionReturn)
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if (*globalSettings).sdlSurface[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized surface on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			ret.AssociativeArrayValue["width"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: int((*globalSettings).sdlSurface[arguments[0].StringValue].W)}
+			ret.AssociativeArrayValue["height"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: int((*globalSettings).sdlSurface[arguments[0].StringValue].H)}
+		}
+
+	}
+
+	return ret
+}
+
+func S_fsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if (*globalSettings).sdlSurface[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized surface on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			(*globalSettings).sdlSurface[arguments[0].StringValue].Free()
+			delete((*globalSettings).sdlSurface, arguments[0].StringValue)
+		}
+
+	}
+
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
 func S_pe_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 	event := sdl.PollEvent()
@@ -235,6 +316,92 @@ func S_gte_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 					ret.IntegerValue = val2
 				}
 			}
+		}
+
+	}
+
+	return ret
+}
+
+func S_d_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+		sdl.Delay(uint32(arguments[0].IntegerValue))
+	}
+
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_it_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
+
+	err := ttf.Init()
+
+	if err != nil {
+		ret.BooleanValue = false
+	}
+
+	return ret
+}
+
+func S_qt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ttf.Quit()
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_oft_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		font, err := ttf.OpenFont(arguments[1].StringValue, arguments[0].IntegerValue)
+		if err == nil {
+			font_reference := "fnt_" + generateRandomNumbers()
+			(*globalSettings).sdlFont[font_reference] = font
+			ret.Type = RET_TYPE_STRING
+			ret.StringValue = font_reference
+		}
+	}
+
+	return ret
+}
+
+func S_cft_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if (*globalSettings).sdlFont[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized font on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			(*globalSettings).sdlFont[arguments[0].StringValue].Close()
+			delete((*globalSettings).sdlFont, arguments[0].StringValue)
+		}
+	}
+
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_rft_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 5, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 4, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if (*globalSettings).sdlFont[arguments[5].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized font on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+
+			surface, err := (*globalSettings).sdlFont[arguments[5].StringValue].RenderUTF8Blended(arguments[4].StringValue, sdl.Color{R: uint8(arguments[3].IntegerValue), G: uint8(arguments[2].IntegerValue), B: uint8(arguments[1].IntegerValue), A: uint8(arguments[0].IntegerValue)})
+
+			if err == nil {
+				surface_reference := "surf_" + generateRandomNumbers()
+				(*globalSettings).sdlSurface[surface_reference] = surface
+				ret.Type = RET_TYPE_STRING
+				ret.StringValue = surface_reference
+			}
+
 		}
 
 	}

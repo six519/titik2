@@ -404,6 +404,15 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_frsw(<string>, <string>, <integer>) - sdl fill rect
 		defineFunction(globalFunctionArray, "s_frsw", S_frsw_execute, 3, true)
 
+		//s_gdsw(<string>) - sdl get surface dimension
+		defineFunction(globalFunctionArray, "s_gdsw", S_gdsw_execute, 1, true)
+
+		//s_bsw(<string>, <string>, <string> ,<string>) - sdl surface blit
+		defineFunction(globalFunctionArray, "s_bsw", S_bsw_execute, 4, true)
+
+		//s_fsw(<string>) - sdl free surface
+		defineFunction(globalFunctionArray, "s_fsw", S_fsw_execute, 1, true)
+
 		//s_pe() - sdl poll event
 		defineFunction(globalFunctionArray, "s_pe", S_pe_execute, 0, true)
 
@@ -412,5 +421,23 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_gte() - sdl get event type
 		defineFunction(globalFunctionArray, "s_gte", S_gte_execute, 1, true)
+
+		//s_d() - sdl delay
+		defineFunction(globalFunctionArray, "s_d", S_d_execute, 1, true)
+
+		//s_it() - sdl ttf init
+		defineFunction(globalFunctionArray, "s_it", S_it_execute, 0, true)
+
+		//s_qt() - sdl ttf quit
+		defineFunction(globalFunctionArray, "s_qt", S_qt_execute, 0, true)
+
+		//s_oft(<string>, <integer>) - sdl ttf open font
+		defineFunction(globalFunctionArray, "s_oft", S_oft_execute, 2, true)
+
+		//s_cft(<string>) - sdl ttf close font
+		defineFunction(globalFunctionArray, "s_cft", S_cft_execute, 1, true)
+
+		//s_rft(<string>, <string>, <integer>, <integer>, <integer>, <integer>) - sdl ttf close font
+		defineFunction(globalFunctionArray, "s_rft", S_rft_execute, 6, true)
 	}
 }
