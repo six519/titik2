@@ -329,6 +329,12 @@ func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *
 		defineConstantInteger("S_E_D", 2, globalVariableArray, globalNativeVarList)
 		defineConstantInteger("S_E_W", 3, globalVariableArray, globalNativeVarList)
 		defineConstantInteger("S_E_S", 4, globalVariableArray, globalNativeVarList)
+
+		//mix init
+		defineConstantInteger("SM_F", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("SM_MO", 1, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("SM_MP", 2, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("SM_O", 3, globalVariableArray, globalNativeVarList)
 	}
 
 }

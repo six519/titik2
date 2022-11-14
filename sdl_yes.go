@@ -5,6 +5,7 @@ package main
 
 import (
 	"errors"
+	"github.com/veandco/go-sdl2/mix"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 	"strconv"
@@ -52,6 +53,13 @@ var SDL_EVENT_TYPES = map[uint32]int{
 	sdl.SYSWMEVENT:   4,
 }
 
+var SDL_MIX_INIT_TYPES = []int{
+	mix.INIT_FLAC,
+	mix.INIT_MOD,
+	mix.INIT_MP3,
+	mix.INIT_OGG,
+}
+
 func S_i_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
 
@@ -73,6 +81,11 @@ func S_i_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 
 func S_q_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	sdl.Quit()
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_mq_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	mix.Quit()
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
 
@@ -404,6 +417,25 @@ func S_rft_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 
 		}
 
+	}
+
+	return ret
+}
+
+func S_mi_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if arguments[0].IntegerValue < 0 || (arguments[0].IntegerValue-1) > len(SDL_MIX_INIT_TYPES) {
+			*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			err := mix.Init(SDL_MIX_INIT_TYPES[arguments[0].IntegerValue])
+
+			if err != nil {
+				ret.BooleanValue = false
+			}
+		}
 	}
 
 	return ret

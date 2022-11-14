@@ -439,5 +439,11 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_rft(<string>, <string>, <integer>, <integer>, <integer>, <integer>) - sdl ttf close font
 		defineFunction(globalFunctionArray, "s_rft", S_rft_execute, 6, true)
+
+		//s_mi(<integer>) - sdl mix init
+		defineFunction(globalFunctionArray, "s_mi", S_mi_execute, 1, true)
+
+		//s_mq() - sdl mix quit
+		defineFunction(globalFunctionArray, "s_mq", S_mq_execute, 0, true)
 	}
 }
