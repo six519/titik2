@@ -439,5 +439,35 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_rft(<string>, <string>, <integer>, <integer>, <integer>, <integer>) - sdl ttf close font
 		defineFunction(globalFunctionArray, "s_rft", S_rft_execute, 6, true)
+
+		//s_mi(<integer>) - sdl mix init
+		defineFunction(globalFunctionArray, "s_mi", S_mi_execute, 1, true)
+
+		//s_mq() - sdl mix quit
+		defineFunction(globalFunctionArray, "s_mq", S_mq_execute, 0, true)
+
+		//s_moa(<integer>, <integer>, <integer>, <integer>) - sdl mix openaudio
+		defineFunction(globalFunctionArray, "s_moa", S_moa_execute, 4, true)
+
+		//s_mca() - sdl mix close audio
+		defineFunction(globalFunctionArray, "s_mca", S_mca_execute, 0, true)
+
+		//s_mlm(<string>) - sdl mix load music
+		defineFunction(globalFunctionArray, "s_mlm", S_mlm_execute, 1, true)
+
+		//s_mfm(<string>) - sdl mix free music
+		defineFunction(globalFunctionArray, "s_mfm", S_mfm_execute, 1, true)
+
+		//s_mpm(<string>, <integer>) - sdl mix play music
+		defineFunction(globalFunctionArray, "s_mpm", S_mpm_execute, 2, true)
+
+		//s_mlw(<string>) - sdl mix load wav
+		defineFunction(globalFunctionArray, "s_mlw", S_mlw_execute, 1, true)
+
+		//s_mfc(<string>) - sdl mix free chunk
+		defineFunction(globalFunctionArray, "s_mfc", S_mfc_execute, 1, true)
+
+		//s_mpc(<string>, <integer>, <integer>) - sdl mix play chunk
+		defineFunction(globalFunctionArray, "s_mpc", S_mpc_execute, 3, true)
 	}
 }

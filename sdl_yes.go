@@ -5,6 +5,7 @@ package main
 
 import (
 	"errors"
+	"github.com/veandco/go-sdl2/mix"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 	"strconv"
@@ -52,6 +53,20 @@ var SDL_EVENT_TYPES = map[uint32]int{
 	sdl.SYSWMEVENT:   4,
 }
 
+var SDL_MIX_INIT_TYPES = []int{
+	mix.INIT_FLAC,
+	mix.INIT_MOD,
+	mix.INIT_MP3,
+	mix.INIT_OGG,
+}
+
+var SDL_MIX_DEFAULTS = []int{
+	mix.DEFAULT_FREQUENCY,
+	mix.DEFAULT_FORMAT,
+	mix.DEFAULT_CHANNELS,
+	mix.DEFAULT_CHUNKSIZE,
+}
+
 func S_i_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
 
@@ -73,6 +88,11 @@ func S_i_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 
 func S_q_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	sdl.Quit()
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_mq_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	mix.Quit()
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
 
@@ -404,6 +424,156 @@ func S_rft_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 
 		}
 
+	}
+
+	return ret
+}
+
+func S_mi_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if arguments[0].IntegerValue < 0 || (arguments[0].IntegerValue-1) > len(SDL_MIX_INIT_TYPES) {
+			*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			err := mix.Init(SDL_MIX_INIT_TYPES[arguments[0].IntegerValue])
+
+			if err != nil {
+				ret.BooleanValue = false
+			}
+		}
+	}
+
+	return ret
+}
+
+func S_moa_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if arguments[3].IntegerValue < 0 || (arguments[3].IntegerValue-1) > len(SDL_MIX_DEFAULTS) || arguments[2].IntegerValue < 0 || (arguments[2].IntegerValue-1) > len(SDL_MIX_DEFAULTS) ||
+			arguments[1].IntegerValue < 0 || (arguments[1].IntegerValue-1) > len(SDL_MIX_DEFAULTS) || arguments[0].IntegerValue < 0 || (arguments[0].IntegerValue-1) > len(SDL_MIX_DEFAULTS) {
+			*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			err := mix.OpenAudio(SDL_MIX_DEFAULTS[arguments[3].IntegerValue], uint16(SDL_MIX_DEFAULTS[arguments[2].IntegerValue]), SDL_MIX_DEFAULTS[arguments[1].IntegerValue], SDL_MIX_DEFAULTS[arguments[0].IntegerValue])
+
+			if err != nil {
+				ret.BooleanValue = false
+			}
+		}
+	}
+
+	return ret
+}
+
+func S_mca_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	mix.CloseAudio()
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_mlm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		music, err := mix.LoadMUS(arguments[0].StringValue)
+		if err == nil {
+			music_reference := "msc_" + generateRandomNumbers()
+			(*globalSettings).sdlMusic[music_reference] = music
+			ret.Type = RET_TYPE_STRING
+			ret.StringValue = music_reference
+		}
+	}
+
+	return ret
+}
+
+func S_mfm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if (*globalSettings).sdlMusic[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized music on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			(*globalSettings).sdlMusic[arguments[0].StringValue].Free()
+			delete((*globalSettings).sdlMusic, arguments[0].StringValue)
+		}
+
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_mpm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if (*globalSettings).sdlMusic[arguments[1].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized music on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			err := (*globalSettings).sdlMusic[arguments[1].StringValue].Play(arguments[0].IntegerValue)
+
+			if err != nil {
+				ret.BooleanValue = false
+			}
+		}
+	}
+
+	return ret
+}
+
+func S_mlw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		wav, err := mix.LoadWAV(arguments[0].StringValue)
+		if err == nil {
+			wav_reference := "wav_" + generateRandomNumbers()
+			(*globalSettings).sdlChunk[wav_reference] = wav
+			ret.Type = RET_TYPE_STRING
+			ret.StringValue = wav_reference
+		}
+	}
+
+	return ret
+}
+
+func S_mfc_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if (*globalSettings).sdlChunk[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized chunk on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			(*globalSettings).sdlChunk[arguments[0].StringValue].Free()
+			delete((*globalSettings).sdlChunk, arguments[0].StringValue)
+		}
+
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_mpc_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if (*globalSettings).sdlChunk[arguments[2].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized chunk on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			_, err := (*globalSettings).sdlChunk[arguments[2].StringValue].Play(arguments[1].IntegerValue, arguments[0].IntegerValue)
+
+			if err != nil {
+				ret.BooleanValue = false
+			}
+		}
 	}
 
 	return ret
