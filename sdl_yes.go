@@ -60,6 +60,13 @@ var SDL_MIX_INIT_TYPES = []int{
 	mix.INIT_OGG,
 }
 
+var SDL_MIX_DEFAULTS = []int{
+	mix.DEFAULT_FREQUENCY,
+	mix.DEFAULT_FORMAT,
+	mix.DEFAULT_CHANNELS,
+	mix.DEFAULT_CHUNKSIZE,
+}
+
 func S_i_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
 
@@ -431,6 +438,29 @@ func S_mi_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 			*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
 			err := mix.Init(SDL_MIX_INIT_TYPES[arguments[0].IntegerValue])
+
+			if err != nil {
+				ret.BooleanValue = false
+			}
+		}
+	}
+
+	return ret
+}
+
+func S_moa_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if arguments[3].IntegerValue < 0 || (arguments[3].IntegerValue-1) > len(SDL_MIX_DEFAULTS) || arguments[2].IntegerValue < 0 || (arguments[2].IntegerValue-1) > len(SDL_MIX_DEFAULTS) ||
+			arguments[1].IntegerValue < 0 || (arguments[1].IntegerValue-1) > len(SDL_MIX_DEFAULTS) || arguments[0].IntegerValue < 0 || (arguments[0].IntegerValue-1) > len(SDL_MIX_DEFAULTS) {
+			*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			err := mix.OpenAudio(SDL_MIX_DEFAULTS[arguments[3].IntegerValue], uint16(SDL_MIX_DEFAULTS[arguments[2].IntegerValue]), SDL_MIX_DEFAULTS[arguments[1].IntegerValue], SDL_MIX_DEFAULTS[arguments[0].IntegerValue])
 
 			if err != nil {
 				ret.BooleanValue = false

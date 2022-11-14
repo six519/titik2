@@ -445,5 +445,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_mq() - sdl mix quit
 		defineFunction(globalFunctionArray, "s_mq", S_mq_execute, 0, true)
+
+		//s_moa(<integer>, <integer>, <integer>, <integer>) - sdl mix openaudio
+		defineFunction(globalFunctionArray, "s_moa", S_moa_execute, 4, true)
 	}
 }
