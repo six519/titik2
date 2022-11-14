@@ -470,3 +470,8 @@ func S_moa_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 
 	return ret
 }
+
+func S_mca_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	mix.CloseAudio()
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
