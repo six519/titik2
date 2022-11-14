@@ -457,5 +457,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_mfm(<string>) - sdl mix free music
 		defineFunction(globalFunctionArray, "s_mfm", S_mfm_execute, 1, true)
+
+		//s_mpm(<string>, <integer>) - sdl mix play music
+		defineFunction(globalFunctionArray, "s_mpm", S_mpm_execute, 2, true)
 	}
 }

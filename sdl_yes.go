@@ -506,3 +506,23 @@ func S_mfm_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 	}
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
+
+func S_mpm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if (*globalSettings).sdlMusic[arguments[1].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized music on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			err := (*globalSettings).sdlMusic[arguments[1].StringValue].Play(arguments[0].IntegerValue)
+
+			if err != nil {
+				ret.BooleanValue = false
+			}
+		}
+	}
+
+	return ret
+}
