@@ -526,3 +526,55 @@ func S_mpm_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 
 	return ret
 }
+
+func S_mlw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		wav, err := mix.LoadWAV(arguments[0].StringValue)
+		if err == nil {
+			wav_reference := "wav_" + generateRandomNumbers()
+			(*globalSettings).sdlChunk[wav_reference] = wav
+			ret.Type = RET_TYPE_STRING
+			ret.StringValue = wav_reference
+		}
+	}
+
+	return ret
+}
+
+func S_mfc_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if (*globalSettings).sdlChunk[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized chunk on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			(*globalSettings).sdlChunk[arguments[0].StringValue].Free()
+			delete((*globalSettings).sdlChunk, arguments[0].StringValue)
+		}
+
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_mpc_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if (*globalSettings).sdlChunk[arguments[2].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized chunk on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			_, err := (*globalSettings).sdlChunk[arguments[2].StringValue].Play(arguments[1].IntegerValue, arguments[0].IntegerValue)
+
+			if err != nil {
+				ret.BooleanValue = false
+			}
+		}
+	}
+
+	return ret
+}
