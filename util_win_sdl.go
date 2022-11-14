@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/veandco/go-sdl2/mix"
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 	"runtime"
@@ -37,6 +38,7 @@ type GlobalSettingsObject struct {
 	sdlRect                  map[string]sdl.Rect
 	sdlEvent                 map[string]sdl.Event
 	sdlFont                  map[string]*ttf.Font
+	sdlMusic                 map[string]*mix.Music
 
 	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
 }
@@ -63,6 +65,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.sdlRect = make(map[string]sdl.Rect)
 	globalSettings.sdlEvent = make(map[string]sdl.Event)
 	globalSettings.sdlFont = make(map[string]*ttf.Font)
+	globalSettings.sdlMusic = make(map[string]*mix.Music)
 
 	if runtime.GOOS == "windows" {
 		//get console handle

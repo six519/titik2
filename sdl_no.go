@@ -107,3 +107,11 @@ func S_moa_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 func S_mca_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
+
+func S_mlm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_mfm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
