@@ -47,11 +47,17 @@ var SDL_WFLAGS = []uint32{
 }
 
 var SDL_EVENT_TYPES = map[uint32]int{
-	sdl.FIRSTEVENT:   0,
-	sdl.QUIT:         1,
-	sdl.DISPLAYEVENT: 2,
-	sdl.WINDOWEVENT:  3,
-	sdl.SYSWMEVENT:   4,
+	sdl.FIRSTEVENT:      0,
+	sdl.QUIT:            1,
+	sdl.DISPLAYEVENT:    2,
+	sdl.WINDOWEVENT:     3,
+	sdl.SYSWMEVENT:      4,
+	sdl.KEYDOWN:         5,
+	sdl.KEYUP:           6,
+	sdl.MOUSEMOTION:     7,
+	sdl.MOUSEBUTTONDOWN: 8,
+	sdl.MOUSEBUTTONUP:   9,
+	sdl.MOUSEWHEEL:      10,
 }
 
 var SDL_MIX_INIT_TYPES = []int{
