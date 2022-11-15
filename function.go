@@ -496,5 +496,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_cpre(<string>, <string>, <string>, <string>) - sdl copy renderer
 		defineFunction(globalFunctionArray, "s_cpre", S_cpre_execute, 4, true)
+
+		//s_li(<string>) - sdl load image
+		defineFunction(globalFunctionArray, "s_li", S_li_execute, 1, true)
 	}
 }
