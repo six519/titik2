@@ -487,5 +487,11 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_dt(<string>) - sdl destroy texture
 		defineFunction(globalFunctionArray, "s_dt", S_dt_execute, 1, true)
+
+		//s_clsre(<string>) - sdl clear renderer
+		defineFunction(globalFunctionArray, "s_clsre", S_clsre_execute, 1, true)
+
+		//s_pre(<string>) - sdl present renderer
+		defineFunction(globalFunctionArray, "s_pre", S_pre_execute, 1, true)
 	}
 }
