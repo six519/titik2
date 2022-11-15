@@ -67,6 +67,13 @@ var SDL_MIX_DEFAULTS = []int{
 	mix.DEFAULT_CHUNKSIZE,
 }
 
+var SDL_RENDERER_FLAGS = []uint32{
+	sdl.RENDERER_SOFTWARE,
+	sdl.RENDERER_ACCELERATED,
+	sdl.RENDERER_PRESENTVSYNC,
+	sdl.RENDERER_TARGETTEXTURE,
+}
+
 func S_i_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: true}
 

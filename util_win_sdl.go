@@ -40,6 +40,7 @@ type GlobalSettingsObject struct {
 	sdlFont                  map[string]*ttf.Font
 	sdlMusic                 map[string]*mix.Music
 	sdlChunk                 map[string]*mix.Chunk
+	sdlRenderer              map[string]*sdl.Renderer
 
 	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
 }
@@ -68,6 +69,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.sdlFont = make(map[string]*ttf.Font)
 	globalSettings.sdlMusic = make(map[string]*mix.Music)
 	globalSettings.sdlChunk = make(map[string]*mix.Chunk)
+	globalSettings.sdlRenderer = make(map[string]*sdl.Renderer)
 
 	if runtime.GOOS == "windows" {
 		//get console handle

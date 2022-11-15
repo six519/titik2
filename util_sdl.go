@@ -36,6 +36,7 @@ type GlobalSettingsObject struct {
 	sdlFont                  map[string]*ttf.Font
 	sdlMusic                 map[string]*mix.Music
 	sdlChunk                 map[string]*mix.Chunk
+	sdlRenderer              map[string]*sdl.Renderer
 }
 
 func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -62,6 +63,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.sdlFont = make(map[string]*ttf.Font)
 	globalSettings.sdlMusic = make(map[string]*mix.Music)
 	globalSettings.sdlChunk = make(map[string]*mix.Chunk)
+	globalSettings.sdlRenderer = make(map[string]*sdl.Renderer)
 
 }
 
