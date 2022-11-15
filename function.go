@@ -419,11 +419,14 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_pe() - sdl poll event
 		defineFunction(globalFunctionArray, "s_pe", S_pe_execute, 0, true)
 
-		//s_ce() - sdl clear event
+		//s_ce(<string>) - sdl clear event
 		defineFunction(globalFunctionArray, "s_ce", S_ce_execute, 1, true)
 
-		//s_gte() - sdl get event type
+		//s_gte(<string>) - sdl get event type
 		defineFunction(globalFunctionArray, "s_gte", S_gte_execute, 1, true)
+
+		//s_kre(<string>) - sdl get event keyboard repeat
+		defineFunction(globalFunctionArray, "s_kre", S_kre_execute, 1, true)
 
 		//s_d() - sdl delay
 		defineFunction(globalFunctionArray, "s_d", S_d_execute, 1, true)
