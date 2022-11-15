@@ -650,3 +650,42 @@ func S_dre_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 	}
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
+
+func S_ctfsre_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if (*globalSettings).sdlRenderer[arguments[1].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized renderer on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+
+			if (*globalSettings).sdlSurface[arguments[0].StringValue] == nil {
+				*errMessage = errors.New("Error: Uninitialized surface on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			} else {
+				texture, err := (*globalSettings).sdlRenderer[arguments[1].StringValue].CreateTextureFromSurface((*globalSettings).sdlSurface[arguments[0].StringValue])
+				if err == nil {
+					tex_reference := "tex_" + generateRandomNumbers()
+					(*globalSettings).sdlTexture[tex_reference] = texture
+					ret.Type = RET_TYPE_STRING
+					ret.StringValue = tex_reference
+				}
+			}
+		}
+	}
+
+	return ret
+}
+
+func S_dt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if (*globalSettings).sdlTexture[arguments[0].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized texture on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			(*globalSettings).sdlTexture[arguments[0].StringValue].Destroy()
+			delete((*globalSettings).sdlTexture, arguments[0].StringValue)
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
