@@ -413,6 +413,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_fsw(<string>) - sdl free surface
 		defineFunction(globalFunctionArray, "s_fsw", S_fsw_execute, 1, true)
 
+		//s_lbsw(<string>) - sdl load bmp
+		defineFunction(globalFunctionArray, "s_lbsw", S_lbsw_execute, 1, true)
+
 		//s_pe() - sdl poll event
 		defineFunction(globalFunctionArray, "s_pe", S_pe_execute, 0, true)
 
@@ -472,5 +475,26 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_mhm(<string>) - sdl mix halt music
 		defineFunction(globalFunctionArray, "s_mhm", S_mhm_execute, 0, true)
+
+		//s_cre(<string>, <integer>, <integer>) - sdl create renderer
+		defineFunction(globalFunctionArray, "s_cre", S_cre_execute, 3, true)
+
+		//s_dre(<string>) - sdl destroy renderer
+		defineFunction(globalFunctionArray, "s_dre", S_dre_execute, 1, true)
+
+		//s_ctfsre(<string>, <string>) - sdl renderer create texture from surface
+		defineFunction(globalFunctionArray, "s_ctfsre", S_ctfsre_execute, 2, true)
+
+		//s_dt(<string>) - sdl destroy texture
+		defineFunction(globalFunctionArray, "s_dt", S_dt_execute, 1, true)
+
+		//s_clsre(<string>) - sdl clear renderer
+		defineFunction(globalFunctionArray, "s_clsre", S_clsre_execute, 1, true)
+
+		//s_pre(<string>) - sdl present renderer
+		defineFunction(globalFunctionArray, "s_pre", S_pre_execute, 1, true)
+
+		//s_cpre(<string>, <string>, <string>, <string>) - sdl copy renderer
+		defineFunction(globalFunctionArray, "s_cpre", S_cpre_execute, 4, true)
 	}
 }
