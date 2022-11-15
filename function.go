@@ -413,6 +413,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_fsw(<string>) - sdl free surface
 		defineFunction(globalFunctionArray, "s_fsw", S_fsw_execute, 1, true)
 
+		//s_lbsw(<string>) - sdl load bmp
+		defineFunction(globalFunctionArray, "s_lbsw", S_lbsw_execute, 1, true)
+
 		//s_pe() - sdl poll event
 		defineFunction(globalFunctionArray, "s_pe", S_pe_execute, 0, true)
 

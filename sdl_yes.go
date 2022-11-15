@@ -308,6 +308,23 @@ func S_fsw_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
 
+func S_lbsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		surface, err := sdl.LoadBMP(arguments[0].StringValue)
+
+		if err == nil {
+			surface_reference := "surf_" + generateRandomNumbers()
+			(*globalSettings).sdlSurface[surface_reference] = surface
+			ret.Type = RET_TYPE_STRING
+			ret.StringValue = surface_reference
+		}
+	}
+
+	return ret
+}
+
 func S_pe_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 	event := sdl.PollEvent()
