@@ -472,5 +472,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//s_mhm(<string>) - sdl mix halt music
 		defineFunction(globalFunctionArray, "s_mhm", S_mhm_execute, 0, true)
+
+		//s_cre(<string>, <integer>, <integer>) - sdl create renderer
+		defineFunction(globalFunctionArray, "s_cre", S_cre_execute, 3, true)
 	}
 }

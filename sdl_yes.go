@@ -590,3 +590,34 @@ func S_mpc_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 
 	return ret
 }
+
+func S_cre_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_NONE}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if (*globalSettings).sdlWindow[arguments[2].StringValue] == nil {
+			*errMessage = errors.New("Error: Uninitialized window on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+
+			if arguments[0].IntegerValue < 0 || (arguments[0].IntegerValue-1) > len(SDL_RENDERER_FLAGS) {
+				*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			} else {
+
+				ren, err := sdl.CreateRenderer((*globalSettings).sdlWindow[arguments[2].StringValue], arguments[1].IntegerValue, SDL_RENDERER_FLAGS[arguments[0].IntegerValue])
+				if err == nil {
+					ren_reference := "ren_" + generateRandomNumbers()
+					(*globalSettings).sdlRenderer[ren_reference] = ren
+					ret.Type = RET_TYPE_STRING
+					ret.StringValue = ren_reference
+				}
+
+			}
+		}
+
+	}
+
+	return ret
+}
