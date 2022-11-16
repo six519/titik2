@@ -494,6 +494,12 @@ Other Functions
     ::
         lineup lp(lineup, integer)
 
+- **sgv** - set global variable.
+
+    **Declaration:**
+    ::
+        Nil sgv(string, any)
+
 MySQL Functions
 ~~~~~~~~~~~~~~~
 

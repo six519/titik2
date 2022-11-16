@@ -144,3 +144,90 @@ func Lp_execute(arguments []FunctionArgument, errMessage *error, globalVariableA
 	}
 	return ret
 }
+
+func Sgv_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_STRING) {
+		if isSystemVariable(arguments[1].StringValue, *globalNativeVarList) {
+			*errMessage = errors.New("Error: Cannot assign to " + arguments[1].StringValue + " on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			isExists, varIndex := isGlobalVariableExists(arguments[1].StringValue, *globalVariableArray)
+
+			if !isExists {
+				*errMessage = errors.New("Error: Global variable '" + arguments[1].StringValue + "' doesn't exists on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			} else {
+				if (*globalVariableArray)[varIndex].IsConstant {
+					*errMessage = errors.New("Error: Cannot override constant '" + arguments[1].StringValue + "' on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+				} else {
+					// set global var
+					if arguments[0].Type == ARG_TYPE_ARRAY {
+						(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ARRAY
+						(*globalVariableArray)[varIndex].ArrayValue = nil
+						for x := 0; x < len(arguments[0].ArrayValue); x++ {
+							thisVar := Variable{}
+
+							if arguments[0].ArrayValue[x].Type == ARG_TYPE_INTEGER {
+								thisVar.Type = VARIABLE_TYPE_INTEGER
+								thisVar.IntegerValue = arguments[0].ArrayValue[x].IntegerValue
+							} else if arguments[0].ArrayValue[x].Type == ARG_TYPE_STRING {
+								thisVar.Type = VARIABLE_TYPE_STRING
+								thisVar.StringValue = arguments[0].ArrayValue[x].StringValue
+							} else if arguments[0].ArrayValue[x].Type == ARG_TYPE_FLOAT {
+								thisVar.Type = VARIABLE_TYPE_FLOAT
+								thisVar.FloatValue = arguments[0].ArrayValue[x].FloatValue
+							} else if arguments[0].ArrayValue[x].Type == ARG_TYPE_BOOLEAN {
+								thisVar.Type = VARIABLE_TYPE_BOOLEAN
+								thisVar.BooleanValue = arguments[0].ArrayValue[x].BooleanValue
+							} else {
+								thisVar.Type = VARIABLE_TYPE_NONE
+							}
+
+							(*globalVariableArray)[varIndex].ArrayValue = append((*globalVariableArray)[varIndex].ArrayValue, thisVar)
+						}
+
+					} else if arguments[0].Type == ARG_TYPE_ASSOCIATIVE_ARRAY {
+						(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_ASSOCIATIVE_ARRAY
+						(*globalVariableArray)[varIndex].AssociativeArrayValue = make(map[string]*Variable)
+
+						for k, v := range arguments[0].AssociativeArrayValue {
+							thisVar := new(Variable)
+
+							if v.Type == ARG_TYPE_INTEGER {
+								thisVar.Type = VARIABLE_TYPE_INTEGER
+								thisVar.IntegerValue = v.IntegerValue
+							} else if v.Type == ARG_TYPE_STRING {
+								thisVar.Type = VARIABLE_TYPE_STRING
+								thisVar.StringValue = v.StringValue
+							} else if v.Type == ARG_TYPE_FLOAT {
+								thisVar.Type = VARIABLE_TYPE_FLOAT
+								thisVar.FloatValue = v.FloatValue
+							} else if v.Type == ARG_TYPE_BOOLEAN {
+								thisVar.Type = VARIABLE_TYPE_BOOLEAN
+								thisVar.BooleanValue = v.BooleanValue
+							} else {
+								thisVar.Type = VARIABLE_TYPE_NONE
+							}
+							(*globalVariableArray)[varIndex].AssociativeArrayValue[k] = thisVar
+						}
+
+					} else if arguments[0].Type == ARG_TYPE_BOOLEAN {
+						(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_BOOLEAN
+						(*globalVariableArray)[varIndex].BooleanValue = arguments[0].BooleanValue
+					} else if arguments[0].Type == ARG_TYPE_FLOAT {
+						(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_FLOAT
+						(*globalVariableArray)[varIndex].FloatValue = arguments[0].FloatValue
+					} else if arguments[0].Type == ARG_TYPE_INTEGER {
+						(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_INTEGER
+						(*globalVariableArray)[varIndex].IntegerValue = arguments[0].IntegerValue
+					} else if arguments[0].Type == ARG_TYPE_STRING {
+						(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_STRING
+						(*globalVariableArray)[varIndex].StringValue = arguments[0].StringValue
+					} else {
+						//none type
+						(*globalVariableArray)[varIndex].Type = VARIABLE_TYPE_NONE
+					}
+				}
+			}
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}

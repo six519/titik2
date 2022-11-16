@@ -140,6 +140,17 @@ func isVariableExists(token Token, globalVariableArray []Variable, scopeName str
 	return false, 0
 }
 
+func isGlobalVariableExists(varToCheck string, globalVariableArray []Variable) (bool, int) {
+
+	for x := 0; x < len(globalVariableArray); x++ {
+		if globalVariableArray[x].Name == varToCheck && globalVariableArray[x].ScopeName == "main" {
+			return true, x
+		}
+	}
+
+	return false, 0
+}
+
 func isSystemVariable(name string, globalNativeVarList []string) bool {
 
 	for x := 0; x < len(globalNativeVarList); x++ {
