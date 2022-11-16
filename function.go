@@ -407,6 +407,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_svr(<string>) - sdl set rectangle values
 		defineFunction(globalFunctionArray, "s_svr", S_svr_execute, 5, true)
 
+		//s_clr(<string>) - sdl clear rectangle
+		defineFunction(globalFunctionArray, "s_clr", S_clr_execute, 1, true)
+
 		//s_frsw(<string>, <string>, <integer>) - sdl fill rect
 		defineFunction(globalFunctionArray, "s_frsw", S_frsw_execute, 3, true)
 
