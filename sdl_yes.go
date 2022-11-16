@@ -60,6 +60,16 @@ var SDL_EVENT_TYPES = map[uint32]int{
 	sdl.MOUSEWHEEL:      10,
 }
 
+var SDL_KEYSCANCODES = map[uint32]int{
+	sdl.SCANCODE_RETURN: 0,
+	sdl.SCANCODE_ESCAPE: 1,
+	sdl.SCANCODE_SPACE:  2,
+	sdl.SCANCODE_RIGHT:  3,
+	sdl.SCANCODE_LEFT:   4,
+	sdl.SCANCODE_DOWN:   5,
+	sdl.SCANCODE_UP:     6,
+}
+
 var SDL_MIX_INIT_TYPES = []int{
 	mix.INIT_FLAC,
 	mix.INIT_MOD,
@@ -384,6 +394,27 @@ func S_kre_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 				switch t := val.(type) {
 				case *sdl.KeyboardEvent:
 					ret.IntegerValue = int(t.Repeat)
+				}
+			}
+		}
+
+	}
+
+	return ret
+}
+
+func S_ksce_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: -1}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+
+		if val, ok := (*globalSettings).sdlEvent[arguments[0].StringValue]; ok {
+			if val != nil {
+				switch t := val.(type) {
+				case *sdl.KeyboardEvent:
+					if val2, ok2 := SDL_KEYSCANCODES[uint32(t.Keysym.Scancode)]; ok2 {
+						ret.IntegerValue = val2
+					}
 				}
 			}
 		}

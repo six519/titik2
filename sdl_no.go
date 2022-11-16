@@ -12,6 +12,7 @@ var SDL_EVENT_TYPES = map[uint32]int{}
 var SDL_MIX_INIT_TYPES = []int{}
 var SDL_MIX_DEFAULTS = []int{}
 var SDL_RENDERER_FLAGS = []uint32{}
+var SDL_KEYSCANCODES = map[uint32]int{}
 
 func S_i_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	return FunctionReturn{Type: RET_TYPE_NONE}
@@ -78,6 +79,10 @@ func S_gte_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 }
 
 func S_kre_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func S_ksce_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
 

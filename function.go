@@ -428,6 +428,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_kre(<string>) - sdl get event keyboard repeat
 		defineFunction(globalFunctionArray, "s_kre", S_kre_execute, 1, true)
 
+		//s_ksce(<string>) - sdl get event keyboard scan code
+		defineFunction(globalFunctionArray, "s_ksce", S_ksce_execute, 1, true)
+
 		//s_d() - sdl delay
 		defineFunction(globalFunctionArray, "s_d", S_d_execute, 1, true)
 

@@ -7,6 +7,7 @@
         {
             "name": "Launch Package",
             "type": "go",
+            "buildFlags": "-tags sdl",
             "request": "launch",
             "mode": "auto",
             "program": "${fileDirname}",
