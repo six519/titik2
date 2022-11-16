@@ -751,7 +751,7 @@ func S_slsre_execute(arguments []FunctionArgument, errMessage *error, globalVari
 		if (*globalSettings).sdlRenderer[arguments[2].StringValue] == nil {
 			*errMessage = errors.New("Error: Uninitialized renderer on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		} else {
-			(*globalSettings).sdlRenderer[arguments[0].StringValue].SetLogicalSize(int32(arguments[1].IntegerValue), int32(arguments[0].IntegerValue))
+			(*globalSettings).sdlRenderer[arguments[2].StringValue].SetLogicalSize(int32(arguments[1].IntegerValue), int32(arguments[0].IntegerValue))
 		}
 	}
 	return FunctionReturn{Type: RET_TYPE_NONE}
