@@ -494,6 +494,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_cre(<string>, <integer>, <integer>) - sdl create renderer
 		defineFunction(globalFunctionArray, "s_cre", S_cre_execute, 3, true)
 
+		//s_slsre(<string>, <integer>, <integer>) - sdl set logical size renderer
+		defineFunction(globalFunctionArray, "s_slsre", S_slsre_execute, 3, true)
+
 		//s_dre(<string>) - sdl destroy renderer
 		defineFunction(globalFunctionArray, "s_dre", S_dre_execute, 1, true)
 
