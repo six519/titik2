@@ -219,6 +219,43 @@ func S_cr_execute(arguments []FunctionArgument, errMessage *error, globalVariabl
 	return ret
 }
 
+func S_gvr_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ASSOCIATIVE_ARRAY}
+	ret.AssociativeArrayValue = make(map[string]FunctionReturn)
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if _, ok := (*globalSettings).sdlRect[arguments[0].StringValue]; ok {
+			ret.AssociativeArrayValue["width"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: int((*globalSettings).sdlRect[arguments[0].StringValue].W)}
+			ret.AssociativeArrayValue["height"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: int((*globalSettings).sdlRect[arguments[0].StringValue].H)}
+			ret.AssociativeArrayValue["x"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: int((*globalSettings).sdlRect[arguments[0].StringValue].X)}
+			ret.AssociativeArrayValue["y"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: int((*globalSettings).sdlRect[arguments[0].StringValue].Y)}
+		} else {
+			*errMessage = errors.New("Error: Uninitialized rectangle on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		}
+	}
+
+	return ret
+}
+
+func S_svr_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 4, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+		if v, ok := (*globalSettings).sdlRect[arguments[4].StringValue]; ok {
+			v.X = int32(arguments[3].IntegerValue)
+			v.Y = int32(arguments[2].IntegerValue)
+			v.W = int32(arguments[1].IntegerValue)
+			v.H = int32(arguments[0].IntegerValue)
+			(*globalSettings).sdlRect[arguments[4].StringValue] = v
+		} else {
+			*errMessage = errors.New("Error: Uninitialized rectangle on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
 func S_frsw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_NONE}
 
