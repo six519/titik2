@@ -137,8 +137,24 @@ func Rl_ut_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 			rl.UnloadTexture((*globalSettings).rayTexture[arguments[0].StringValue])
 			delete((*globalSettings).rayTexture, arguments[0].StringValue)
 		} else {
-			*errMessage = errors.New("Error: Uninitialized image on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			*errMessage = errors.New("Error: Uninitialized texture on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
 		}
 	}
 	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func Rl_gvt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_ASSOCIATIVE_ARRAY}
+	ret.AssociativeArrayValue = make(map[string]FunctionReturn)
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if _, ok := (*globalSettings).rayTexture[arguments[0].StringValue]; ok {
+			ret.AssociativeArrayValue["w"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: int((*globalSettings).rayTexture[arguments[0].StringValue].Width)}
+			ret.AssociativeArrayValue["h"] = FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: int((*globalSettings).rayTexture[arguments[0].StringValue].Height)}
+		} else {
+			*errMessage = errors.New("Error: Uninitialized texture on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		}
+	}
+
+	return ret
 }

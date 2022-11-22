@@ -559,5 +559,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//rl_ut(<string>) - raylib unload texture
 		defineFunction(globalFunctionArray, "rl_ut", Rl_ut_execute, 1, true)
+
+		//rl_gvt(<string>) - raylib get texture dimensions
+		defineFunction(globalFunctionArray, "rl_gvt", Rl_gvt_execute, 1, true)
 	}
 }
