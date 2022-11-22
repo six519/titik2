@@ -1,5 +1,5 @@
-//go:build !win && !sdl
-// +build !win,!sdl
+//go:build !win && !sdl && !ray
+// +build !win,!sdl,!ray
 
 package main
 

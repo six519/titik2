@@ -73,3 +73,28 @@ func Rl_stf_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 	}
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
+
+func Rl_li_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		image := rl.LoadImage(arguments[0].StringValue)
+		image_reference := "rlimg_" + generateRandomNumbers()
+		(*globalSettings).rayImage[image_reference] = image
+		ret.StringValue = image_reference
+	}
+
+	return ret
+}
+
+func Rl_ui_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if _, ok := (*globalSettings).rayImage[arguments[0].StringValue]; ok {
+			rl.UnloadImage((*globalSettings).rayImage[arguments[0].StringValue])
+			delete((*globalSettings).rayImage, arguments[0].StringValue)
+		} else {
+			*errMessage = errors.New("Error: Uninitialized image on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}

@@ -544,5 +544,11 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//rl_stf(<integer>) - raylib set target fps
 		defineFunction(globalFunctionArray, "rl_stf", Rl_stf_execute, 1, true)
+
+		//rl_li(<string>) - raylib load image
+		defineFunction(globalFunctionArray, "rl_li", Rl_li_execute, 1, true)
+
+		//rl_ui(<string>) - raylib unload image
+		defineFunction(globalFunctionArray, "rl_ui", Rl_ui_execute, 1, true)
 	}
 }
