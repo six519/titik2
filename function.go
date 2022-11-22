@@ -550,5 +550,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//rl_ui(<string>) - raylib unload image
 		defineFunction(globalFunctionArray, "rl_ui", Rl_ui_execute, 1, true)
+
+		//rl_dt(<string>, <integer>, <integer>, <integer>, <integer>) - raylib draw text
+		defineFunction(globalFunctionArray, "rl_dt", Rl_dt_execute, 5, true)
 	}
 }
