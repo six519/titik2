@@ -66,3 +66,10 @@ func Rl_cb_execute(arguments []FunctionArgument, errMessage *error, globalVariab
 	}
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
+
+func Rl_stf_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+		rl.SetTargetFPS(int32(arguments[0].IntegerValue))
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
