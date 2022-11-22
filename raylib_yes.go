@@ -158,3 +158,21 @@ func Rl_gvt_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 
 	return ret
 }
+
+func Rl_drt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+		if _, ok := (*globalSettings).rayTexture[arguments[3].StringValue]; ok {
+			if arguments[0].IntegerValue < 0 || (arguments[0].IntegerValue-1) > len(RAYLIB_COLORS) {
+				*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			} else {
+				rl.DrawTexture((*globalSettings).rayTexture[arguments[3].StringValue], int32(arguments[2].IntegerValue), int32(arguments[1].IntegerValue), RAYLIB_COLORS[arguments[0].IntegerValue])
+			}
+		} else {
+			*errMessage = errors.New("Error: Uninitialized texture on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
