@@ -24,6 +24,7 @@ type GlobalSettingsObject struct {
 	mySQLConnection          map[string]*sql.DB
 	fileHandler              map[string]*os.File
 	rayImage                 map[string]*rl.Image
+	rayTexture               map[string]rl.Texture2D
 }
 
 func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -44,5 +45,6 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.mySQLConnection = make(map[string]*sql.DB)
 	globalSettings.fileHandler = make(map[string]*os.File)
 	globalSettings.rayImage = make(map[string]*rl.Image)
+	globalSettings.rayTexture = make(map[string]rl.Texture2D)
 
 }

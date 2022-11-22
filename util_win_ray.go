@@ -28,6 +28,7 @@ type GlobalSettingsObject struct {
 	mySQLConnection          map[string]*sql.DB
 	fileHandler              map[string]*os.File
 	rayImage                 map[string]*rl.Image
+	rayTexture               map[string]rl.Texture2D
 
 	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
 }
@@ -50,6 +51,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.mySQLConnection = make(map[string]*sql.DB)
 	globalSettings.fileHandler = make(map[string]*os.File)
 	globalSettings.rayImage = make(map[string]*rl.Image)
+	globalSettings.rayTexture = make(map[string]rl.Texture2D)
 
 	if runtime.GOOS == "windows" {
 		//get console handle

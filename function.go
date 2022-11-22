@@ -553,5 +553,11 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//rl_dt(<string>, <integer>, <integer>, <integer>, <integer>) - raylib draw text
 		defineFunction(globalFunctionArray, "rl_dt", Rl_dt_execute, 5, true)
+
+		//rl_ltfi(<string>) - raylib load texture from image
+		defineFunction(globalFunctionArray, "rl_ltfi", Rl_ltfi_execute, 1, true)
+
+		//rl_ut(<string>) - raylib unload texture
+		defineFunction(globalFunctionArray, "rl_ut", Rl_ut_execute, 1, true)
 	}
 }
