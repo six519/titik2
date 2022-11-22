@@ -29,6 +29,12 @@ func Version() {
 	} else {
 		fmt.Println("SDL Support: No")
 	}
+
+	if RAYLIB_ENABLED {
+		fmt.Println("Raylib Support: Yes")
+	} else {
+		fmt.Println("Raylib Support: No")
+	}
 }
 
 func SyntaxErrorMessage(lineNumber int, columnNumber int, description string, fileName string) string {
