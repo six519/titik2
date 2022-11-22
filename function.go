@@ -521,4 +521,25 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_li(<string>) - sdl load image
 		defineFunction(globalFunctionArray, "s_li", S_li_execute, 1, true)
 	}
+
+	//RAYLIB FUNCTIONALITIES
+	if RAYLIB_ENABLED {
+		//rl_iw(<integer>, <integer>, <string>) - raylib init window
+		defineFunction(globalFunctionArray, "rl_iw", Rl_iw_execute, 3, true)
+
+		//rl_scw() - raylib window should close
+		defineFunction(globalFunctionArray, "rl_scw", Rl_scw_execute, 0, true)
+
+		//rl_cw() - raylib close window
+		defineFunction(globalFunctionArray, "rl_cw", Rl_cw_execute, 0, true)
+
+		//rl_bd() - raylib begin drawing
+		defineFunction(globalFunctionArray, "rl_bd", Rl_bd_execute, 0, true)
+
+		//rl_ed() - raylib end drawing
+		defineFunction(globalFunctionArray, "rl_ed", Rl_ed_execute, 0, true)
+
+		//rl_cb(<integer>) - raylib clear background
+		defineFunction(globalFunctionArray, "rl_cb", Rl_cb_execute, 1, true)
+	}
 }

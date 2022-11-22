@@ -375,4 +375,19 @@ func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *
 		defineConstantInteger("S_SC_U", 6, globalVariableArray, globalNativeVarList)
 	}
 
+	if RAYLIB_ENABLED {
+		//raylib colors
+		defineConstantInteger("R_C_RW", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_W", 1, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_BLK", 2, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_BLN", 3, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_M", 4, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_BL", 5, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_R", 6, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_P", 7, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_O", 8, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_Y", 9, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_G", 10, globalVariableArray, globalNativeVarList)
+	}
+
 }
