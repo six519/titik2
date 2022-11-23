@@ -176,3 +176,55 @@ func Rl_drt_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 	}
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
+
+func Rl_iad_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	rl.InitAudioDevice()
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func Rl_lms_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		music := rl.LoadMusicStream(arguments[0].StringValue)
+		music_reference := "rlmus_" + generateRandomNumbers()
+		(*globalSettings).rayMusic[music_reference] = music
+		ret.StringValue = music_reference
+	}
+
+	return ret
+}
+
+func Rl_pms_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if _, ok := (*globalSettings).rayMusic[arguments[0].StringValue]; ok {
+			rl.PlayMusicStream((*globalSettings).rayMusic[arguments[0].StringValue])
+		} else {
+			*errMessage = errors.New("Error: Uninitialized music on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func Rl_ums_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if _, ok := (*globalSettings).rayMusic[arguments[0].StringValue]; ok {
+			rl.UpdateMusicStream((*globalSettings).rayMusic[arguments[0].StringValue])
+		} else {
+			*errMessage = errors.New("Error: Uninitialized music on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func Rl_unms_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if _, ok := (*globalSettings).rayMusic[arguments[0].StringValue]; ok {
+			rl.UnloadMusicStream((*globalSettings).rayMusic[arguments[0].StringValue])
+			delete((*globalSettings).rayMusic, arguments[0].StringValue)
+		} else {
+			*errMessage = errors.New("Error: Uninitialized music on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}

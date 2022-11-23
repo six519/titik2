@@ -565,5 +565,20 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//rl_drt(<string>, <integer>, <integer>, <integer>) - raylib draw texture
 		defineFunction(globalFunctionArray, "rl_drt", Rl_drt_execute, 4, true)
+
+		//rl_iad() - raylib init audio device
+		defineFunction(globalFunctionArray, "rl_iad", Rl_iad_execute, 0, true)
+
+		//rl_lms(<string>) - raylib load music stream
+		defineFunction(globalFunctionArray, "rl_lms", Rl_lms_execute, 1, true)
+
+		//rl_pms(<string>) - raylib play music stream
+		defineFunction(globalFunctionArray, "rl_pms", Rl_pms_execute, 1, true)
+
+		//rl_ums(<string>) - raylib update music stream
+		defineFunction(globalFunctionArray, "rl_ums", Rl_ums_execute, 1, true)
+
+		//rl_unms(<string>) - raylib unload music stream
+		defineFunction(globalFunctionArray, "rl_unms", Rl_unms_execute, 1, true)
 	}
 }
