@@ -569,6 +569,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//rl_drt(<string>, <integer>, <integer>, <integer>) - raylib draw texture
 		defineFunction(globalFunctionArray, "rl_drt", Rl_drt_execute, 4, true)
 
+		//rl_drtp(<string>, <float>, <float>, <float>, <float>, <float>, <float>, <float>, <float>, <float>, <float>, <float>, <integer>) - raylib draw texture pro
+		defineFunction(globalFunctionArray, "rl_drtp", Rl_drtp_execute, 13, true)
+
 		//rl_iad() - raylib init audio device
 		defineFunction(globalFunctionArray, "rl_iad", Rl_iad_execute, 0, true)
 

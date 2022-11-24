@@ -206,6 +206,45 @@ func Rl_drt_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
 
+func Rl_drtp_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 12, ARG_TYPE_STRING) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 11, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 10, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 9, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 8, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 7, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 6, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 5, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 4, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 3, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_FLOAT) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		if arguments[0].IntegerValue < 0 || (arguments[0].IntegerValue-1) > len(RAYLIB_COLORS) {
+			*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			if _, ok := (*globalSettings).rayTexture[arguments[12].StringValue]; ok {
+				if arguments[0].IntegerValue < 0 || (arguments[0].IntegerValue-1) > len(RAYLIB_COLORS) {
+					*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+				} else {
+					rl.DrawTexturePro(
+						(*globalSettings).rayTexture[arguments[12].StringValue],
+						rl.NewRectangle(float32(arguments[11].FloatValue), float32(arguments[10].FloatValue), float32(arguments[9].FloatValue), float32(arguments[8].FloatValue)),
+						rl.NewRectangle(float32(arguments[7].FloatValue), float32(arguments[6].FloatValue), float32(arguments[5].FloatValue), float32(arguments[4].FloatValue)),
+						rl.Vector2{float32(arguments[3].FloatValue), float32(arguments[2].FloatValue)},
+						float32(arguments[1].FloatValue),
+						RAYLIB_COLORS[arguments[0].IntegerValue],
+					)
+				}
+			} else {
+				*errMessage = errors.New("Error: Uninitialized texture on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+			}
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
 func Rl_iad_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	rl.InitAudioDevice()
 	return FunctionReturn{Type: RET_TYPE_NONE}
