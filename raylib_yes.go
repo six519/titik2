@@ -296,3 +296,19 @@ func Rl_urt_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 	}
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }
+
+func Rl_btm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if _, ok := (*globalSettings).rayRenderTexture[arguments[0].StringValue]; ok {
+			rl.BeginTextureMode((*globalSettings).rayRenderTexture[arguments[0].StringValue])
+		} else {
+			*errMessage = errors.New("Error: Uninitialized render texture on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func Rl_etm_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	rl.EndTextureMode()
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}

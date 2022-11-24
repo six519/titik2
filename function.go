@@ -587,11 +587,17 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//rl_ikd(<integer>) - raylib is key down
 		defineFunction(globalFunctionArray, "rl_ikd", Rl_ikd_execute, 1, true)
 
-		//rl_lrt(<integer>) - raylib load render texture
+		//rl_lrt(<integer>, <integer>) - raylib load render texture
 		defineFunction(globalFunctionArray, "rl_lrt", Rl_lrt_execute, 2, true)
 
-		//rl_urt(<integer>) - raylib unload render texture
+		//rl_urt(<string>) - raylib unload render texture
 		defineFunction(globalFunctionArray, "rl_urt", Rl_urt_execute, 1, true)
+
+		//rl_btm(<string>) - raylib begin texture mode
+		defineFunction(globalFunctionArray, "rl_btm", Rl_btm_execute, 1, true)
+
+		//rl_etm(<string>) - raylib end texture mode
+		defineFunction(globalFunctionArray, "rl_etm", Rl_etm_execute, 0, true)
 
 	}
 }
