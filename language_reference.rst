@@ -308,6 +308,12 @@ Conversion Functions
     ::
         integer toi(any data type)
 
+- **tof** - convert any data type to float type.
+
+    **Declaration:**
+    ::
+        float tof(any data type)
+
 - **tos** - convert any data type to string type.
 
     **Declaration:**

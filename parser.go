@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 	"unicode"
 	//fmt
@@ -563,7 +564,14 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 								//convert to integer
 								result.Type = TOKEN_TYPE_INTEGER
 								tempLeftInt, _ = strconv.Atoi(leftOperand.Value)
-								tempRightInt, _ = strconv.Atoi(rightOperand.Value)
+
+								if strings.Contains(rightOperand.Value, ".") {
+									//convert to float first then to integer
+									thisFloat, _ := strconv.ParseFloat(rightOperand.Value, 64)
+									tempRightInt = int(thisFloat)
+								} else {
+									tempRightInt, _ = strconv.Atoi(rightOperand.Value)
+								}
 							} else if leftOperand.Type == TOKEN_TYPE_STRING {
 								//string
 								result.Type = TOKEN_TYPE_STRING
@@ -638,7 +646,7 @@ func (parser Parser) Parse(tokenArray []Token, globalVariableArray *[]Variable, 
 										result.Value = strconv.Itoa(tempLeftInt / tempRightInt)
 									} else {
 										//let's assume it's float
-										if tempRightInt == 0 {
+										if tempRightFloat == 0 {
 											return errors.New(SyntaxErrorMessage(rightOperand.Line, rightOperand.Column, "Division by zero", rightOperand.FileName))
 										}
 										result.Value = strconv.FormatFloat(tempLeftFloat/tempRightFloat, 'f', -1, 64)

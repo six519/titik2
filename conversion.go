@@ -7,11 +7,11 @@ import (
 func Toi_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_INTEGER, IntegerValue: 0}
 
-	if(arguments[0].Type == ARG_TYPE_FLOAT) {
+	if arguments[0].Type == ARG_TYPE_FLOAT {
 		ret.IntegerValue = int(arguments[0].FloatValue) + 0
-	} else if(arguments[0].Type == ARG_TYPE_STRING) {
+	} else if arguments[0].Type == ARG_TYPE_STRING {
 		ret.IntegerValue, _ = strconv.Atoi(arguments[0].StringValue)
-	} else if(arguments[0].Type == ARG_TYPE_INTEGER) {
+	} else if arguments[0].Type == ARG_TYPE_INTEGER {
 		ret.IntegerValue = arguments[0].IntegerValue
 	}
 
@@ -21,20 +21,34 @@ func Toi_execute(arguments []FunctionArgument, errMessage *error, globalVariable
 func Tos_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
 
-	if(arguments[0].Type == ARG_TYPE_FLOAT) {
+	if arguments[0].Type == ARG_TYPE_FLOAT {
 		ret.StringValue = strconv.FormatFloat(arguments[0].FloatValue, 'f', -1, 64)
-	} else if(arguments[0].Type == ARG_TYPE_STRING) {
+	} else if arguments[0].Type == ARG_TYPE_STRING {
 		ret.StringValue = arguments[0].StringValue
-	} else if(arguments[0].Type == ARG_TYPE_INTEGER) {
+	} else if arguments[0].Type == ARG_TYPE_INTEGER {
 		ret.StringValue = strconv.Itoa(arguments[0].IntegerValue)
-	} else if(arguments[0].Type == ARG_TYPE_BOOLEAN) {
-		if(arguments[0].BooleanValue) {
+	} else if arguments[0].Type == ARG_TYPE_BOOLEAN {
+		if arguments[0].BooleanValue {
 			ret.StringValue = "true"
 		} else {
 			ret.StringValue = "false"
-		}	
+		}
 	} else {
 		ret.StringValue = ""
+	}
+
+	return ret
+}
+
+func Tof_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_FLOAT, FloatValue: 0}
+
+	if arguments[0].Type == ARG_TYPE_FLOAT {
+		ret.FloatValue = arguments[0].FloatValue
+	} else if arguments[0].Type == ARG_TYPE_STRING {
+		ret.FloatValue, _ = strconv.ParseFloat(arguments[0].StringValue, 64)
+	} else if arguments[0].Type == ARG_TYPE_INTEGER {
+		ret.FloatValue = float64(arguments[0].IntegerValue)
 	}
 
 	return ret

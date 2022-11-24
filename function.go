@@ -166,6 +166,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 	//tos(<anyvar>)
 	defineFunction(globalFunctionArray, "tos", Tos_execute, 1, true)
 
+	//tof(<anyvar>)
+	defineFunction(globalFunctionArray, "tof", Tof_execute, 1, true)
+
 	//len(<lineup>)
 	defineFunction(globalFunctionArray, "len", Len_execute, 1, true)
 
