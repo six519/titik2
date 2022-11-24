@@ -10,6 +10,7 @@ import (
 const RAYLIB_ENABLED bool = false
 
 var RAYLIB_COLORS = []color.RGBA{}
+var RAYLIB_KEYCODES = []int32{}
 
 func Rl_iw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	return FunctionReturn{Type: RET_TYPE_NONE}
@@ -88,5 +89,9 @@ func Rl_ums_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 }
 
 func Rl_unms_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func Rl_ikd_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	return FunctionReturn{Type: RET_TYPE_NONE}
 }

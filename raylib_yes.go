@@ -26,6 +26,22 @@ var RAYLIB_COLORS = []color.RGBA{
 	rl.Gray,
 }
 
+var RAYLIB_KEYCODES = []int32{
+	//keyboard
+	rl.KeySpace,
+	rl.KeyEscape,
+	rl.KeyEnter,
+	rl.KeyRight,
+	rl.KeyLeft,
+	rl.KeyDown,
+	rl.KeyUp,
+	//android
+	rl.KeyBack,
+	rl.KeyMenu,
+	rl.KeyVolumeUp,
+	rl.KeyVolumeDown,
+}
+
 func Rl_iw_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 2, ARG_TYPE_INTEGER) &&
 		validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
@@ -240,4 +256,16 @@ func Rl_unms_execute(arguments []FunctionArgument, errMessage *error, globalVari
 		}
 	}
 	return FunctionReturn{Type: RET_TYPE_NONE}
+}
+
+func Rl_ikd_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_BOOLEAN, BooleanValue: false}
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+		if arguments[0].IntegerValue < 0 || (arguments[0].IntegerValue-1) > len(RAYLIB_KEYCODES) {
+			*errMessage = errors.New("Error: Parameter out of range on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		} else {
+			ret.BooleanValue = rl.IsKeyDown(RAYLIB_KEYCODES[arguments[0].IntegerValue])
+		}
+	}
+	return ret
 }

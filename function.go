@@ -583,5 +583,9 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//rl_lt(<string>) - raylib load texture
 		defineFunction(globalFunctionArray, "rl_lt", Rl_lt_execute, 1, true)
+
+		//rl_ikd(<integer>) - raylib is key down
+		defineFunction(globalFunctionArray, "rl_ikd", Rl_ikd_execute, 1, true)
+
 	}
 }
