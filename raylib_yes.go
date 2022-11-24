@@ -131,6 +131,19 @@ func Rl_ltfi_execute(arguments []FunctionArgument, errMessage *error, globalVari
 	return ret
 }
 
+func Rl_lt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING, StringValue: ""}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		texture := rl.LoadTexture(arguments[0].StringValue)
+		texture_reference := "rltxt_" + generateRandomNumbers()
+		(*globalSettings).rayTexture[texture_reference] = texture
+		ret.StringValue = texture_reference
+	}
+
+	return ret
+}
+
 func Rl_ut_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
 	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
 		if _, ok := (*globalSettings).rayTexture[arguments[0].StringValue]; ok {

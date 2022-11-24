@@ -580,5 +580,8 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 
 		//rl_unms(<string>) - raylib unload music stream
 		defineFunction(globalFunctionArray, "rl_unms", Rl_unms_execute, 1, true)
+
+		//rl_lt(<string>) - raylib load texture
+		defineFunction(globalFunctionArray, "rl_lt", Rl_lt_execute, 1, true)
 	}
 }
