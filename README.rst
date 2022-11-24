@@ -1,6 +1,8 @@
 titik2
 ======
 
+.. image:: http://ferdinandsilva.com/static/titik_logo_small.png
+
 Titik Programming Language/Interpreter Written In Go Lang
 
 Intro
