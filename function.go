@@ -596,8 +596,11 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//rl_btm(<string>) - raylib begin texture mode
 		defineFunction(globalFunctionArray, "rl_btm", Rl_btm_execute, 1, true)
 
-		//rl_etm(<string>) - raylib end texture mode
+		//rl_etm() - raylib end texture mode
 		defineFunction(globalFunctionArray, "rl_etm", Rl_etm_execute, 0, true)
+
+		//rl_gtfrt(<string>) - raylib get texture from render texture
+		defineFunction(globalFunctionArray, "rl_gtfrt", Rl_gtfrt_execute, 1, true)
 
 	}
 }
