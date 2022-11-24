@@ -375,4 +375,32 @@ func initBuiltInVariables(globalVariableArray *[]Variable, globalNativeVarList *
 		defineConstantInteger("S_SC_U", 6, globalVariableArray, globalNativeVarList)
 	}
 
+	if RAYLIB_ENABLED {
+		//raylib colors
+		defineConstantInteger("R_C_RW", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_W", 1, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_BLK", 2, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_BLN", 3, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_M", 4, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_BL", 5, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_R", 6, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_P", 7, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_O", 8, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_Y", 9, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_C_G", 10, globalVariableArray, globalNativeVarList)
+
+		//raylib keycodes
+		defineConstantInteger("R_K_S", 0, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_K_ES", 1, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_K_EN", 2, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_K_R", 3, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_K_L", 4, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_K_D", 5, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_K_U", 6, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_K_B", 7, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_K_M", 8, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_K_VU", 9, globalVariableArray, globalNativeVarList)
+		defineConstantInteger("R_K_VD", 10, globalVariableArray, globalNativeVarList)
+	}
+
 }

@@ -1,3 +1,5 @@
+github.com/gen2brain/raylib-go/raylib v0.0.0-20221117130019-ce3c8e83dd6d h1:X+URitXeDGTT5Ng5LhEG0DPdHq8DDL16dWnJMxgGj+8=
+github.com/gen2brain/raylib-go/raylib v0.0.0-20221117130019-ce3c8e83dd6d/go.mod h1:+NbsqGlEQqGqrsgJFF5Yj2dkvn0ML2SQb8RqM2hJsPU=
 github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
 github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/mattn/go-sqlite3 v1.14.10 h1:MLn+5bFRlWMGoSRmJour3CL1w/qL96mvipqpwQW/Sfk=

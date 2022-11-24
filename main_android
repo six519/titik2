@@ -1,0 +1,46 @@
+package main
+
+import (
+	"fmt"
+	rl "github.com/gen2brain/raylib-go/raylib"
+	"os"
+)
+
+func init() {
+	rl.SetCallbackFunc(main)
+}
+
+func main() {
+	var globalVariableArray []Variable
+	var globalFunctionArray []Function
+	var globalNativeVarList []string
+	var globalSettings GlobalSettingsObject
+	globalSettings = GlobalSettingsObject{}
+	globalSettings.Init(&globalVariableArray, &globalFunctionArray, &globalNativeVarList)
+	initNativeFunctions(&globalFunctionArray)
+	initBuiltInVariables(&globalVariableArray, &globalNativeVarList)
+
+	var gotReturn bool = false
+	var returnToken Token
+	var needBreak bool = false
+	var stackReference []Token
+	var getLastStackBool bool = false
+	var lastStackBool bool = false
+
+	lxr := Lexer{FileName: "android"}
+	lxr.ReadString(tcode)
+
+	tokenArray, tokenErr := lxr.GenerateToken()
+	if tokenErr != nil {
+		fmt.Println(tokenErr)
+		os.Exit(2)
+	}
+
+	prsr := Parser{}
+	parserErr := prsr.Parse(tokenArray, &globalVariableArray, &globalFunctionArray, "main", &globalNativeVarList, &gotReturn, &returnToken, false, &needBreak, &stackReference, &globalSettings, getLastStackBool, &lastStackBool)
+
+	if parserErr != nil {
+		fmt.Println(parserErr)
+		os.Exit(2)
+	}
+}

@@ -1,5 +1,5 @@
-//go:build win && !sdl && !ray
-// +build win,!sdl,!ray
+//go:build win && !sdl && ray
+// +build win,!sdl,ray
 
 package main
 
@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/gen2brain/raylib-go/raylib"
 	"runtime"
 	"syscall"
 	"unsafe"
@@ -26,6 +27,10 @@ type GlobalSettingsObject struct {
 	netUDPConnectionListener map[string]*net.UDPConn
 	mySQLConnection          map[string]*sql.DB
 	fileHandler              map[string]*os.File
+	rayImage                 map[string]*rl.Image
+	rayTexture               map[string]rl.Texture2D
+	rayMusic                 map[string]rl.Music
+	rayRenderTexture         map[string]rl.RenderTexture2D
 
 	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
 }
@@ -47,6 +52,10 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.netUDPConnectionListener = make(map[string]*net.UDPConn)
 	globalSettings.mySQLConnection = make(map[string]*sql.DB)
 	globalSettings.fileHandler = make(map[string]*os.File)
+	globalSettings.rayImage = make(map[string]*rl.Image)
+	globalSettings.rayTexture = make(map[string]rl.Texture2D)
+	globalSettings.rayMusic = make(map[string]rl.Music)
+	globalSettings.rayRenderTexture = make(map[string]rl.RenderTexture2D)
 
 	if runtime.GOOS == "windows" {
 		//get console handle

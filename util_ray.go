@@ -1,16 +1,13 @@
-//go:build win && !sdl && !ray
-// +build win,!sdl,!ray
+//go:build !win && !sdl && ray
+// +build !win,!sdl,ray
 
 package main
 
 import (
 	"database/sql"
+	"github.com/gen2brain/raylib-go/raylib"
 	"net"
 	"os"
-
-	"runtime"
-	"syscall"
-	"unsafe"
 )
 
 type GlobalSettingsObject struct {
@@ -26,8 +23,10 @@ type GlobalSettingsObject struct {
 	netUDPConnectionListener map[string]*net.UDPConn
 	mySQLConnection          map[string]*sql.DB
 	fileHandler              map[string]*os.File
-
-	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
+	rayImage                 map[string]*rl.Image
+	rayTexture               map[string]rl.Texture2D
+	rayMusic                 map[string]rl.Music
+	rayRenderTexture         map[string]rl.RenderTexture2D
 }
 
 func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable, globalFunctionArray *[]Function, globalNativeVarList *[]string) {
@@ -47,13 +46,9 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.netUDPConnectionListener = make(map[string]*net.UDPConn)
 	globalSettings.mySQLConnection = make(map[string]*sql.DB)
 	globalSettings.fileHandler = make(map[string]*os.File)
+	globalSettings.rayImage = make(map[string]*rl.Image)
+	globalSettings.rayTexture = make(map[string]rl.Texture2D)
+	globalSettings.rayMusic = make(map[string]rl.Music)
+	globalSettings.rayRenderTexture = make(map[string]rl.RenderTexture2D)
 
-	if runtime.GOOS == "windows" {
-		//get console handle
-		//for windows
-		kernel32 := syscall.NewLazyDLL("kernel32.dll")
-		getConsoleScreenBufferInfoProc := kernel32.NewProc("GetConsoleScreenBufferInfo")
-		handle, _ := syscall.GetStdHandle(syscall.STD_OUTPUT_HANDLE)
-		_, _, _ = getConsoleScreenBufferInfoProc.Call(uintptr(handle), uintptr(unsafe.Pointer(&globalSettings.consoleInfo)), 0)
-	}
 }

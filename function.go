@@ -524,4 +524,89 @@ func initNativeFunctions(globalFunctionArray *[]Function) {
 		//s_li(<string>) - sdl load image
 		defineFunction(globalFunctionArray, "s_li", S_li_execute, 1, true)
 	}
+
+	//RAYLIB FUNCTIONALITIES
+	if RAYLIB_ENABLED {
+		//rl_iw(<integer>, <integer>, <string>) - raylib init window
+		defineFunction(globalFunctionArray, "rl_iw", Rl_iw_execute, 3, true)
+
+		//rl_scw() - raylib window should close
+		defineFunction(globalFunctionArray, "rl_scw", Rl_scw_execute, 0, true)
+
+		//rl_cw() - raylib close window
+		defineFunction(globalFunctionArray, "rl_cw", Rl_cw_execute, 0, true)
+
+		//rl_bd() - raylib begin drawing
+		defineFunction(globalFunctionArray, "rl_bd", Rl_bd_execute, 0, true)
+
+		//rl_ed() - raylib end drawing
+		defineFunction(globalFunctionArray, "rl_ed", Rl_ed_execute, 0, true)
+
+		//rl_cb(<integer>) - raylib clear background
+		defineFunction(globalFunctionArray, "rl_cb", Rl_cb_execute, 1, true)
+
+		//rl_stf(<integer>) - raylib set target fps
+		defineFunction(globalFunctionArray, "rl_stf", Rl_stf_execute, 1, true)
+
+		//rl_li(<string>) - raylib load image
+		defineFunction(globalFunctionArray, "rl_li", Rl_li_execute, 1, true)
+
+		//rl_ui(<string>) - raylib unload image
+		defineFunction(globalFunctionArray, "rl_ui", Rl_ui_execute, 1, true)
+
+		//rl_dt(<string>, <integer>, <integer>, <integer>, <integer>) - raylib draw text
+		defineFunction(globalFunctionArray, "rl_dt", Rl_dt_execute, 5, true)
+
+		//rl_ltfi(<string>) - raylib load texture from image
+		defineFunction(globalFunctionArray, "rl_ltfi", Rl_ltfi_execute, 1, true)
+
+		//rl_ut(<string>) - raylib unload texture
+		defineFunction(globalFunctionArray, "rl_ut", Rl_ut_execute, 1, true)
+
+		//rl_gvt(<string>) - raylib get texture dimensions
+		defineFunction(globalFunctionArray, "rl_gvt", Rl_gvt_execute, 1, true)
+
+		//rl_drt(<string>, <integer>, <integer>, <integer>) - raylib draw texture
+		defineFunction(globalFunctionArray, "rl_drt", Rl_drt_execute, 4, true)
+
+		//rl_drtp(<string>, <float>, <float>, <float>, <float>, <float>, <float>, <float>, <float>, <float>, <float>, <float>, <integer>) - raylib draw texture pro
+		defineFunction(globalFunctionArray, "rl_drtp", Rl_drtp_execute, 13, true)
+
+		//rl_iad() - raylib init audio device
+		defineFunction(globalFunctionArray, "rl_iad", Rl_iad_execute, 0, true)
+
+		//rl_lms(<string>) - raylib load music stream
+		defineFunction(globalFunctionArray, "rl_lms", Rl_lms_execute, 1, true)
+
+		//rl_pms(<string>) - raylib play music stream
+		defineFunction(globalFunctionArray, "rl_pms", Rl_pms_execute, 1, true)
+
+		//rl_ums(<string>) - raylib update music stream
+		defineFunction(globalFunctionArray, "rl_ums", Rl_ums_execute, 1, true)
+
+		//rl_unms(<string>) - raylib unload music stream
+		defineFunction(globalFunctionArray, "rl_unms", Rl_unms_execute, 1, true)
+
+		//rl_lt(<string>) - raylib load texture
+		defineFunction(globalFunctionArray, "rl_lt", Rl_lt_execute, 1, true)
+
+		//rl_ikd(<integer>) - raylib is key down
+		defineFunction(globalFunctionArray, "rl_ikd", Rl_ikd_execute, 1, true)
+
+		//rl_lrt(<integer>, <integer>) - raylib load render texture
+		defineFunction(globalFunctionArray, "rl_lrt", Rl_lrt_execute, 2, true)
+
+		//rl_urt(<string>) - raylib unload render texture
+		defineFunction(globalFunctionArray, "rl_urt", Rl_urt_execute, 1, true)
+
+		//rl_btm(<string>) - raylib begin texture mode
+		defineFunction(globalFunctionArray, "rl_btm", Rl_btm_execute, 1, true)
+
+		//rl_etm() - raylib end texture mode
+		defineFunction(globalFunctionArray, "rl_etm", Rl_etm_execute, 0, true)
+
+		//rl_gtfrt(<string>) - raylib get texture from render texture
+		defineFunction(globalFunctionArray, "rl_gtfrt", Rl_gtfrt_execute, 1, true)
+
+	}
 }
