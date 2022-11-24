@@ -269,3 +269,30 @@ func Rl_ikd_execute(arguments []FunctionArgument, errMessage *error, globalVaria
 	}
 	return ret
 }
+
+func Rl_lrt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	ret := FunctionReturn{Type: RET_TYPE_STRING}
+
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 1, ARG_TYPE_INTEGER) &&
+		validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_INTEGER) {
+
+		render_texture := rl.LoadRenderTexture(int32(arguments[1].IntegerValue), int32(arguments[0].IntegerValue))
+		render_texture_reference := "rlrtxt_" + generateRandomNumbers()
+		(*globalSettings).rayRenderTexture[render_texture_reference] = render_texture
+		ret.StringValue = render_texture_reference
+	}
+
+	return ret
+}
+
+func Rl_urt_execute(arguments []FunctionArgument, errMessage *error, globalVariableArray *[]Variable, globalFunctionArray *[]Function, scopeName string, globalNativeVarList *[]string, globalSettings *GlobalSettingsObject, line_number int, column_number int, file_name string) FunctionReturn {
+	if validateParameters(arguments, errMessage, line_number, column_number, file_name, 0, ARG_TYPE_STRING) {
+		if _, ok := (*globalSettings).rayRenderTexture[arguments[0].StringValue]; ok {
+			rl.UnloadRenderTexture((*globalSettings).rayRenderTexture[arguments[0].StringValue])
+			delete((*globalSettings).rayRenderTexture, arguments[0].StringValue)
+		} else {
+			*errMessage = errors.New("Error: Uninitialized render texture on line number " + strconv.Itoa(line_number) + " and column number " + strconv.Itoa(column_number) + ", Filename: " + file_name)
+		}
+	}
+	return FunctionReturn{Type: RET_TYPE_NONE}
+}

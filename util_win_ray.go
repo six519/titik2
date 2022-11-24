@@ -30,6 +30,7 @@ type GlobalSettingsObject struct {
 	rayImage                 map[string]*rl.Image
 	rayTexture               map[string]rl.Texture2D
 	rayMusic                 map[string]rl.Music
+	rayRenderTexture         map[string]rl.RenderTexture2D
 
 	consoleInfo CONSOLE_SCREEN_BUFFER_INFO //for windows only
 }
@@ -54,6 +55,7 @@ func (globalSettings *GlobalSettingsObject) Init(globalVariableArray *[]Variable
 	globalSettings.rayImage = make(map[string]*rl.Image)
 	globalSettings.rayTexture = make(map[string]rl.Texture2D)
 	globalSettings.rayMusic = make(map[string]rl.Music)
+	globalSettings.rayRenderTexture = make(map[string]rl.RenderTexture2D)
 
 	if runtime.GOOS == "windows" {
 		//get console handle
